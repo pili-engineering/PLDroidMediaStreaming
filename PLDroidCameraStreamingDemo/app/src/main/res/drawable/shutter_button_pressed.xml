@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    >
+    <item android:drawable="@drawable/white_ring"/>
+
+    <item android:left="@dimen/pldroid_streaming_red_square_padding" android:right="@dimen/pldroid_streaming_red_square_padding" android:bottom="@dimen/pldroid_streaming_red_square_padding"
+        android:top="@dimen/pldroid_streaming_red_square_padding" android:drawable="@drawable/red_square"/>
+
+</layer-list>

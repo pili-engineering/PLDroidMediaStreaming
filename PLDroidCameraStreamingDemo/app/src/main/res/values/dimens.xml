@@ -1,0 +1,14 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+
+    <dimen name="pldroid_streaming_activity_horizontal_margin">0dp</dimen>
+    <dimen name="pldroid_streaming_activity_vertical_margin">0dp</dimen>
+    <dimen name="pldroid_streaming_item_padding">12dp</dimen>
+    <dimen name="pldroid_streaming_ring_size">72dp</dimen>
+    <dimen name="pldroid_streaming_ring_width">6dip</dimen>
+    <dimen name="pldroid_streaming_square_corner_radius">8dip</dimen>
+    <dimen name="pldroid_streaming_red_circle_padding">8dip</dimen>
+    <dimen name="pldroid_streaming_red_square_padding">16dip</dimen>
+</resources>
