@@ -35,12 +35,6 @@ public class CameraStreamingActivity extends Activity implements CameraStreaming
 
     private String mStatusMsgContent;
 
-    private static final String STREAM_PUBLISH_HOST = "publish host from pili";
-    private static final String STREAM_HUB_NAME = "hub name from pili";
-    private static final String STREAM_ID = "stream id from pili";
-    private static final String STREAM_PUBLISH_KEY = "publish key from pili";
-    private static final String STREAM_PUBLISH_SECURITY = "dynamic or static";
-
     private static final int MSG_UPDATE_SHUTTER_BUTTON_STATE = 0;
 
     private Handler mHandler = new Handler(Looper.getMainLooper()) {
@@ -80,7 +74,13 @@ public class CameraStreamingActivity extends Activity implements CameraStreaming
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 //        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 //
-        Stream stream = new Stream(STREAM_PUBLISH_HOST, STREAM_HUB_NAME, STREAM_ID, STREAM_PUBLISH_KEY, STREAM_PUBLISH_SECURITY);
+        // get the followings from server
+        String publishHost = "publish host from server";         // such as "f9zdwh.pub.z1.pili.qiniup.com"
+        String streamId = "stream id from server";               // such as "z1.live.558cf018e3ba570400000010"
+        String publishKey = "publish key from server";           // such as "c4da83f14319d349"
+        String publishSecurity = "publish security from server"; // such as "dynamic" or "static", "dynamic" is recommended 
+
+        Stream stream = new Stream(publishHost, streamId, publishKey, publishSecurity);
         StreamingProfile profile = new StreamingProfile();
         profile.setQuality(StreamingProfile.QUALITY_LOW1)
                 .setStream(stream);
