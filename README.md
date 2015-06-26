@@ -174,10 +174,13 @@ protected void onDestroy() {
 
 ### 版本历史
 * 1.0.1 ([Release Notes][5])
-发布 PLDroidCameraStreaming v1.0.1
-* 1.0.0 ([Release Notes][4])
+  - 发布 pldroid-camera-streaming-1.0.1.jar
+  - 更新 Stream 类结构
+  - 更新 Stream 的构造方式
 
-发布 PLDroidCameraStreaming v1.0.0
+* 1.0.0 ([Release Notes][4])
+  - 发布 PLDroidCameraStreaming v1.0.0
+
 
 [1]: /PLDroidCameraStreamingDemo
 [2]: /PLDroidCameraStreamingDemo/app/src/main/AndroidManifest.xml
