@@ -8,7 +8,6 @@ PLDroidCameraStreaming 是一个适用于 Android 推送直播流的 SDK，可�
   - [权限](#权限)
   - [示例代码](#示例代码)
 - [依赖库](#依赖库)
-- [感谢](#感谢)
 - [版本历史](#版本历史)
 
 ## 功能特性
@@ -173,16 +172,12 @@ protected void onDestroy() {
 ### 依赖库
 - FFMPEG
 
-### 感谢
-- 感谢 Google 的开源项目 [grafika][4]
-
 ### 版本历史
-* 1.0.0 ([Release Notes][5])
+* 1.0.0 ([Release Notes][4])
 
 发布 PLDroidCameraStreaming v1.0.0
 
 [1]: /PLDroidCameraStreamingDemo
 [2]: /PLDroidCameraStreamingDemo/app/src/main/AndroidManifest.xml
 [3]: /PLDroidCameraStreamingDemo/app/src/main/java/com/pili/pldroid/streaming/camera/demo/CameraStreamingActivity.java
-[4]: https://github.com/google/grafika
-[5]: /ReleaseNotes/release-notes-1.0.0.md
+[4]: /ReleaseNotes/release-notes-1.0.0.md
