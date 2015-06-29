@@ -69,24 +69,69 @@ GLSurfaceView glSurfaceView = (GLSurfaceView) findViewById(R.id.cameraPreview_su
 
 3) 实例化并初始化 `StreamingProfile`、`Stream`、`CameraStreamingSetting`
 
-配置 `Stream` 各项参数，SDK 会通过 `Stream` 对象生成必要的推流信息。
+`streamJsonStrFromServer` 是由服务端返回的一段 JSON String，该 JSON String 描述了 `Stream` 的结构。通常，您可以使用 Pili 服务端 SDK 的 `getStream(streamId)` 方法来获取一个 `Stream` 对象，在服务端并将该对象以 JSON String 格式输出，该输出即是 `streamJsonStrFromServer` 变量的内容。例如，一段 JSON 格式的 `Stream` 内容如下：
 
->注意以下配置为 `Stream` 对象构造所必需，若参数非法，将会得到 `java.lang.IllegalArgumentException` 
-
-```JAVA
-// get the followings from server
-String publishHost = "publish host from server";         // such as "f9zdwh.pub.z1.pili.qiniup.com"
-String streamId = "stream id from server";               // such as "z1.live.558cf018e3ba570400000010"
-String publishKey = "publish key from server";           // such as "c4da83f14319d349"
-String publishSecurity = "publish security from server"; // such as "dynamic" or "static", "dynamic" is recommended 
 ```
+{
+    "id": "xxx",
+    "hub": "live",
+    "title": "xxx",
+    "publishKey": "xxx",
+    "publishSecurity": "xxx",
+    // ...
+}
+```
+然后根据 `streamJsonStrFromServer` 构造 `JSONObject` 类型的对象 `streamJson`。
 
 ```JAVA
-Stream stream = new Stream(publishHost, streamId, publishKey, publishSecurity);
+// Get publish host from your server
+String publishHost = "publish host from server";  // such as "f9zdwh.pub.z1.pili.qiniup.com"
+/*
+*
+* You should get the streamJson from your server, maybe like this:
+*
+* Step 1: Get streamJsonStrFromServer from server
+* URL url = new URL(yourURL);
+* URLConnection conn = url.openConnection();
+*
+* HttpURLConnection httpConn = (HttpURLConnection) conn;
+* httpConn.setAllowUserInteraction(false);
+* httpConn.setInstanceFollowRedirects(true);
+* httpConn.setRequestMethod("GET");
+* httpConn.connect();
+*
+* InputStream is = httpConn.getInputStream();
+* streamJsonStrFromServer = convertInputStreamToString(is);
+*
+* Step 2: Instantiate streamJson object
+* JSONObject streamJson = new JSONObject(streamJsonStrFromServer);
+*
+*
+* Then you can use streamJson to instantiate stream object
+* Stream stream = new Stream(streamJson);
+*
+* */
+String streamJsonStrFromServer = "{"
+        + "\"id\"             :\"z1.live.55910c19fb16df0cbf00af8e\", "
+        + "\"hub\"            :\"live\", "
+        + "\"title\"          :\"55910c19fb16df0cbf00af8e\", "
+        + "\"publishKey\"     :\"b06c7427b454762c\", "
+        + "\"publishSecurity\":\"dynamic\", "
+        + "..."
+        + "}";
+
+JSONObject streamJson = null;
+try {
+    streamJson = new JSONObject(streamJsonStrFromServer);
+} catch (JSONException e) {
+    e.printStackTrace();
+}
+        
+Stream stream = new Stream(streamJson);
 
 StreamingProfile profile = new StreamingProfile();
 profile.setQuality(StreamingProfile.QUALITY_MEDIUM1)
-       .setStream(stream);
+       .setStreamAndPublishhost(stream, publishHost);
 
 CameraStreamingSetting setting = new CameraStreamingSetting();
 setting.setCameraId(Camera.CameraInfo.CAMERA_FACING_BACK)
@@ -136,6 +181,7 @@ mCameraStreamingManager.setStreamingStateListener(this);
 
 5) 开始推流
 ```JAVA
+// should be invoked after getting STATE.READY message
 mCameraStreamingManager.startStreaming();
 ```
 
@@ -173,10 +219,17 @@ protected void onDestroy() {
 - FFMPEG
 
 ### 版本历史
+* 1.0.2 ([Release Notes][6])
+  - 发布 pldroid-camera-streaming-1.0.2.jar
+  - 修复无 `StreamingStateListener` 情况下的 Crash 问题
+  - 修复正常启动后无 READY 消息返回问题
+  - 更新 `Stream` 定义，并与服务端保持一致
+  - 增加相机正常启动后即开始推流功能
+  
 * 1.0.1 ([Release Notes][5])
   - 发布 pldroid-camera-streaming-1.0.1.jar
-  - 更新 Stream 类结构
-  - 更新 Stream 的构造方式
+  - 更新 `Stream` 类结构
+  - 更新 `Stream` 的构造方式
 
 * 1.0.0 ([Release Notes][4])
   - 发布 PLDroidCameraStreaming v1.0.0
@@ -187,3 +240,4 @@ protected void onDestroy() {
 [3]: /PLDroidCameraStreamingDemo/app/src/main/java/com/pili/pldroid/streaming/camera/demo/CameraStreamingActivity.java
 [4]: /ReleaseNotes/release-notes-1.0.0.md
 [5]: /ReleaseNotes/release-notes-1.0.1.md
+[6]: /ReleaseNotes/release-notes-1.0.2.md
