@@ -73,11 +73,11 @@ GLSurfaceView glSurfaceView = (GLSurfaceView) findViewById(R.id.cameraPreview_su
 
 ```
 {
-    "id": "xxx",
+    "id": "z1.live.55920c19fb16df0cbf00af8e",
     "hub": "live",
-    "title": "xxx",
-    "publishKey": "xxx",
-    "publishSecurity": "xxx",
+    "title": "55910c13fb16df0cbf00af8e",
+    "publishKey": "b06c7427b454762e",
+    "publishSecurity": "dynamic",
     // ...
 }
 ```
