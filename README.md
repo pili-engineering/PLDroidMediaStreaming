@@ -111,14 +111,7 @@ String publishHost = "publish host from server";  // such as "f9zdwh.pub.z1.pili
 * Stream stream = new Stream(streamJson);
 *
 * */
-String streamJsonStrFromServer = "{"
-        + "\"id\"             :\"z1.live.55910c19fb16df0cbf00af8e\", "
-        + "\"hub\"            :\"live\", "
-        + "\"title\"          :\"55910c19fb16df0cbf00af8e\", "
-        + "\"publishKey\"     :\"b06c7427b454762c\", "
-        + "\"publishSecurity\":\"dynamic\", "
-        + "..."
-        + "}";
+String streamJsonStrFromServer = "stream json string from your server";
 
 JSONObject streamJson = null;
 try {
