@@ -1,5 +1,6 @@
 # PLDroidCameraStreaming
-PLDroidCameraStreaming 是一个适用于 Android 推送直播流的 SDK，可高度定制化和二次开发，支持 RTMP 推流以及 H.264 / AAC 硬编码。
+
+PLDroidCameraStreaming 是一个适用于 Android 的 RTMP 直播推流 SDK，可高度定制化和二次开发。特色是支持 Android Camera 画面捕获并进行 H.264 硬编码， 以及支持 Android 麦克风音频采样并进行 AAC 硬编码；同时，还实现了一套可供开发者选择的编码参数集合，以便灵活调节相应的分辨率和码率。借助 PLDroidCameraStreaming ，开发者可以快速构建一款类似 [Meerkat](https://meerkatapp.co/) 或 [Periscope](https://www.periscope.tv/) 的 Android 直播应用。
 
 # 内容摘要
 - [功能特性](#功能特性)
