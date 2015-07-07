@@ -5,9 +5,16 @@
     <string name="action_settings">Settings</string>
     <string name="start">Start</string>
 
+    <string name="camera_streaming_txt">Camera Streaming</string>
+    <string name="pure_audio_streaming_txt">Audio Streaming</string>
+
     <string name="string_state_ready">READY</string>
     <string name="string_state_preparing">PREPARING</string>
     <string name="string_state_connecting">CONNECTING</string>
     <string name="string_state_streaming">STREAMING</string>
     <string name="string_state_netblocking">NETBLOCKING, STOPPING</string>
+    <string name="title_activity_audio_streaming">AudioStreamingActivity</string>
+
+    <string name="flash_light_on">ON</string>
+    <string name="flash_light_off">OFF</string>
 </resources>

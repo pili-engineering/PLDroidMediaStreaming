@@ -30,6 +30,11 @@
             android:name=".CameraStreamingActivity"
             android:theme="@android:style/Theme.Holo.Light.NoActionBar.Fullscreen" >
         </activity>
+        <activity
+            android:name=".AudioStreamingActivity"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar.Fullscreen"
+            android:label="@string/title_activity_audio_streaming" >
+        </activity>
     </application>
 
 </manifest>
