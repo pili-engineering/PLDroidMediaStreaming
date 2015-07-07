@@ -21,6 +21,8 @@ PLDroidCameraStreaming 是一个适用于 Android 的 RTMP 直播推流 SDK，�
 7. Android Min API 18 
 8. 支持前后置摄像头 
 9. 支持自动对焦
+10. 支持闪光灯操作
+11. 支持纯音频推流，以及后台运行
 
 ## 使用方法
 ### 项目配置
@@ -129,11 +131,13 @@ profile.setQuality(StreamingProfile.QUALITY_MEDIUM1)
 
 CameraStreamingSetting setting = new CameraStreamingSetting();
 setting.setCameraId(Camera.CameraInfo.CAMERA_FACING_BACK)
+       .setContinuousFocusModeEnabled(true)
        .setStreamingProfile(profile)
-       .setCameraPreviewSize(1280, 720);
+       .setCameraPrvSizeLevel(CameraStreamingSetting.PREVIEW_SIZE_LEVEL.MEDIUM)
+       .setCameraPrvSizeRatio(CameraStreamingSetting.PREVIEW_SIZE_RATIO.RATIO_4_3);
 ```
 
-目前 SDK 预定义的 Quality 列表：
+- SDK 预定义的 Quality 列表：
 ```JAVA
 public static final int QUALITY_LOW1;
 public static final int QUALITY_LOW2;
@@ -147,17 +151,41 @@ public static final int QUALITY_HIGH2;
 public static final int QUALITY_HIGH3;
 ```
 
+- SDK 预定义的 preivew size level 列表：
+```
+CameraStreamingSetting.PREVIEW_SIZE_LEVEL.SMALL
+CameraStreamingSetting.PREVIEW_SIZE_LEVEL.MEDIUM
+CameraStreamingSetting.PREVIEW_SIZE_LEVEL.LARGE
+```
+
+- SDK 预定义的 preview size ratio 列表：
+```
+CameraStreamingSetting.PREVIEW_SIZE_RATIO.RATIO_4_3
+CameraStreamingSetting.PREVIEW_SIZE_RATIO.RATIO_16_9
+```
+
+SDK 会根据您设置的 ratio 、 level 从系统支持的 preview size 列表中找到最佳的 size
+
 >若缺少上述步骤，SDK 默认使用如下设置：
 ```
-Camera Id   : Camera.CameraInfo.CAMERA_FACING_BACK
-Publish Url : Environment.getExternalStorageDirectory().getAbsolutePath() + "/pldroid-recording.mp4"
-Quality     : StreamingProfile.QUALITY_MEDIUM1
-Preview Size: 640X480
+Camera Id      : Camera.CameraInfo.CAMERA_FACING_BACK
+Publish Url    : Environment.getExternalStorageDirectory().getAbsolutePath() + "/pldroid-recording.mp4"
+Quality        : StreamingProfile.QUALITY_MEDIUM1
+Prv Size Level : MEDIUM
+Prv Size Ratio : RATIO_16_9
 ```
 
 4) 实例化并初始化核心类 `CameraStreamingManager`
+- Camera Streaming
 ```JAVA
 mCameraStreamingManager = new CameraStreamingManager(this, afl, glSurfaceView);
+mCameraStreamingManager.onPrepare(setting);
+mCameraStreamingManager.setStreamingStateListener(this);
+```
+
+- Pure Audio Streaming
+```JAVA
+mCameraStreamingManager = new CameraStreamingManager(this);
 mCameraStreamingManager.onPrepare(setting);
 mCameraStreamingManager.setStreamingStateListener(this);
 ```
@@ -209,10 +237,26 @@ protected void onDestroy() {
 }
 ```
 
+>纯音频推流支持后台运行，你只需要控制好 `onPause()` 及 `onDestory()` 周期函数即可。
+
 ### 依赖库
 - FFMPEG
 
 ### 版本历史
+* 1.1.0 ([Release Notes][7])
+  - 发布 pldroid-camera-streaming-1.1.0.jar
+  - 更新 libpldroid_ffmpegbridge.so
+  - 优化 ffmpegbridge 模块，降低 libpldroid_ffmpegbridge.so 文件大小
+  - 添加纯音频推流支持：添加纯音频推流 `CameraStreamingManager(Context ctx)` 构造函数
+  - 纯音频推流支持后台运行
+  - 添加 preview size 设定接口：`setCameraPrvSizeLevel` 及 `setCameraPrvSizeRatio`
+  - 添加 torch 操作接口： `turnLightOn` 及 `turnLightOff`
+  - 添加控制连续自动对焦的接口：`setContinuousFocusModeEnabled`
+  - 废弃 `setCameraPreviewSize` 接口
+  - 修复部分机型因 preivew size 不支持而导致的 crash 问题
+  - 添加 `AudioStreamingActivity` 及 `StreamingBaseActivity`，用来演示纯音频推流
+  - 添加 torch 操作演示代码
+
 * 1.0.2 ([Release Notes][6])
   - 发布 pldroid-camera-streaming-1.0.2.jar
   - 修复无 `StreamingStateListener` 情况下的 Crash 问题
@@ -235,3 +279,4 @@ protected void onDestroy() {
 [4]: /ReleaseNotes/release-notes-1.0.0.md
 [5]: /ReleaseNotes/release-notes-1.0.1.md
 [6]: /ReleaseNotes/release-notes-1.0.2.md
+[7]: /ReleaseNotes/release-notes-1.1.0.md
