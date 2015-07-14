@@ -22,12 +22,21 @@
     </com.pili.pldroid.streaming.widget.AspectFrameLayout>
 
     <Button
+        android:id="@+id/camera_switch_btn"
+        android:layout_marginTop="@dimen/pldroid_streaming_item_padding"
+        android:layout_centerHorizontal="true"
+        android:textColor="@color/pldroid_streaming_white"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <Button
         android:id="@+id/torch_btn"
         android:layout_marginTop="@dimen/pldroid_streaming_item_padding"
         android:layout_alignParentRight="true"
         android:layout_marginRight="@dimen/pldroid_streaming_item_padding"
         android:textColor="@color/pldroid_streaming_white"
         android:text="@string/flash_light_on"
+        android:visibility="gone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
