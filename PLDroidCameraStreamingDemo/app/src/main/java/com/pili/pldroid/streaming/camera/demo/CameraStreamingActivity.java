@@ -3,6 +3,7 @@ package com.pili.pldroid.streaming.camera.demo;
 import android.hardware.Camera;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -21,6 +22,7 @@ public class CameraStreamingActivity extends StreamingBaseActivity {
 
     private Button mTorchBtn;
     private boolean mIsTorchOn = false;
+    private Button mCameraSwitchBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,17 +36,18 @@ public class CameraStreamingActivity extends StreamingBaseActivity {
 
         mSatusTextView = (TextView) findViewById(R.id.streamingStatus);
         mTorchBtn = (Button) findViewById(R.id.torch_btn);
+        mCameraSwitchBtn = (Button) findViewById(R.id.camera_switch_btn);
 
         Stream stream = new Stream(mJSONObject);
         StreamingProfile profile = new StreamingProfile();
         profile.setQuality(StreamingProfile.QUALITY_LOW1)
-                .setStreamAndPublishhost(stream, mPublishHost);
+                .setStream(stream);
 
         CameraStreamingSetting setting = new CameraStreamingSetting();
         setting.setCameraId(Camera.CameraInfo.CAMERA_FACING_BACK)
                 .setContinuousFocusModeEnabled(true)
                 .setStreamingProfile(profile)
-                .setCameraPrvSizeLevel(CameraStreamingSetting.PREVIEW_SIZE_LEVEL.SMALL)
+                .setCameraPrvSizeLevel(CameraStreamingSetting.PREVIEW_SIZE_LEVEL.MEDIUM)
                 .setCameraPrvSizeRatio(CameraStreamingSetting.PREVIEW_SIZE_RATIO.RATIO_4_3);
 
         mCameraStreamingManager = new CameraStreamingManager(this, afl, glSurfaceView);
@@ -76,6 +79,18 @@ public class CameraStreamingActivity extends StreamingBaseActivity {
                 }).start();
             }
         });
+
+        mCameraSwitchBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mCameraStreamingManager.switchCamera();
+                    }
+                }).start();
+            }
+        });
     }
 
     private void setTorchEnabled(final boolean enabled) {
@@ -87,4 +102,30 @@ public class CameraStreamingActivity extends StreamingBaseActivity {
             }
         });
     }
+
+    @Override
+    public void onStateChanged(final int state, Object extra) {
+        super.onStateChanged(state, extra);
+        switch (state) {
+            case CameraStreamingManager.STATE.CAMERA_SWITCHED:
+                mShutterButtonPressed = false;
+                if (extra != null) {
+                    Log.i(TAG, "current camera id:" + (Integer)extra);
+                }
+                Log.i(TAG, "camera switched");
+                break;
+            case CameraStreamingManager.STATE.TORCH_INFO:
+                if (extra != null) {
+                    boolean isSupportedTorch = (Boolean) extra;
+                    Log.i(TAG, "isSupportedTorch=" + isSupportedTorch);
+                    if (isSupportedTorch) {
+                        mTorchBtn.setVisibility(View.VISIBLE);
+                    } else {
+                        mTorchBtn.setVisibility(View.GONE);
+                    }
+                }
+                break;
+        }
+    }
+
 }

@@ -19,7 +19,7 @@ PLDroidCameraStreaming 是一个适用于 Android 的 RTMP 直播推流 SDK，�
 5. 支持 RTMP 协议推流
 6. 支持 ARMv7a 
 7. Android Min API 18 
-8. 支持前后置摄像头 
+8. 支持前后置摄像头，以及动态切换 
 9. 支持自动对焦
 10. 支持闪光灯操作
 11. 支持纯音频推流，以及后台运行
@@ -81,14 +81,19 @@ GLSurfaceView glSurfaceView = (GLSurfaceView) findViewById(R.id.cameraPreview_su
     "title": "55910c13fb16df0cbf00af8e",
     "publishKey": "b06c7427b454762e",
     "publishSecurity": "dynamic",
+    "hosts" : {
+        "publish" : "xxx.pub.z1.pili.qiniup.com",
+        "play"    : {
+            "hls"    : "xxx.hls1.z1.pili.qiniucdn.com",
+            "rtmp"   : "xxx.live1.z1.pili.qiniucdn.com"
+        }
+    }
     // ...
 }
 ```
 然后根据 `streamJsonStrFromServer` 构造 `JSONObject` 类型的对象 `streamJson`。
 
 ```JAVA
-// Get publish host from your server
-String publishHost = "publish host from server";  // such as "f9zdwh.pub.z1.pili.qiniup.com"
 /*
 *
 * You should get the streamJson from your server, maybe like this:
@@ -127,7 +132,7 @@ Stream stream = new Stream(streamJson);
 
 StreamingProfile profile = new StreamingProfile();
 profile.setQuality(StreamingProfile.QUALITY_MEDIUM1)
-       .setStreamAndPublishhost(stream, publishHost);
+       .setStream(stream);
 
 CameraStreamingSetting setting = new CameraStreamingSetting();
 setting.setCameraId(Camera.CameraInfo.CAMERA_FACING_BACK)
@@ -198,6 +203,8 @@ mCameraStreamingManager.setStreamingStateListener(this);
 - STATE.SHUTDOWN
 - STATE.IOERROR
 - STATE.NETBLOCKING
+- STATE.CAMERA_SWITCHED
+- STATE.TORCH_INFO
 
 >您需要注意的是，`onStateChanged` 回调函数可能被非 UI 线程调用，可参考 [CameraStreamingActivity][3] 
 
@@ -243,6 +250,22 @@ protected void onDestroy() {
 - FFMPEG
 
 ### 版本历史
+* 1.2.0 ([Release Notes][8])
+  - 发布 pldroid-camera-streaming-1.2.0.jar
+  - 更新 libpldroid_ffmpegbridge.so
+  - 更新 Stream 设置接口：`setStream(stream)`
+  - 添加 Camera 切换接口：`switchCamera`
+  - 修复 Android L crash 问题
+  - 添加 Camera 切换状态：`STATE.CAMERA_SWITCHED`
+  - 添加 Torch 是否支持状态：`STATE.TORCH_INFO`
+  - 更新状态回调接口：`onStateChanged(state, extra)`
+  - 修复特殊操作的概率性 crash 问题
+  - 修复部分机型 `turnLightOn` 及 `turnLightOff` 接口无效问题
+  - 修复部分机型点击 Home 按键 crash 问题
+  - 修复部分机型因 `PREVIEW_SIZE_LEVEL` 导致 crash 问题
+  - 添加 Camera 切换操作演示代码
+  - 更新 Torch 组件显示逻辑
+
 * 1.1.0 ([Release Notes][7])
   - 发布 pldroid-camera-streaming-1.1.0.jar
   - 更新 libpldroid_ffmpegbridge.so
@@ -280,3 +303,4 @@ protected void onDestroy() {
 [5]: /ReleaseNotes/release-notes-1.0.1.md
 [6]: /ReleaseNotes/release-notes-1.0.2.md
 [7]: /ReleaseNotes/release-notes-1.1.0.md
+[8]: /ReleaseNotes/release-notes-1.2.0.md

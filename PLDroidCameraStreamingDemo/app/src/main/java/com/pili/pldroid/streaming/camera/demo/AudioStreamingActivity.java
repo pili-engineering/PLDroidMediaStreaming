@@ -23,7 +23,7 @@ public class AudioStreamingActivity extends StreamingBaseActivity {
 
         StreamingProfile.Stream stream = new StreamingProfile.Stream(mJSONObject);
         StreamingProfile profile = new StreamingProfile();
-            profile.setStreamAndPublishhost(stream, mPublishHost);
+            profile.setStream(stream);
 
         CameraStreamingSetting setting = new CameraStreamingSetting();
         setting.setStreamingProfile(profile);

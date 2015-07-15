@@ -34,7 +34,6 @@ public class StreamingBaseActivity extends Activity implements CameraStreamingMa
     protected CameraStreamingManager mCameraStreamingManager;
 
     protected JSONObject mJSONObject;
-    protected String mPublishHost;
 
     protected Handler mHandler = new Handler(Looper.getMainLooper()) {
         @Override
@@ -68,8 +67,6 @@ public class StreamingBaseActivity extends Activity implements CameraStreamingMa
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        // Get publish host from your server
-        String publishHost = "y9vt63.pub.z1.pili.qiniup.com";
        /*
         * You should get the streamJson from your server, maybe like this:
         *
@@ -96,7 +93,6 @@ public class StreamingBaseActivity extends Activity implements CameraStreamingMa
         * */
         String streamJsonStrFromServer = "stream json string from your server";
 
-        mPublishHost = publishHost;
         try {
             mJSONObject = new JSONObject(streamJsonStrFromServer);
         } catch (JSONException e) {
@@ -113,6 +109,7 @@ public class StreamingBaseActivity extends Activity implements CameraStreamingMa
     @Override
     protected void onPause() {
         super.onPause();
+        mShutterButtonPressed = false;
         mCameraStreamingManager.onPause();
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
@@ -124,7 +121,7 @@ public class StreamingBaseActivity extends Activity implements CameraStreamingMa
     }
 
     @Override
-    public void onStateChanged(final int state) {
+    public void onStateChanged(final int state, Object extra) {
         Log.i(TAG, "onStateChanged state:" + state);
         switch (state) {
             case CameraStreamingManager.STATE.PREPARING:
