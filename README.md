@@ -81,7 +81,9 @@ GLSurfaceView glSurfaceView = (GLSurfaceView) findViewById(R.id.cameraPreview_su
     "publishKey": "b06c7427b454762e",
     "publishSecurity": "dynamic",
     "hosts" : {
-        "publish" : "xxx.pub.z1.pili.qiniup.com",
+        "publish" : {
+            "rtmp"   : "xxx.pub.z1.pili.qiniup.com"
+        },
         "play"    : {
             "hls"    : "xxx.hls1.z1.pili.qiniucdn.com",
             "rtmp"   : "xxx.live1.z1.pili.qiniucdn.com"
