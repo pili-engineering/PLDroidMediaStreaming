@@ -147,6 +147,7 @@ setting.setCameraId(Camera.CameraInfo.CAMERA_FACING_BACK)
 ```JAVA
 public static final int QUALITY_LOW1;
 public static final int QUALITY_LOW2;
+public static final int QUALITY_LOW3;
 
 public static final int QUALITY_MEDIUM1;
 public static final int QUALITY_MEDIUM2;
@@ -156,6 +157,20 @@ public static final int QUALITY_HIGH1;
 public static final int QUALITY_HIGH2;
 public static final int QUALITY_HIGH3;
 ```
+
+- Quality 配置表
+
+| Level  | Fps | Bitrate(Kbps) |
+|---|---|---|
+|QUALITY_LOW1|12|150|
+|QUALITY_LOW2|15|264|
+|QUALITY_LOW3|15|350|
+|QUALITY_MEDIUM1|30|512|
+|QUALITY_MEDIUM2|30|800|
+|QUALITY_MEDIUM3|30|1000|
+|QUALITY_HIGH1|30|1200|
+|QUALITY_HIGH2|30|1500|
+|QUALITY_HIGH3|30|2000|
 
 - SDK 预定义的 preivew size level 列表：
 ```
@@ -247,10 +262,25 @@ protected void onDestroy() {
 
 >纯音频推流支持后台运行，你只需要控制好 `onPause()` 及 `onDestory()` 周期函数即可。
 
+8) `setNativeLoggingEnabled(enabled)`
+
+当 enabled 设置为 true ，SDK Native 层的 log 将会被打开；当设置为 false，SDK Native 层的 log 将会被关闭。默认处于打开状态。
+
+```JAVA
+mCameraStreamingManager.setNativeLoggingEnabled(false);
+```
+
 ### 依赖库
 - FFMPEG
 
 ### 版本历史
+* 1.2.1 ([Release Notes][9])
+  - 发布 pldroid-camera-streaming-1.2.1.jar
+  - 更新 libpldroid_ffmpegbridge.so
+  - 优化内存问题，修复 OOM 异常
+  - 优化 Quality 配置
+  - 添加 `setNativeLoggingEnabled()` 接口
+
 * 1.2.0 ([Release Notes][8])
   - 发布 pldroid-camera-streaming-1.2.0.jar
   - 更新 libpldroid_ffmpegbridge.so
@@ -305,3 +335,4 @@ protected void onDestroy() {
 [6]: /ReleaseNotes/release-notes-1.0.2.md
 [7]: /ReleaseNotes/release-notes-1.1.0.md
 [8]: /ReleaseNotes/release-notes-1.2.0.md
+[9]: /ReleaseNotes/release-notes-1.2.1.md
