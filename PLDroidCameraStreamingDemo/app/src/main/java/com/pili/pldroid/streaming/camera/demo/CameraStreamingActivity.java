@@ -40,7 +40,7 @@ public class CameraStreamingActivity extends StreamingBaseActivity {
 
         Stream stream = new Stream(mJSONObject);
         StreamingProfile profile = new StreamingProfile();
-        profile.setQuality(StreamingProfile.QUALITY_LOW1)
+        profile.setQuality(StreamingProfile.QUALITY_MEDIUM1)
                 .setStream(stream);
 
         CameraStreamingSetting setting = new CameraStreamingSetting();
@@ -53,6 +53,7 @@ public class CameraStreamingActivity extends StreamingBaseActivity {
         mCameraStreamingManager = new CameraStreamingManager(this, afl, glSurfaceView);
         mCameraStreamingManager.onPrepare(setting);
         mCameraStreamingManager.setStreamingStateListener(this);
+//        mCameraStreamingManager.setNativeLoggingEnabled(false);
 
         mShutterButton.setOnClickListener(new View.OnClickListener() {
             @Override
