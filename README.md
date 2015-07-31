@@ -221,6 +221,7 @@ mCameraStreamingManager.setStreamingStateListener(this);
 - STATE.NETBLOCKING
 - STATE.CAMERA_SWITCHED
 - STATE.TORCH_INFO
+- STATE.CONNECTION_TIMEOUT
 
 >您需要注意的是，`onStateChanged` 回调函数可能被非 UI 线程调用，可参考 [CameraStreamingActivity][3] 
 
@@ -274,6 +275,14 @@ mCameraStreamingManager.setNativeLoggingEnabled(false);
 - FFMPEG
 
 ### 版本历史
+* 1.2.2 ([Release Notes][10])
+  - 发布 pldroid-camera-streaming-1.2.2.jar
+  - 更新 libpldroid_ffmpegbridge.so
+  - 修复概率性的 crash 问题
+  - 添加 `STATE.CONNECTION_TIMEOUT` 状态
+  - 修复部分机型因连接错误而导致屏幕 Hang 住
+  - 在 UI 层对点击事件加入保护逻辑，避免快速点击导致应用 crash
+
 * 1.2.1 ([Release Notes][9])
   - 发布 pldroid-camera-streaming-1.2.1.jar
   - 更新 libpldroid_ffmpegbridge.so
@@ -336,3 +345,4 @@ mCameraStreamingManager.setNativeLoggingEnabled(false);
 [7]: /ReleaseNotes/release-notes-1.1.0.md
 [8]: /ReleaseNotes/release-notes-1.2.0.md
 [9]: /ReleaseNotes/release-notes-1.2.1.md
+[10]: /ReleaseNotes/release-notes-1.2.2.md

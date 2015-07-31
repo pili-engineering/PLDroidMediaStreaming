@@ -40,17 +40,27 @@ public class StreamingBaseActivity extends Activity implements CameraStreamingMa
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case MSG_UPDATE_SHUTTER_BUTTON_STATE:
-                    mShutterButtonPressed = !mShutterButtonPressed;
-                    mShutterButton.setPressed(mShutterButtonPressed);
-                    if (mShutterButtonPressed) {
-                        boolean res = mCameraStreamingManager.startStreaming();
-                        Log.i(TAG, "res:" + res);
-                        if (!res) {
-                            mShutterButtonPressed = !mShutterButtonPressed;
-                            mShutterButton.setPressed(mShutterButtonPressed);
-                        }
+                    if (!mShutterButtonPressed) {
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                // disable the shutter button before startStreaming
+                                setShutterButtonEnabled(false);
+                                boolean res = mCameraStreamingManager.startStreaming();
+                                mShutterButtonPressed = true;
+                                Log.i(TAG, "res:" + res);
+                                if (!res) {
+                                    mShutterButtonPressed = false;
+                                    setShutterButtonEnabled(true);
+                                }
+                                setShutterButtonPressed(mShutterButtonPressed);
+                            }
+                        }).start();
                     } else {
+                        // disable the shutter button before stopStreaming
+                        setShutterButtonEnabled(false);
                         mCameraStreamingManager.stopStreaming();
+                        setShutterButtonPressed(false);
                     }
                     break;
                 default:
@@ -137,15 +147,22 @@ public class StreamingBaseActivity extends Activity implements CameraStreamingMa
                 break;
             case CameraStreamingManager.STATE.STREAMING:
                 mStatusMsgContent = getString(R.string.string_state_streaming);
+                setShutterButtonEnabled(true);
                 break;
             case CameraStreamingManager.STATE.SHUTDOWN:
                 mStatusMsgContent = getString(R.string.string_state_ready);
+                setShutterButtonEnabled(true);
+                setShutterButtonPressed(false);
                 break;
             case CameraStreamingManager.STATE.IOERROR:
                 mStatusMsgContent = getString(R.string.string_state_ready);
+                setShutterButtonEnabled(true);
                 break;
             case CameraStreamingManager.STATE.NETBLOCKING:
                 mStatusMsgContent = getString(R.string.string_state_netblocking);
+                break;
+            case CameraStreamingManager.STATE.CONNECTION_TIMEOUT:
+                mStatusMsgContent = getString(R.string.string_state_con_timeout);
                 break;
             case CameraStreamingManager.STATE.UNKNOWN:
                 mStatusMsgContent = getString(R.string.string_state_ready);

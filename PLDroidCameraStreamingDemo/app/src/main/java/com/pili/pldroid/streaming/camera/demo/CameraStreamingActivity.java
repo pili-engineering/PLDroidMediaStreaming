@@ -84,14 +84,24 @@ public class CameraStreamingActivity extends StreamingBaseActivity {
         mCameraSwitchBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mCameraStreamingManager.switchCamera();
-                    }
-                }).start();
+//                new Thread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        mCameraStreamingManager.switchCamera();
+//                    }
+//                }).start();
+                mHandler.removeCallbacks(mSwitcher);
+                mHandler.postDelayed(mSwitcher, 100);
             }
         });
+    }
+
+    private Switcher mSwitcher = new Switcher();
+    private class Switcher implements Runnable {
+        @Override
+        public void run() {
+            mCameraStreamingManager.switchCamera();
+        }
     }
 
     private void setTorchEnabled(final boolean enabled) {
