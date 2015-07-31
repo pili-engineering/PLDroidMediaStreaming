@@ -13,6 +13,7 @@
     <string name="string_state_connecting">CONNECTING</string>
     <string name="string_state_streaming">STREAMING</string>
     <string name="string_state_netblocking">NETBLOCKING, STOPPING</string>
+    <string name="string_state_con_timeout">CONNECTION TIMEOUT</string>
     <string name="title_activity_audio_streaming">AudioStreamingActivity</string>
 
     <string name="flash_light_on">ON</string>
