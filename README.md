@@ -3,17 +3,17 @@
 PLDroidCameraStreaming 是一个适用于 Android 的 RTMP 直播推流 SDK，可高度定制化和二次开发。特色是支持 Android Camera 画面捕获并进行 H.264 硬编码， 以及支持 Android 麦克风音频采样并进行 AAC 硬编码；同时，还实现了一套可供开发者选择的编码参数集合，以便灵活调节相应的分辨率和码率。借助 PLDroidCameraStreaming ，开发者可以快速构建一款类似 [Meerkat](https://meerkatapp.co/) 或 [Periscope](https://www.periscope.tv/) 的 Android 直播应用。
 
 ## 功能特性
-1. 支持 MediaCodec 硬编码 
-2. 支持 AAC 音频编码 
-3. 支持 H264 视频编码 
-4. 内置生成安全的 RTMP 推流地址
-5. 支持 RTMP 协议推流
-6. 支持 ARMv7a 
-7. Android Min API 18 
-8. 支持前后置摄像头，以及动态切换 
-9. 支持自动对焦
-10. 支持闪光灯操作
-11. 支持纯音频推流，以及后台运行
+  - [x] 支持 MediaCodec 硬编码 
+  - [x] 支持 AAC 音频编码 
+  - [x] 支持 H264 视频编码 
+  - [x] 内置生成安全的 RTMP 推流地址
+  - [x] 支持 RTMP 协议推流
+  - [x] 支持 ARMv7a 
+  - [x] Android Min API 18 
+  - [x] 支持前后置摄像头，以及动态切换 
+  - [x] 支持自动对焦
+  - [x] 支持闪光灯操作
+  - [x] 支持纯音频推流，以及后台运行
 
 ## 内容摘要
 - [使用方法](#使用方法)
@@ -132,7 +132,8 @@ try {
 Stream stream = new Stream(streamJson);
 
 StreamingProfile profile = new StreamingProfile();
-profile.setQuality(StreamingProfile.QUALITY_MEDIUM1)
+profile.setVideoQuality(StreamingProfile.VIDEO_QUALITY_MEDIUM1)
+       .setAudioQuality(StreamingProfile.AUDIO_QUALITY_HIGH2)
        .setStream(stream);
 
 CameraStreamingSetting setting = new CameraStreamingSetting();
@@ -143,34 +144,59 @@ setting.setCameraId(Camera.CameraInfo.CAMERA_FACING_BACK)
        .setCameraPrvSizeRatio(CameraStreamingSetting.PREVIEW_SIZE_RATIO.RATIO_4_3);
 ```
 
-- SDK 预定义的 Quality 列表：
+- SDK 预定义的 Video Quality 列表：
 ```JAVA
-public static final int QUALITY_LOW1;
-public static final int QUALITY_LOW2;
-public static final int QUALITY_LOW3;
+public static final int VIDEO_QUALITY_LOW1;
+public static final int VIDEO_QUALITY_LOW2;
+public static final int VIDEO_QUALITY_LOW3;
 
-public static final int QUALITY_MEDIUM1;
-public static final int QUALITY_MEDIUM2;
-public static final int QUALITY_MEDIUM3;
+public static final int VIDEO_QUALITY_MEDIUM1;
+public static final int VIDEO_QUALITY_MEDIUM2;
+public static final int VIDEO_QUALITY_MEDIUM3;
 
-public static final int QUALITY_HIGH1;
-public static final int QUALITY_HIGH2;
-public static final int QUALITY_HIGH3;
+public static final int VIDEO_QUALITY_HIGH1;
+public static final int VIDEO_QUALITY_HIGH2;
+public static final int VIDEO_QUALITY_HIGH3;
 ```
 
-- Quality 配置表
+- SDK 预定义的 Audio Quality 列表：
+```JAVA
+public static final int AUDIO_QUALITY_LOW1;
+public static final int AUDIO_QUALITY_LOW2;
 
-| Level  | Fps | Bitrate(Kbps) |
+public static final int AUDIO_QUALITY_MEDIUM1;
+public static final int AUDIO_QUALITY_MEDIUM2;
+
+public static final int AUDIO_QUALITY_HIGH1;
+public static final int AUDIO_QUALITY_HIGH2;
+```
+
+- Video Quality 配置表
+
+| Level | Fps | Video Bitrate(Kbps) |
 |---|---|---|
-|QUALITY_LOW1|12|150|
-|QUALITY_LOW2|15|264|
-|QUALITY_LOW3|15|350|
-|QUALITY_MEDIUM1|30|512|
-|QUALITY_MEDIUM2|30|800|
-|QUALITY_MEDIUM3|30|1000|
-|QUALITY_HIGH1|30|1200|
-|QUALITY_HIGH2|30|1500|
-|QUALITY_HIGH3|30|2000|
+|VIDEO_QUALITY_LOW1|12|150|
+|VIDEO_QUALITY_LOW2|15|264|
+|VIDEO_QUALITY_LOW3|15|350|
+|VIDEO_QUALITY_MEDIUM1|30|512|
+|VIDEO_QUALITY_MEDIUM2|30|800|
+|VIDEO_QUALITY_MEDIUM3|30|1000|
+|VIDEO_QUALITY_HIGH1|30|1200|
+|VIDEO_QUALITY_HIGH2|30|1500|
+|VIDEO_QUALITY_HIGH3|30|2000|
+
+- Audio Quality 配置表
+
+| Level | Audio Bitrate(Kbps) | Audio Sample Rate(Hz)|
+|---|---|---|
+|AUDIO_QUALITY_LOW1|18|44100|
+|AUDIO_QUALITY_LOW2|24|44100|
+|AUDIO_QUALITY_MEDIUM1|32|44100|
+|AUDIO_QUALITY_MEDIUM2|48|44100|
+|AUDIO_QUALITY_HIGH1|96|44100|
+|AUDIO_QUALITY_HIGH2|128|44100|
+
+>若设置一个未被 SDK 支持的 quality，将会得到 `IllegalArgumentException("Cannot support the quality:" + quality)` 异常。
 
 - SDK 预定义的 preivew size level 列表：
 ```
@@ -191,7 +217,8 @@ SDK 会根据您设置的 ratio 、 level 从系统支持的 preview size 列表
 ```
 Camera Id      : Camera.CameraInfo.CAMERA_FACING_BACK
 Publish Url    : Environment.getExternalStorageDirectory().getAbsolutePath() + "/pldroid-recording.mp4"
-Quality        : StreamingProfile.QUALITY_MEDIUM1
+Audio Quality  : StreamingProfile.AUDIO_QUALITY_LOW1
+Video Quality  : StreamingProfile.VIDEO_QUALITY_LOW1
 Prv Size Level : MEDIUM
 Prv Size Ratio : RATIO_16_9
 ```
@@ -275,6 +302,13 @@ mCameraStreamingManager.setNativeLoggingEnabled(false);
 - FFMPEG
 
 ### 版本历史
+* 1.2.3 ([Release Notes][11])
+  - 发布 pldroid-camera-streaming-1.2.3.jar
+  - 新增 Audio quality 和 Video quality 配置项，可自由组合音视频码率参数
+  - 新增 Video quality 设置接口 `setVideoQuality`
+  - 新增 Audio quality 设置接口 `setAudioQuality`
+  - 优化 jar 包，减少约 30% 体积
+
 * 1.2.2 ([Release Notes][10])
   - 发布 pldroid-camera-streaming-1.2.2.jar
   - 更新 libpldroid_ffmpegbridge.so
@@ -346,3 +380,4 @@ mCameraStreamingManager.setNativeLoggingEnabled(false);
 [8]: /ReleaseNotes/release-notes-1.2.0.md
 [9]: /ReleaseNotes/release-notes-1.2.1.md
 [10]: /ReleaseNotes/release-notes-1.2.2.md
+[11]: /ReleaseNotes/release-notes-1.2.3.md

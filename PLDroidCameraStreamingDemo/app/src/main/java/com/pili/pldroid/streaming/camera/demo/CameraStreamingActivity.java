@@ -40,7 +40,8 @@ public class CameraStreamingActivity extends StreamingBaseActivity {
 
         Stream stream = new Stream(mJSONObject);
         StreamingProfile profile = new StreamingProfile();
-        profile.setQuality(StreamingProfile.QUALITY_MEDIUM1)
+        profile.setVideoQuality(StreamingProfile.VIDEO_QUALITY_MEDIUM1)
+                .setAudioQuality(StreamingProfile.AUDIO_QUALITY_HIGH2)
                 .setStream(stream);
 
         CameraStreamingSetting setting = new CameraStreamingSetting();
