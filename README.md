@@ -8,6 +8,8 @@ PLDroidCameraStreaming 是一个适用于 Android 的 RTMP 直播推流 SDK，�
   - [x] 支持 H264 视频编码 
   - [x] 内置生成安全的 RTMP 推流地址
   - [x] 支持 RTMP 协议推流
+  - [x] 支持自适应码率
+  - [x] 支持截帧功能
   - [x] 支持 ARMv7a 
   - [x] Android Min API 18 
   - [x] 支持前后置摄像头，以及动态切换 
@@ -238,7 +240,8 @@ mCameraStreamingManager.onPrepare(setting);
 mCameraStreamingManager.setStreamingStateListener(this);
 ```
 
-您需要实现 `StreamingStateListener`，以便通过回调函数 `onStateChanged` 接收如下消息：
+您需要实现 `StreamingStateListener`，
+以便通过回调函数 `onStateChanged` 接收如下消息：
 - STATE.PREPARING
 - STATE.READY
 - STATE.CONNECTING
@@ -249,6 +252,12 @@ mCameraStreamingManager.setStreamingStateListener(this);
 - STATE.CAMERA_SWITCHED
 - STATE.TORCH_INFO
 - STATE.CONNECTION_TIMEOUT
+- STATE.SENDING_BUFFER_EMPTY
+- STATE.SENDING_BUFFER_FULL
+
+通过 `onStateHandled` 接收如下消息：
+- STATE.SENDING_BUFFER_HAS_FEW_ITEMS
+- STATE.SENDING_BUFFER_HAS_MANY_ITEMS
 
 >您需要注意的是，`onStateChanged` 回调函数可能被非 UI 线程调用，可参考 [CameraStreamingActivity][3] 
 
@@ -290,7 +299,92 @@ protected void onDestroy() {
 
 >纯音频推流支持后台运行，你只需要控制好 `onPause()` 及 `onDestory()` 周期函数即可。
 
-8) `setNativeLoggingEnabled(enabled)`
+8) 自适应码率
+
+下面是 `SendingBufferProfile` 的相关配置：
+```
+public static final float LOW_THRESHOLD_MIN = 0;
+public static final float LOW_THRESHOLD_MAX = 1.0f;
+public static final float LOW_THRESHOLD_DEFAULT = 0.2f;
+
+public static final float HIGH_THRESHOLD_MIN = 0;
+public static final float HIGH_THRESHOLD_MAX = 1.0f;
+public static final float HIGH_THRESHOLD_DEFAULT = 0.8f;
+
+public static final float DURATION_LIMIT_MIN = HIGH_THRESHOLD_MAX + 0.1f;
+public static final float DURATION_LIMIT_MAX = 5.0f;
+public static final float DURATION_LIMIT_DEFAULT = 3.0f;
+
+public static final long LOW_THRESHOLD_TIMEOUT_MIN     = 10 * 1000; // ms
+public static final long DEFAULT_LOW_THRESHOLD_TIMEOUT = 60 * 1000; // ms
+
+// [LOW_THRESHOLD_MIN, LOW_THRESHOLD_MAX] && [LOW_THRESHOLD_MIN, high - 0.1)
+private float mLowThreshold;
+
+// [HIGH_THRESHOLD_MIN, HIGH_THRESHOLD_MAX] && (low + 0.1, HIGH_THRESHOLD_MAX]
+private float mHighThreshold;
+
+// [DURATION_LIMIT_MIN, DURATION_LIMIT_MAX]
+private float mDurationLimit;
+
+// [LOW_THRESHOLD_TIMEOUT_MIN, Long.MAX_VALUE)
+// To measure the low buffering case
+private long mLowThresholdTimeout;
+```
+
+您需要首先构造 `SendingBufferProfile` ，并传入 `LowThreshold`(s), `HighThreshold`(s), `DurationLimit`(s) 和 `LowThresholdTimeout`(ms)
+
+- LowThreshold 是 `SENDING_BUFFER_HAS_FEW_ITEMS` 消息的阀值。在收到 `SENDING_BUFFER_HAS_FEW_ITEMS` 后，表明 SendingBuffer 中有 LowThreshold 的 buffer，您可以在此回调中添加提升 quality 的相关逻辑。
+
+- HighThreshold 是 `SENDING_BUFFER_HAS_MANY_ITEMS` 消息的阀值。在收到 `SENDING_BUFFER_HAS_MANY_ITEMS` 后，表明 SendingBuffer 中有 HighThreshold 的 buffer，您可以在此回调中添加降低 quality 的相关逻辑。
+
+- DurationLimit 是 `SENDING_BUFFER_FULL` 消息的阀值。在收到 FULL 之后，SDK 将会开始进行丢帧处理。
+
+- SDK 检测到 SendingBuffer 达到 LowThreshold 后，会通过 LowThresholdTimeout 来决定何时回调 `SENDING_BUFFER_HAS_FEW_ITEMS`。当前 LowThresholdTimeout 最低为 `LOW_THRESHOLD_TIMEOUT_MIN`，默认为 `DEFAULT_LOW_THRESHOLD_TIMEOUT`。
+
+下面是 Demo 中的处理逻辑，在接收到 `SENDING_BUFFER_HAS_FEW_ITEMS` 后，会提升 quality，设定之后，需要调用 `notifyProfileChanged` ；在接收到 `SENDING_BUFFER_HAS_MANY_ITEMS` 后，会降低 quality，同理，需要调用 `notifyProfileChanged`。
+
+> 在 `onStateHandled` 中，您可以直接返回 false，表明不执行自适应码率的策略
+
+```
+case CameraStreamingManager.STATE.SENDING_BUFFER_HAS_FEW_ITEMS:
+    mProfile.improveVideoQuality(1);
+    mCameraStreamingManager.notifyProfileChanged(mProfile);
+    return true;
+case CameraStreamingManager.STATE.SENDING_BUFFER_HAS_MANY_ITEMS:
+    mProfile.reduceVideoQuality(1);
+    mCameraStreamingManager.notifyProfileChanged(mProfile);
+    return true;
+```
+
+9) 截帧
+
+在调用 `captureFrame` 的时候，您需要传入 width 和 height，以及 `FrameCapturedCallback`。SDK 完成截帧之后，会回调 `onFrameCaptured` ，并将结果以参数的形式返回给调用者。
+
+> 调用者有义务对 Bitmap 进行释放
+
+```
+mCameraStreamingManager.captureFrame(w, h, new FrameCapturedCallback() {
+    @Override
+    public void onFrameCaptured(Bitmap bmp) {
+    
+    }
+}
+```
+
+10) FULL & REAL mode
+
+在获得 `AspectFrameLayout` 对象之后，您可以调用 `setShowMode` 方法来选择您需要的显示方式 。
+
+- SHOW_MODE.FULL，可以全屏显示（没有黑边），但是预览的图像和播放的效果有出入
+- SHOW_MODE.REAL，所见即所得
+
+```
+AspectFrameLayout afl = (AspectFrameLayout) findViewById(R.id.cameraPreview_afl);
+afl.setShowMode(AspectFrameLayout.SHOW_MODE.FULL);
+```
+
+11) `setNativeLoggingEnabled(enabled)`
 
 当 enabled 设置为 true ，SDK Native 层的 log 将会被打开；当设置为 false，SDK Native 层的 log 将会被关闭。默认处于打开状态。
 
@@ -302,6 +396,17 @@ mCameraStreamingManager.setNativeLoggingEnabled(false);
 - FFMPEG
 
 ### 版本历史
+* 1.3.0 ([Release Notes][12])
+  - 发布 pldroid-camera-streaming-1.3.0.jar
+  - 新增自适应码率功能
+  - 新增截帧接口
+  - 新增 Preview Layout `REAL/FULL` mode，解决显示黑边问题
+  - 修复 IOS 和 Android 使用同一个 stream 时，导致 IOS 无法正常推流的问题
+  - 修复部分机型切换前后置 crash 问题
+  - 新增自适应码率演示代码
+  - 新增截帧演示代码
+  - 新增 REAL/FULL mode 演示代码
+
 * 1.2.3 ([Release Notes][11])
   - 发布 pldroid-camera-streaming-1.2.3.jar
   - 新增 Audio quality 和 Video quality 配置项，可自由组合音视频码率参数
@@ -381,3 +486,4 @@ mCameraStreamingManager.setNativeLoggingEnabled(false);
 [9]: /ReleaseNotes/release-notes-1.2.1.md
 [10]: /ReleaseNotes/release-notes-1.2.2.md
 [11]: /ReleaseNotes/release-notes-1.2.3.md
+[12]: /ReleaseNotes/release-notes-1.3.0.md

@@ -7,7 +7,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
@@ -72,9 +71,9 @@ public class StreamingBaseActivity extends Activity implements CameraStreamingMa
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
        /*
@@ -167,6 +166,10 @@ public class StreamingBaseActivity extends Activity implements CameraStreamingMa
             case CameraStreamingManager.STATE.UNKNOWN:
                 mStatusMsgContent = getString(R.string.string_state_ready);
                 break;
+            case CameraStreamingManager.STATE.SENDING_BUFFER_EMPTY:
+                break;
+            case CameraStreamingManager.STATE.SENDING_BUFFER_FULL:
+                break;
         }
         runOnUiThread(new Runnable() {
             @Override
@@ -174,6 +177,12 @@ public class StreamingBaseActivity extends Activity implements CameraStreamingMa
                 mSatusTextView.setText(mStatusMsgContent);
             }
         });
+    }
+
+    @Override
+    public boolean onStateHandled(final int state, Object extra) {
+        Log.i(TAG, "onStateHandled state:" + state);
+        return false;
     }
 
     protected void setShutterButtonPressed(final boolean pressed) {
