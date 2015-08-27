@@ -10,7 +10,7 @@ PLDroidCameraStreaming 是一个适用于 Android 的 RTMP 直播推流 SDK，�
   - [x] 支持 RTMP 协议推流
   - [x] 支持自适应码率
   - [x] 支持截帧功能
-  - [x] 支持 ARMv7a 
+  - [x] 支持 ARMv7a, ARM64v8a
   - [x] Android Min API 18 
   - [x] 支持前后置摄像头，以及动态切换 
   - [x] 支持自动对焦
@@ -141,7 +141,6 @@ profile.setVideoQuality(StreamingProfile.VIDEO_QUALITY_MEDIUM1)
 CameraStreamingSetting setting = new CameraStreamingSetting();
 setting.setCameraId(Camera.CameraInfo.CAMERA_FACING_BACK)
        .setContinuousFocusModeEnabled(true)
-       .setStreamingProfile(profile)
        .setCameraPrvSizeLevel(CameraStreamingSetting.PREVIEW_SIZE_LEVEL.MEDIUM)
        .setCameraPrvSizeRatio(CameraStreamingSetting.PREVIEW_SIZE_RATIO.RATIO_4_3);
 ```
@@ -229,14 +228,14 @@ Prv Size Ratio : RATIO_16_9
 - Camera Streaming
 ```JAVA
 mCameraStreamingManager = new CameraStreamingManager(this, afl, glSurfaceView);
-mCameraStreamingManager.onPrepare(setting);
+mCameraStreamingManager.onPrepare(setting, profile);
 mCameraStreamingManager.setStreamingStateListener(this);
 ```
 
 - Pure Audio Streaming
 ```JAVA
 mCameraStreamingManager = new CameraStreamingManager(this);
-mCameraStreamingManager.onPrepare(setting);
+mCameraStreamingManager.onPrepare(setting, profile);
 mCameraStreamingManager.setStreamingStateListener(this);
 ```
 
@@ -396,6 +395,15 @@ mCameraStreamingManager.setNativeLoggingEnabled(false);
 - FFMPEG
 
 ### 版本历史
+
+* 1.3.1 ([Release Notes][13])
+  - 发布 pldroid-camera-streaming-1.3.1.jar
+  - 增加 arm64-v8a 支持，新增 arm64-v8a/libpldroid_ffmpegbridge.so
+  - 更新 armeabi-v7a/libpldroid_ffmpegbridge.so
+  - 新增切换 `Stream` 接口：setStreamingProfile
+  - 新增 `setLocalFileAbsolutePath` 接口
+  - 修复横屏下，经过特殊操作，Camera 预览显示异常的问题
+
 * 1.3.0 ([Release Notes][12])
   - 发布 pldroid-camera-streaming-1.3.0.jar
   - 新增自适应码率功能
@@ -487,3 +495,4 @@ mCameraStreamingManager.setNativeLoggingEnabled(false);
 [10]: /ReleaseNotes/release-notes-1.2.2.md
 [11]: /ReleaseNotes/release-notes-1.2.3.md
 [12]: /ReleaseNotes/release-notes-1.3.0.md
+[13]: /ReleaseNotes/release-notes-1.3.1.md

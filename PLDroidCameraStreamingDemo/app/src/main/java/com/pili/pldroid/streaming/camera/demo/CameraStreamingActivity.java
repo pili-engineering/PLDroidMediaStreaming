@@ -54,7 +54,7 @@ public class CameraStreamingActivity extends StreamingBaseActivity {
         setContentView(R.layout.activity_camera_streaming);
 
         AspectFrameLayout afl = (AspectFrameLayout) findViewById(R.id.cameraPreview_afl);
-        afl.setShowMode(AspectFrameLayout.SHOW_MODE.FULL);
+        afl.setShowMode(AspectFrameLayout.SHOW_MODE.REAL);
         GLSurfaceView glSurfaceView = (GLSurfaceView) findViewById(R.id.cameraPreview_surfaceView);
 
         mShutterButton = (Button) findViewById(R.id.toggleRecording_button);
@@ -68,19 +68,23 @@ public class CameraStreamingActivity extends StreamingBaseActivity {
         mProfile = new StreamingProfile();
         mProfile.setVideoQuality(StreamingProfile.VIDEO_QUALITY_LOW1)
                 .setAudioQuality(StreamingProfile.AUDIO_QUALITY_HIGH1)
-                .setSendingBufferProfile(new StreamingProfile.SendingBufferProfile(0.2f, 0.8f, 3.0f, 20 * 1000))
-                .setStream(stream);
+                .setStream(stream)
+//                .setLocalFileAbsolutePath(Environment.getExternalStorageDirectory().getAbsolutePath() + "/pldroid-recording.mp4")
+                .setSendingBufferProfile(new StreamingProfile.SendingBufferProfile(0.2f, 0.8f, 3.0f, 20 * 1000));
+
         mSupportVideoQualities = mProfile.getSupportVideoQualities();
 
         CameraStreamingSetting setting = new CameraStreamingSetting();
         setting.setCameraId(Camera.CameraInfo.CAMERA_FACING_BACK)
                 .setContinuousFocusModeEnabled(true)
-                .setStreamingProfile(mProfile)
                 .setCameraPrvSizeLevel(CameraStreamingSetting.PREVIEW_SIZE_LEVEL.MEDIUM)
                 .setCameraPrvSizeRatio(CameraStreamingSetting.PREVIEW_SIZE_RATIO.RATIO_16_9);
 
         mCameraStreamingManager = new CameraStreamingManager(this, afl, glSurfaceView);
-        mCameraStreamingManager.onPrepare(setting);
+        mCameraStreamingManager.onPrepare(setting, mProfile);
+        // update the StreamingProfile
+//        mProfile.setStream(new Stream(mJSONObject1));
+//        mCameraStreamingManager.setStreamingProfile(mProfile);
         mCameraStreamingManager.setStreamingStateListener(this);
 //        mCameraStreamingManager.setNativeLoggingEnabled(false);
 
