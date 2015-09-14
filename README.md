@@ -10,7 +10,7 @@ PLDroidCameraStreaming 是一个适用于 Android 的 RTMP 直播推流 SDK，�
   - [x] 支持 RTMP 协议推流
   - [x] 支持自适应码率
   - [x] 支持截帧功能
-  - [x] 支持 ARMv7a, ARM64v8a
+  - [x] 支持 ARM, ARMv7a, ARM64v8a
   - [x] Android Min API 18 
   - [x] 支持前后置摄像头，以及动态切换 
   - [x] 支持自动对焦
@@ -22,7 +22,6 @@ PLDroidCameraStreaming 是一个适用于 Android 的 RTMP 直播推流 SDK，�
   - [配置工程](#项目配置)
   - [权限](#权限)
   - [示例代码](#示例代码)
-- [依赖库](#依赖库)
 - [版本历史](#版本历史)
 
 ## 使用方法
@@ -30,7 +29,10 @@ PLDroidCameraStreaming 是一个适用于 Android 的 RTMP 直播推流 SDK，�
 从 `releases/` 目录获取：
 
 - pldroid-camera-streaming-xxx.jar
-- armeabi-v7a/libpldroid_ffmpegbridge.so
+- armeabi/libpldroid_streaming_core.so
+- armeabi-v7a/libpldroid_streaming_core.so
+- arm64-v8a/libpldroid_streaming_core.so
+
 并在项目中加入对应的 jar / so 文件的依赖关系，可参考 [PLDroidCameraStreamingDemo][1] 中的做法。
 
 ### 权限
@@ -253,6 +255,7 @@ mCameraStreamingManager.setStreamingStateListener(this);
 - STATE.CONNECTION_TIMEOUT
 - STATE.SENDING_BUFFER_EMPTY
 - STATE.SENDING_BUFFER_FULL
+- STATE.DISCONNECTED
 
 通过 `onStateHandled` 接收如下消息：
 - STATE.SENDING_BUFFER_HAS_FEW_ITEMS
@@ -391,10 +394,18 @@ afl.setShowMode(AspectFrameLayout.SHOW_MODE.FULL);
 mCameraStreamingManager.setNativeLoggingEnabled(false);
 ```
 
-### 依赖库
-- FFMPEG
-
 ### 版本历史
+
+* 1.3.3 ([Release Notes][15])
+  - 发布 pldroid-camera-streaming-1.3.3.jar
+  - 删除 arm64-v8a/libpldroid_ffmpegbridge.so 以及 armeabi-v7a/libpldroid_ffmpegbridge.so
+  - 新增 armeabi 支持
+  - 新增 arm64-v8a/libpldroid_streaming_core.so, armeabi-v7a/libpldroid_streaming_core.so 和 armeabi/libpldroid_streaming_core.so
+  - 体积裁剪数十倍，动态链接库裁剪至 69KB
+  - 完全移除 FFmpeg 依赖
+  - 修复推流过程中，切换前后置断流问题
+  - 修复自适应码率过程中，切换 quality 断流问题
+  - 修复前后置切换概率性 crash 问题
 
 * 1.3.2 ([Release Notes][14])
   - 发布 pldroid-camera-streaming-1.3.2.jar
@@ -501,3 +512,4 @@ mCameraStreamingManager.setNativeLoggingEnabled(false);
 [12]: /ReleaseNotes/release-notes-1.3.0.md
 [13]: /ReleaseNotes/release-notes-1.3.1.md
 [14]: /ReleaseNotes/release-notes-1.3.2.md
+[15]: /ReleaseNotes/release-notes-1.3.3.md

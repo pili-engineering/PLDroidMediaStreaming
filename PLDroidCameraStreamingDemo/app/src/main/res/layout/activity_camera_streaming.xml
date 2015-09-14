@@ -12,7 +12,8 @@
         android:id="@+id/cameraPreview_afl"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_centerInParent="true" >
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentTop="true">
 
         <android.opengl.GLSurfaceView
             android:id="@+id/cameraPreview_surfaceView"
@@ -21,6 +22,10 @@
             android:layout_gravity="center" />
     </com.pili.pldroid.streaming.widget.AspectFrameLayout>
 
+    <EditText
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
     <Button
         android:id="@+id/camera_switch_btn"
         android:layout_marginTop="@dimen/pldroid_streaming_item_padding"
