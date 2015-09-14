@@ -396,6 +396,10 @@ mCameraStreamingManager.setNativeLoggingEnabled(false);
 
 ### 版本历史
 
+* 1.3.2 ([Release Notes][14])
+  - 发布 pldroid-camera-streaming-1.3.2.jar
+  - 修复输入法弹起导致预览画面调整的问题
+
 * 1.3.1 ([Release Notes][13])
   - 发布 pldroid-camera-streaming-1.3.1.jar
   - 增加 arm64-v8a 支持，新增 arm64-v8a/libpldroid_ffmpegbridge.so
@@ -496,3 +500,4 @@ mCameraStreamingManager.setNativeLoggingEnabled(false);
 [11]: /ReleaseNotes/release-notes-1.2.3.md
 [12]: /ReleaseNotes/release-notes-1.3.0.md
 [13]: /ReleaseNotes/release-notes-1.3.1.md
+[14]: /ReleaseNotes/release-notes-1.3.2.md

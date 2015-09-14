@@ -30,7 +30,7 @@ import java.util.Map;
 /**
  * Created by jerikc on 15/6/16.
  */
-public class CameraStreamingActivity extends StreamingBaseActivity {
+public class CameraStreamingActivity extends StreamingBaseActivity implements View.OnLayoutChangeListener {
     private static final String TAG = "CameraStreamingActivity";
 
     private Button mTorchBtn;
@@ -40,6 +40,7 @@ public class CameraStreamingActivity extends StreamingBaseActivity {
     private StreamingProfile mProfile;
     private Map<Integer, Integer> mSupportVideoQualities;
     private Context mContext;
+    private View mRootView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +53,9 @@ public class CameraStreamingActivity extends StreamingBaseActivity {
         mContext = this;
 
         setContentView(R.layout.activity_camera_streaming);
+
+        mRootView = findViewById(R.id.content);
+        mRootView.addOnLayoutChangeListener(this);
 
         AspectFrameLayout afl = (AspectFrameLayout) findViewById(R.id.cameraPreview_afl);
         afl.setShowMode(AspectFrameLayout.SHOW_MODE.REAL);
@@ -146,6 +150,12 @@ public class CameraStreamingActivity extends StreamingBaseActivity {
     }
 
     private Switcher mSwitcher = new Switcher();
+
+    @Override
+    public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+        Log.i(TAG, "view!!!!:" + v);
+    }
+
     private class Switcher implements Runnable {
         @Override
         public void run() {
@@ -244,16 +254,16 @@ public class CameraStreamingActivity extends StreamingBaseActivity {
 
     @Override
     public boolean onStateHandled(final int state, Object extra) {
-        super.onStateChanged(state, extra);
+        super.onStateHandled(state, extra);
         switch (state) {
             case CameraStreamingManager.STATE.SENDING_BUFFER_HAS_FEW_ITEMS:
                 mProfile.improveVideoQuality(1);
                 mCameraStreamingManager.notifyProfileChanged(mProfile);
-                return false;
+                return true;
             case CameraStreamingManager.STATE.SENDING_BUFFER_HAS_MANY_ITEMS:
                 mProfile.reduceVideoQuality(1);
                 mCameraStreamingManager.notifyProfileChanged(mProfile);
-                return false;
+                return true;
         }
         return false;
     }
