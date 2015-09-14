@@ -27,6 +27,7 @@
         </activity>
 
         <activity
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
             android:name=".CameraStreamingActivity"
             android:theme="@android:style/Theme.Holo.Light.NoActionBar" >
         </activity>
