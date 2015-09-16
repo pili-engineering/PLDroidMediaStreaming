@@ -396,6 +396,12 @@ mCameraStreamingManager.setNativeLoggingEnabled(false);
 
 ### 版本历史
 
+* 1.3.4 ([Release Notes][16])
+  - 发布 pldroid-camera-streaming-1.3.4.jar
+  - 更新 libpldroid_streaming_core.so
+  - 修复采用 ART 运行时的 Android 机型的 crash 问题
+  - 修复封包不兼容的问题
+
 * 1.3.3 ([Release Notes][15])
   - 发布 pldroid-camera-streaming-1.3.3.jar
   - 删除 arm64-v8a/libpldroid_ffmpegbridge.so 以及 armeabi-v7a/libpldroid_ffmpegbridge.so
@@ -513,3 +519,4 @@ mCameraStreamingManager.setNativeLoggingEnabled(false);
 [13]: /ReleaseNotes/release-notes-1.3.1.md
 [14]: /ReleaseNotes/release-notes-1.3.2.md
 [15]: /ReleaseNotes/release-notes-1.3.3.md
+[16]: /ReleaseNotes/release-notes-1.3.4.md
