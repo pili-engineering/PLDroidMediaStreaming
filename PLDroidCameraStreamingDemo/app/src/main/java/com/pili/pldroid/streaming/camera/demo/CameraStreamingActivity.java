@@ -70,8 +70,9 @@ public class CameraStreamingActivity extends StreamingBaseActivity implements Vi
 
         Stream stream = new Stream(mJSONObject);
         mProfile = new StreamingProfile();
-        mProfile.setVideoQuality(StreamingProfile.VIDEO_QUALITY_LOW1)
-                .setAudioQuality(StreamingProfile.AUDIO_QUALITY_HIGH1)
+        mProfile.setVideoQuality(StreamingProfile.VIDEO_QUALITY_MEDIUM1)
+                .setAudioQuality(StreamingProfile.AUDIO_QUALITY_MEDIUM2)
+                .setEncodingSizeLevel(StreamingProfile.VIDEO_ENCODING_SIZE_HD)
                 .setStream(stream)
 //                .setLocalFileAbsolutePath(Environment.getExternalStorageDirectory().getAbsolutePath() + "/pldroid-recording.mp4")
                 .setSendingBufferProfile(new StreamingProfile.SendingBufferProfile(0.2f, 0.8f, 3.0f, 20 * 1000));
@@ -81,7 +82,7 @@ public class CameraStreamingActivity extends StreamingBaseActivity implements Vi
         CameraStreamingSetting setting = new CameraStreamingSetting();
         setting.setCameraId(Camera.CameraInfo.CAMERA_FACING_BACK)
                 .setContinuousFocusModeEnabled(true)
-                .setCameraPrvSizeLevel(CameraStreamingSetting.PREVIEW_SIZE_LEVEL.MEDIUM)
+                .setCameraPrvSizeLevel(CameraStreamingSetting.PREVIEW_SIZE_LEVEL.SMALL)
                 .setCameraPrvSizeRatio(CameraStreamingSetting.PREVIEW_SIZE_RATIO.RATIO_16_9);
 
         mCameraStreamingManager = new CameraStreamingManager(this, afl, glSurfaceView);
@@ -232,7 +233,7 @@ public class CameraStreamingActivity extends StreamingBaseActivity implements Vi
         super.onStateChanged(state, extra);
         switch (state) {
             case CameraStreamingManager.STATE.CAMERA_SWITCHED:
-                mShutterButtonPressed = false;
+//                mShutterButtonPressed = false;
                 if (extra != null) {
                     Log.i(TAG, "current camera id:" + (Integer)extra);
                 }

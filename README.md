@@ -174,6 +174,14 @@ public static final int AUDIO_QUALITY_HIGH1;
 public static final int AUDIO_QUALITY_HIGH2;
 ```
 
+- SDK 预定义的 Video Encoding Size 列表：
+```JAVA
+public static final int VIDEO_ENCODING_SIZE_QVGA;
+public static final int VIDEO_ENCODING_SIZE_VGA;
+public static final int VIDEO_ENCODING_SIZE_HD;
+public static final int VIDEO_ENCODING_SIZE_FHD;
+```
+
 - Video Quality 配置表
 
 | Level | Fps | Video Bitrate(Kbps) |
@@ -198,6 +206,15 @@ public static final int AUDIO_QUALITY_HIGH2;
 |AUDIO_QUALITY_MEDIUM2|48|44100|
 |AUDIO_QUALITY_HIGH1|96|44100|
 |AUDIO_QUALITY_HIGH2|128|44100|
+
+- Video Encoding Size 配置表
+
+| Level | Resolution(16:9) | Resolution(4:3)|
+|---|---|---|
+|VIDEO_ENCODING_SIZE_QVGA|480 x 272|320 x 240|
+|VIDEO_ENCODING_SIZE_VGA|854 x 480|640 x 480|
+|VIDEO_ENCODING_SIZE_HD|1280 x 720|960 x 720|
+|VIDEO_ENCODING_SIZE_FHD|1920 x 1080|1440 x 1080|
 
 >若设置一个未被 SDK 支持的 quality，将会得到 `IllegalArgumentException("Cannot support the quality:" + quality)` 异常。
 
@@ -396,6 +413,16 @@ mCameraStreamingManager.setNativeLoggingEnabled(false);
 
 ### 版本历史
 
+* 1.3.5 ([Release Notes][17])
+  - 发布 pldroid-camera-streaming-1.3.5.jar
+  - 更新 libpldroid_streaming_core.so
+  - 修复部分机型音视频不同步问题
+  - 分离 preview size 与 encoding size
+  - 新增 `setEncodingSizeLevel` API，并提供 encoding size 参数列表
+  - 修复部分机型花屏问题
+  - 修复前后置摄像头切换概率性断流问题
+  - 修复概率性 crash 问题
+
 * 1.3.4 ([Release Notes][16])
   - 发布 pldroid-camera-streaming-1.3.4.jar
   - 更新 libpldroid_streaming_core.so
@@ -520,3 +547,4 @@ mCameraStreamingManager.setNativeLoggingEnabled(false);
 [14]: /ReleaseNotes/release-notes-1.3.2.md
 [15]: /ReleaseNotes/release-notes-1.3.3.md
 [16]: /ReleaseNotes/release-notes-1.3.4.md
+[17]: /ReleaseNotes/release-notes-1.3.5.md
