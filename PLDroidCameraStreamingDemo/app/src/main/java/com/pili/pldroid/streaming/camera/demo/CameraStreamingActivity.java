@@ -145,6 +145,7 @@ public class CameraStreamingActivity extends StreamingBaseActivity implements Vi
     @Override
     protected void onPause() {
         super.onPause();
+        Log.i(TAG, "onPause");
         mHandler.removeCallbacksAndMessages(null);
         mSwitcher = null;
         mScreenshooter = null;

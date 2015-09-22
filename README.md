@@ -413,6 +413,14 @@ mCameraStreamingManager.setNativeLoggingEnabled(false);
 
 ### 版本历史
 
+* 1.3.6 ([Release Notes][18])
+  - 发布 pldroid-camera-streaming-1.3.6.jar
+  - 更新 libpldroid_streaming_core.so
+  - 优化 video stream 流畅度
+  - 修复概率性断流问题
+  - 修复部分机型推流过程中，概率性 crash 问题
+  - 修复部分机型切换前后置摄像头过程中，概率性 crash 问题
+
 * 1.3.5 ([Release Notes][17])
   - 发布 pldroid-camera-streaming-1.3.5.jar
   - 更新 libpldroid_streaming_core.so
@@ -548,3 +556,4 @@ mCameraStreamingManager.setNativeLoggingEnabled(false);
 [15]: /ReleaseNotes/release-notes-1.3.3.md
 [16]: /ReleaseNotes/release-notes-1.3.4.md
 [17]: /ReleaseNotes/release-notes-1.3.5.md
+[18]: /ReleaseNotes/release-notes-1.3.6.md
