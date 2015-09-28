@@ -273,6 +273,7 @@ mCameraStreamingManager.setStreamingStateListener(this);
 - STATE.SENDING_BUFFER_EMPTY
 - STATE.SENDING_BUFFER_FULL
 - STATE.DISCONNECTED
+- STATE.NO_SUPPORTED_PREVIEW_SIZE
 
 通过 `onStateHandled` 接收如下消息：
 - STATE.SENDING_BUFFER_HAS_FEW_ITEMS
@@ -412,6 +413,14 @@ mCameraStreamingManager.setNativeLoggingEnabled(false);
 ```
 
 ### 版本历史
+
+* 1.3.8 ([Release Notes][20])
+  - 发布 pldroid-camera-streaming-1.3.8.jar
+  - 更新 libpldroid_streaming_core.so
+  - 优化切换前后置摄像头数据重发时间，增强推流过程中切换前后置摄像头的稳定性
+  - 优化内存使用，避免 OOM
+  - 修复部分机型概率性 crash 问题
+  - 兼容 supportedPreviewSizeList 为空的机型
 
 * 1.3.7 ([Release Notes][19])
   - 发布 pldroid-camera-streaming-1.3.7.jar
@@ -565,3 +574,4 @@ mCameraStreamingManager.setNativeLoggingEnabled(false);
 [17]: /ReleaseNotes/release-notes-1.3.5.md
 [18]: /ReleaseNotes/release-notes-1.3.6.md
 [19]: /ReleaseNotes/release-notes-1.3.7.md
+[20]: /ReleaseNotes/release-notes-1.3.8.md
