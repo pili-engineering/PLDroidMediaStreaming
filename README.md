@@ -10,7 +10,7 @@ PLDroidCameraStreaming 是一个适用于 Android 的 RTMP 直播推流 SDK，�
   - [x] 支持 RTMP 协议推流
   - [x] 支持自适应码率
   - [x] 支持截帧功能
-  - [x] 支持 ARM, ARMv7a, ARM64v8a
+  - [x] 支持 ARM, ARMv7a, ARM64v8a, X86
   - [x] Android Min API 18 
   - [x] 支持前后置摄像头，以及动态切换 
   - [x] 支持自动对焦
@@ -32,6 +32,7 @@ PLDroidCameraStreaming 是一个适用于 Android 的 RTMP 直播推流 SDK，�
 - armeabi/libpldroid_streaming_core.so
 - armeabi-v7a/libpldroid_streaming_core.so
 - arm64-v8a/libpldroid_streaming_core.so
+- x86/libpldroid_streaming_core.so
 
 并在项目中加入对应的 jar / so 文件的依赖关系，可参考 [PLDroidCameraStreamingDemo][1] 中的做法。
 
@@ -414,6 +415,17 @@ mCameraStreamingManager.setNativeLoggingEnabled(false);
 
 ### 版本历史
 
+* 1.3.9 ([Release Notes][21])
+  - 发布 pldroid-camera-streaming-1.3.9.jar
+  - 更新 libpldroid_streaming_core.so
+  - 增加 x86 支持
+  - 新增 x86/libpldroid_streaming_core.so
+  - 优化内存，减少内存抖动，增强稳定性
+  - 修复 onResume 之后快速 onPause 导致的 crash 问题
+  - 修复部分机型截图 crash 问题
+  - 修复部分机型切换前后置摄像头之后，导致切片异常问题
+  - 修复网络异常导致的 crash 问题(issue 54)
+
 * 1.3.8 ([Release Notes][20])
   - 发布 pldroid-camera-streaming-1.3.8.jar
   - 更新 libpldroid_streaming_core.so
@@ -575,3 +587,4 @@ mCameraStreamingManager.setNativeLoggingEnabled(false);
 [18]: /ReleaseNotes/release-notes-1.3.6.md
 [19]: /ReleaseNotes/release-notes-1.3.7.md
 [20]: /ReleaseNotes/release-notes-1.3.8.md
+[21]: /ReleaseNotes/release-notes-1.3.9.md

@@ -33,5 +33,8 @@ proguard/
 # Ndk
 /*/obj/
 
+PLDroidCameraStreaming/library/src/main/libs/
+PLDroidCameraStreaming/library/src/main/obj/
+
 # OSX files
 .DS_Store
