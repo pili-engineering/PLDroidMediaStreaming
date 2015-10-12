@@ -74,7 +74,6 @@ public class CameraStreamingActivity extends StreamingBaseActivity implements Vi
                 .setAudioQuality(StreamingProfile.AUDIO_QUALITY_MEDIUM2)
                 .setEncodingSizeLevel(StreamingProfile.VIDEO_ENCODING_SIZE_HD)
                 .setStream(stream)
-//                .setLocalFileAbsolutePath(Environment.getExternalStorageDirectory().getAbsolutePath() + "/pldroid-recording.mp4")
                 .setSendingBufferProfile(new StreamingProfile.SendingBufferProfile(0.2f, 0.8f, 3.0f, 20 * 1000));
 
         mSupportVideoQualities = mProfile.getSupportVideoQualities();
