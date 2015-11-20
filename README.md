@@ -1,21 +1,85 @@
 # PLDroidCameraStreaming
 
-PLDroidCameraStreaming 是一个适用于 Android 的 RTMP 直播推流 SDK，可高度定制化和二次开发。特色是支持 Android Camera 画面捕获并进行 H.264 硬编码， 以及支持 Android 麦克风音频采样并进行 AAC 硬编码；同时，还实现了一套可供开发者选择的编码参数集合，以便灵活调节相应的分辨率和码率。借助 PLDroidCameraStreaming ，开发者可以快速构建一款类似 [Meerkat](https://meerkatapp.co/) 或 [Periscope](https://www.periscope.tv/) 的 Android 直播应用。
+PLDroidCameraStreaming 是一个适用于 Android 的 RTMP 直播推流 SDK，可高度定制化和二次开发。特色是同时支持 H.264 软编／硬编和 AAC 软编／硬编。支持 Android Camera 画面捕获，并进行 H.264 编码，以及支持 Android 麦克风音频采样并进行 AAC 编码；还实现了一套可供开发者选择的编码参数集合，以便灵活调节相应的分辨率和码率；同时，SDK 提供数据源回调接口，用户可进行 Filter 处理。借助 PLDroidCameraStreaming ，开发者可以快速构建一款类似 [Meerkat](https://meerkatapp.co/) 或 [Periscope](https://www.periscope.tv/) 的 Android 直播应用。
 
 ## 功能特性
-  - [x] 支持 MediaCodec 硬编码 
-  - [x] 支持 AAC 音频编码 
-  - [x] 支持 H264 视频编码 
-  - [x] 内置生成安全的 RTMP 推流地址
-  - [x] 支持 RTMP 协议推流
-  - [x] 支持自适应码率
-  - [x] 支持截帧功能
-  - [x] 支持 ARM, ARMv7a, ARM64v8a, X86
-  - [x] Android Min API 18 
-  - [x] 支持前后置摄像头，以及动态切换 
+  - [x] 支持 H.264 和 AAC 软编（推荐）
+  - [x] 支持 H.264 和 AAC 硬编
+  - [x] 软编支持 Android Min API 15（Android 4.0.3）及其以上版本
+  - [x] 硬编支持 Android Min API 18（Android 4.3）及其以上版本
+  - [x] 支持构造带安全授权凭证的 RTMP 推流地址
+  - [x] 支持 RTMP 封包及推流
+  - [x] 支持 RTMP 推流自适应网络质量动态切换码率或自定义策略
+  - [x] 支持数据源回调接口，可自定义 Filter (滤镜) 特效处理
+  - [x] 支持前后置摄像头，以及动态切换
   - [x] 支持自动对焦
   - [x] 支持闪光灯操作
   - [x] 支持纯音频推流，以及后台运行
+  - [x] 支持截帧功能
+  - [x] 支持 ARM, ARMv7a, ARM64v8a, X86 主流芯片平台
+  
+## 测试通过的机型清单
+下表是目前测试通过的机型清单，您也可以在 Issue 中添加您测试通过的机型信息，感谢！
+
+| 品牌 | 机型 | 版本 |
+|---|---|---|
+| 三星 | GALAXY S5 | 5.0 |
+| 三星 | GALAXY S4 i9500 | 5.0.0 |
+| 三星 | GALAXY Trend Duos S7562C | 4.1.2 |
+| 三星 | GALAXY Note II N7108 | 4.3 |
+| 三星 | GALAXY Premier I9260 | 4.1.2 |
+| 三星 | GALAXY SIII I9300 | 4.3 |
+| 三星 | GALAXY Note2 | 4.3 |
+| 三星 | SM-A5000 | 4.4.4 |
+| 三星 | SM-N9008V | 5.0 |
+| 三星 | SM-G7108V | 4.3 |
+| 三星 | SM-G7106 | 4.3 |
+| 三星 | GT-I9508 | 4.4.2 |
+| 三星 | SM-G9006V | 4.4.2  |
+| 三星 | SM-N7508V | 4.3 |
+| 三星 | SM-G9008V  | 4.4.2 |
+| 三星 | SM-N9005 | 5.0 |
+| 三星 | SM-G5308W | 4.4.4 |
+| 三星 | SM-G9008W | 4.4.2 |
+| 三星 | SM-N9108V | 5.0.1 |
+| 三星 | SM-N9008 | 4.4.2 |
+| 华为 | Y523 | 4.4.2 |
+| 华为 | 荣耀畅玩4X CHE-TL00 | 4.4.2 |
+| 华为 | H30-T00 | 4.4.2 |
+| 华为 | P7-L07 | 4.4.2 |
+| 华为 | p8 | 5.0 |
+| 华为 | u9500 | 4.0.3 |
+| 华为 | Honor 6 | 4.4.2 |
+| 华为 | 畅玩4 | 4.4.4 |
+| 华为 | C199 | v4.4.2 |
+| 小米 | Xiaomi 2A | 4.1.1 |
+| 小米 | Xiaomi 3 | 4.4.4 |
+| 小米 | Xiaomi 2S | 5.0.2 |
+| 小米 | 4L TE-CMCC | 4.4.4 |
+| 红米 | NOTE 1 TD | 4.4.2 |
+| 红米 | HM 1S | 4.4.2 |
+| 红米 | NOTE | 4.4.4 |
+| 魅族 | Mx 4 Pro | 4.4.2 |
+| 魅族 | Mx 5 | 5.0.1 |
+| vivo | Y17W | 4.2.2 |
+| vivo | Y17T | 4.2.2 |
+| vivo | S7T | 4.2.2 |
+| vivo | X3V |  4.4.2 |
+| oppo | R7 | 5.1.1 |
+| oppo | R2017  | 4.3 |
+| oppo | R831S | 4.3 |
+| oppo | R8107 | 4.4.4 |
+| oppo | R8007 | 4.3 |
+| oppo | X9007 | 4.3 |
+| 酷派 | Coolpad 大神1 8297 | 4.2.2 |
+| 酷派 | Coolpad 8730L | 4.3 |
+| 酷派 | Coolpad 8675 | 4.4.2 |
+| 酷派 | 8729 | 4.3 |
+| 酷派 | 7620L | 4.3 |
+| 索尼 | Z3 | 5.0.2 |
+| 金立 | GN9000L | 4.3 |
+| Alcatel One Touch | 6040D | 4.4.2 |
+| 美图 | | 4.4.4 |
 
 ## 内容摘要
 - [使用方法](#使用方法)
@@ -28,11 +92,25 @@ PLDroidCameraStreaming 是一个适用于 Android 的 RTMP 直播推流 SDK，�
 ### 项目配置
 从 `releases/` 目录获取：
 
-- pldroid-camera-streaming-xxx.jar
-- armeabi/libpldroid_streaming_core.so
-- armeabi-v7a/libpldroid_streaming_core.so
-- arm64-v8a/libpldroid_streaming_core.so
-- x86/libpldroid_streaming_core.so
+```
+pldroid-camera-streaming-xxx.jar
+
+arm64-v8a/libpldroid_streaming_aac_encoder.so
+arm64-v8a/libpldroid_streaming_core.so
+arm64-v8a/libpldroid_streaming_h264_encoder.so
+
+armeabi/libpldroid_streaming_aac_encoder.so
+armeabi/libpldroid_streaming_core.so
+armeabi/libpldroid_streaming_h264_encoder.so
+
+armeabi-v7a/libpldroid_streaming_aac_encoder.so
+armeabi-v7a/libpldroid_streaming_core.so
+armeabi-v7a/libpldroid_streaming_h264_encoder.so
+
+x86/libpldroid_streaming_aac_encoder.so
+x86/libpldroid_streaming_core.so
+x86/libpldroid_streaming_h264_encoder.so
+```
 
 并在项目中加入对应的 jar / so 文件的依赖关系，可参考 [PLDroidCameraStreamingDemo][1] 中的做法。
 
@@ -76,55 +154,11 @@ GLSurfaceView glSurfaceView = (GLSurfaceView) findViewById(R.id.cameraPreview_su
 
 3) 实例化并初始化 `StreamingProfile`、`Stream`、`CameraStreamingSetting`
 
-`streamJsonStrFromServer` 是由服务端返回的一段 JSON String，该 JSON String 描述了 `Stream` 的结构。通常，您可以使用 Pili 服务端 SDK 的 `getStream(streamId)` 方法来获取一个 `Stream` 对象，在服务端并将该对象以 JSON String 格式输出，该输出即是 `streamJsonStrFromServer` 变量的内容。例如，一段 JSON 格式的 `Stream` 内容如下：
+`streamJsonStrFromServer` 是由服务端返回的一段 JSON String，该 JSON String 描述了 `Stream` 的结构。通常，您可以使用 Pili 服务端 SDK 的 `getStream(streamId)` 方法来获取一个 `Stream` 对象，在服务端并将该对象以 JSON String 格式输出，该输出即是 `streamJsonStrFromServer` 变量的内容。从业务服务器获取对应的 `Stream` 可参考 [MainActivity.java](/PLDroidCameraStreamingDemo/app/src/main/java/com/pili/pldroid/streaming/camera/demo/MainActivity.java) 中的 `requestByHttpPost` 方法。
 
-```
-{
-    "id": "z1.live.55920c19fb16df0cbf00af8e",
-    "hub": "live",
-    "title": "55910c13fb16df0cbf00af8e",
-    "publishKey": "b06c7427b454762e",
-    "publishSecurity": "dynamic",
-    "hosts" : {
-        "publish" : {
-            "rtmp"   : "xxx.pub.z1.pili.qiniup.com"
-        },
-        "play"    : {
-            "hls"    : "xxx.hls1.z1.pili.qiniucdn.com",
-            "rtmp"   : "xxx.live1.z1.pili.qiniucdn.com"
-        }
-    }
-    // ...
-}
-```
 然后根据 `streamJsonStrFromServer` 构造 `JSONObject` 类型的对象 `streamJson`。
 
 ```JAVA
-/*
-*
-* You should get the streamJson from your server, maybe like this:
-*
-* Step 1: Get streamJsonStrFromServer from server
-* URL url = new URL(yourURL);
-* URLConnection conn = url.openConnection();
-*
-* HttpURLConnection httpConn = (HttpURLConnection) conn;
-* httpConn.setAllowUserInteraction(false);
-* httpConn.setInstanceFollowRedirects(true);
-* httpConn.setRequestMethod("GET");
-* httpConn.connect();
-*
-* InputStream is = httpConn.getInputStream();
-* streamJsonStrFromServer = convertInputStreamToString(is);
-*
-* Step 2: Instantiate streamJson object
-* JSONObject streamJson = new JSONObject(streamJsonStrFromServer);
-*
-*
-* Then you can use streamJson to instantiate stream object
-* Stream stream = new Stream(streamJson);
-*
-* */
 String streamJsonStrFromServer = "stream json string from your server";
 
 JSONObject streamJson = null;
@@ -213,9 +247,9 @@ public static final int VIDEO_ENCODING_SIZE_FHD;
 | Level | Resolution(16:9) | Resolution(4:3)|
 |---|---|---|
 |VIDEO_ENCODING_SIZE_QVGA|480 x 272|320 x 240|
-|VIDEO_ENCODING_SIZE_VGA|854 x 480|640 x 480|
+|VIDEO_ENCODING_SIZE_VGA|848 x 480|640 x 480|
 |VIDEO_ENCODING_SIZE_HD|1280 x 720|960 x 720|
-|VIDEO_ENCODING_SIZE_FHD|1920 x 1080|1440 x 1080|
+|VIDEO_ENCODING_SIZE_FHD|1920 x 1088|1440 x 1088|
 
 >若设置一个未被 SDK 支持的 quality，将会得到 `IllegalArgumentException("Cannot support the quality:" + quality)` 异常。
 
@@ -246,15 +280,33 @@ Prv Size Ratio : RATIO_16_9
 
 4) 实例化并初始化核心类 `CameraStreamingManager`
 - Camera Streaming
+
+硬编初始化 
 ```JAVA
-mCameraStreamingManager = new CameraStreamingManager(this, afl, glSurfaceView);
+mCameraStreamingManager = new CameraStreamingManager(this, afl, glSurfaceView, EncodingType.HW_VIDEO_WITH_HW_AUDIO_CODEC);
+mCameraStreamingManager.onPrepare(setting, profile);
+mCameraStreamingManager.setStreamingStateListener(this);
+```
+软编初始化 
+
+```JAVA
+mCameraStreamingManager = new CameraStreamingManager(this, afl, glSurfaceView, EncodingType.SW_VIDEO_WITH_SW_AUDIO_CODEC);
 mCameraStreamingManager.onPrepare(setting, profile);
 mCameraStreamingManager.setStreamingStateListener(this);
 ```
 
-- Pure Audio Streaming
+- 纯音频推流
+
+软编初始化 
 ```JAVA
-mCameraStreamingManager = new CameraStreamingManager(this);
+mCameraStreamingManager = new CameraStreamingManager(this, EncodingType.SW_AUDIO_CODEC);
+mCameraStreamingManager.onPrepare(profile);
+mCameraStreamingManager.setStreamingStateListener(this);
+```
+
+硬编初始化
+```JAVA
+mCameraStreamingManager = new CameraStreamingManager(this, EncodingType.HW_AUDIO_CODEC);
 mCameraStreamingManager.onPrepare(setting, profile);
 mCameraStreamingManager.setStreamingStateListener(this);
 ```
@@ -318,7 +370,7 @@ protected void onDestroy() {
 }
 ```
 
->纯音频推流支持后台运行，你只需要控制好 `onPause()` 及 `onDestory()` 周期函数即可。
+>纯音频推流支持后台运行，只需要控制好 `onPause()` 及 `onDestory()` 周期函数即可。
 
 8) 自适应码率
 
@@ -393,7 +445,34 @@ mCameraStreamingManager.captureFrame(w, h, new FrameCapturedCallback() {
 }
 ```
 
-10) FULL & REAL mode
+10) Filter 实现
+您可以通过如下 Callback 获取数据源或 Texture id，并定制化滤镜效果。
+
+- `onPreviewFrame` 会回调 NV21 格式的 YUV 数据，您 Filter 之后，会进行后续的编码和封包等操作。
+- 该过程是一个同步过程。
+- `onPreviewFrame` 仅在 Streaming 状态下被回调。
+
+```JAVA
+public interface StreamingPreviewCallback {
+    void onPreviewFrame(byte[] datas, Camera camera);
+}
+```
+
+`onDrawFrame` 会回调 Texture id，您处理完之后，返回新的 Texture id 进行显示。该过程是一个同步过程。
+- 如下四个回调均执行在 GL rendering thread
+- 如果 `onDrawFrame` 直接返回 `texId`，代表放弃 Filter 处理；否则 `onDrawFrame` 应该返回一个您处理过的纹理 ID
+- 自定义的 Texture id 应该是 `GLES20.GL_TEXTURE_2D` 类型
+
+```JAVA
+public interface SurfaceTextureCallback {
+    void onSurfaceCreated();
+    void onSurfaceChanged(int width, int height);
+    void onSurfaceDestroyed();
+    int onDrawFrame(int texId, int width, int height);
+}
+```
+
+11) FULL & REAL mode
 
 在获得 `AspectFrameLayout` 对象之后，您可以调用 `setShowMode` 方法来选择您需要的显示方式 。
 
@@ -405,7 +484,39 @@ AspectFrameLayout afl = (AspectFrameLayout) findViewById(R.id.cameraPreview_afl)
 afl.setShowMode(AspectFrameLayout.SHOW_MODE.FULL);
 ```
 
-11) `setNativeLoggingEnabled(enabled)`
+12) 自定义 SDK 涉及的 Shared Library Name
+
+如果您将 so 更名如下（前者为更新前的 so，后者为您更新后的 so）：
+
+- libpldroid_streaming_aac_encoder.so  -> libpldroid_streaming_aac_encoder_xxx.so
+- libpldroid_streaming_core.so         -> libpldroid_streaming_core_xxx.so
+- libpldroid_streaming_h264_encoder.so -> libpldroid_streaming_h264_encoder_xxx.so
+
+那么您需要在 `CameraStreamingManager` 构造前调用如下代码：
+
+```
+SharedLibraryNameHelper.getInstance().renameSharedLibrary(
+        SharedLibraryNameHelper.PLSharedLibraryType.PL_SO_TYPE_AAC, "pldroid_streaming_aac_encoder_xxx");
+
+SharedLibraryNameHelper.getInstance().renameSharedLibrary(
+        SharedLibraryNameHelper.PLSharedLibraryType.PL_SO_TYPE_CORE, "pldroid_streaming_core_xxx");
+
+SharedLibraryNameHelper.getInstance().renameSharedLibrary(
+        SharedLibraryNameHelper.PLSharedLibraryType.PL_SO_TYPE_H264, "pldroid_streaming_h264_encoder_xxx");
+```
+
+13）软编的 `EncoderRCModes`
+目前支持的类型：
+- EncoderRCModes.QUALITY_PRIORITY: 质量优先，实际的码率可能高于设置的码率
+- EncoderRCModes.BITRATE_PRIORITY: 码率优先，更精确地码率控制
+
+可通过 `StreamingProfile` 的 `setEncoderRCMode` 方法进行设置，如下：
+```JAVA
+StreamingProfile profile;
+profile.setEncoderRCMode(StreamingProfile.EncoderRCModes.QUALITY_PRIORITY);
+```
+
+14) `setNativeLoggingEnabled(enabled)`
 
 当 enabled 设置为 true ，SDK Native 层的 log 将会被打开；当设置为 false，SDK Native 层的 log 将会被关闭。默认处于打开状态。
 
@@ -414,6 +525,16 @@ mCameraStreamingManager.setNativeLoggingEnabled(false);
 ```
 
 ### 版本历史
+
+* 1.4.1 ([Release Notes][22])
+  - 发布 pldroid-camera-streaming-1.4.1.jar
+  - 更新 libpldroid_streaming_core.so
+  - 新增 libpldroid_streaming_aac_encoder.so 和 libpldroid_streaming_h264_encoder.so
+  - 增加软编支持
+  - 新增软编数据源回调接口，可定制化 Filter 效果
+  - 修复硬编部分机型 crash 问题
+  - 修复硬编切换前后置时长异常问题
+  - 更新 demo 展示代码 
 
 * 1.3.9 ([Release Notes][21])
   - 发布 pldroid-camera-streaming-1.3.9.jar
@@ -566,7 +687,6 @@ mCameraStreamingManager.setNativeLoggingEnabled(false);
 * 1.0.0 ([Release Notes][4])
   - 发布 PLDroidCameraStreaming v1.0.0
 
-
 [1]: /PLDroidCameraStreamingDemo
 [2]: /PLDroidCameraStreamingDemo/app/src/main/AndroidManifest.xml
 [3]: /PLDroidCameraStreamingDemo/app/src/main/java/com/pili/pldroid/streaming/camera/demo/CameraStreamingActivity.java
@@ -588,3 +708,4 @@ mCameraStreamingManager.setNativeLoggingEnabled(false);
 [19]: /ReleaseNotes/release-notes-1.3.7.md
 [20]: /ReleaseNotes/release-notes-1.3.8.md
 [21]: /ReleaseNotes/release-notes-1.3.9.md
+[22]: /ReleaseNotes/release-notes-1.4.1.md

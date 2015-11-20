@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.pili.pldroid.streaming.CameraStreamingManager;
+import com.pili.pldroid.streaming.SharedLibraryNameHelper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -26,7 +27,9 @@ public class StreamingBaseActivity extends Activity implements CameraStreamingMa
     protected Button mShutterButton;
     protected boolean mShutterButtonPressed = false;
 
-    protected static final int MSG_UPDATE_SHUTTER_BUTTON_STATE = 0;
+    protected static final int MSG_START_STREAMING = 0;
+    protected static final int MSG_STOP_STREAMING = 1;
+
     protected String mStatusMsgContent;
     protected TextView mSatusTextView;
 
@@ -38,29 +41,32 @@ public class StreamingBaseActivity extends Activity implements CameraStreamingMa
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
-                case MSG_UPDATE_SHUTTER_BUTTON_STATE:
-                    if (!mShutterButtonPressed) {
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                // disable the shutter button before startStreaming
-                                setShutterButtonEnabled(false);
-                                boolean res = mCameraStreamingManager.startStreaming();
-                                mShutterButtonPressed = true;
-                                Log.i(TAG, "res:" + res);
-                                if (!res) {
-                                    mShutterButtonPressed = false;
-                                    setShutterButtonEnabled(true);
-                                }
-                                setShutterButtonPressed(mShutterButtonPressed);
+                case MSG_START_STREAMING:
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            // disable the shutter button before startStreaming
+                            setShutterButtonEnabled(false);
+                            boolean res = mCameraStreamingManager.startStreaming();
+                            mShutterButtonPressed = true;
+                            Log.i(TAG, "res:" + res);
+                            if (!res) {
+                                mShutterButtonPressed = false;
+                                setShutterButtonEnabled(true);
                             }
-                        }).start();
-                    } else {
-                        // disable the shutter button before stopStreaming
-                        setShutterButtonEnabled(false);
-                        mCameraStreamingManager.stopStreaming();
-                        setShutterButtonPressed(false);
+                            setShutterButtonPressed(mShutterButtonPressed);
+                        }
+                    }).start();
+                    break;
+                case MSG_STOP_STREAMING:
+                    // disable the shutter button before stopStreaming
+                    setShutterButtonEnabled(false);
+                    boolean res = mCameraStreamingManager.stopStreaming();
+                    if (!res) {
+                        mShutterButtonPressed = true;
+                        setShutterButtonEnabled(true);
                     }
+                    setShutterButtonPressed(mShutterButtonPressed);
                     break;
                 default:
                     Log.e(TAG, "Invalid message");
@@ -76,31 +82,17 @@ public class StreamingBaseActivity extends Activity implements CameraStreamingMa
 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-       /*
-        * You should get the streamJson from your server, maybe like this:
-        *
-        * Step 1: Get streamJsonStrFromServer from server
-        * URL url = new URL(yourURL);
-        * URLConnection conn = url.openConnection();
-        *
-        * HttpURLConnection httpConn = (HttpURLConnection) conn;
-        * httpConn.setAllowUserInteraction(false);
-        * httpConn.setInstanceFollowRedirects(true);
-        * httpConn.setRequestMethod("GET");
-        * httpConn.connect();
-        *
-        * InputStream is = httpConn.getInputStream();
-        * streamJsonStrFromServer = convertInputStreamToString(is);
-        *
-        * Step 2: Instantiate streamJson object
-        * JSONObject streamJson = new JSONObject(streamJsonStrFromServer);
-        *
-        *
-        * Then you can use streamJson to instantiate stream object
-        * Stream stream = new Stream(streamJson);
-        *
-        * */
-        String streamJsonStrFromServer = "stream json string from your server";
+//        SharedLibraryNameHelper.getInstance().renameSharedLibrary(
+//                SharedLibraryNameHelper.PLSharedLibraryType.PL_SO_TYPE_AAC, "pldroid_streaming_aac_encoder_v7a");
+//
+//        SharedLibraryNameHelper.getInstance().renameSharedLibrary(
+//                SharedLibraryNameHelper.PLSharedLibraryType.PL_SO_TYPE_CORE, "pldroid_streaming_core_v7a");
+//
+//        SharedLibraryNameHelper.getInstance().renameSharedLibrary(
+//                SharedLibraryNameHelper.PLSharedLibraryType.PL_SO_TYPE_H264, "pldroid_streaming_h264_encoder_v7a");
+
+        String streamJsonStrFromServer = getIntent().getStringExtra("stream_json_str");
+//        Log.i(TAG, "streamJsonStrFromServer:" + streamJsonStrFromServer);
 
         try {
             mJSONObject = new JSONObject(streamJsonStrFromServer);
@@ -118,6 +110,7 @@ public class StreamingBaseActivity extends Activity implements CameraStreamingMa
     @Override
     protected void onPause() {
         super.onPause();
+
         mShutterButtonPressed = false;
         mCameraStreamingManager.onPause();
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -139,7 +132,7 @@ public class StreamingBaseActivity extends Activity implements CameraStreamingMa
             case CameraStreamingManager.STATE.READY:
                 mStatusMsgContent = getString(R.string.string_state_ready);
                 // start streaming when READY
-                onShutterButtonClick();
+                startStreaming();
                 break;
             case CameraStreamingManager.STATE.CONNECTING:
                 mStatusMsgContent = getString(R.string.string_state_connecting);
@@ -169,6 +162,8 @@ public class StreamingBaseActivity extends Activity implements CameraStreamingMa
             case CameraStreamingManager.STATE.SENDING_BUFFER_EMPTY:
                 break;
             case CameraStreamingManager.STATE.SENDING_BUFFER_FULL:
+                break;
+            case CameraStreamingManager.STATE.AUDIO_RECORDING_FAIL:
                 break;
         }
         runOnUiThread(new Runnable() {
@@ -206,8 +201,13 @@ public class StreamingBaseActivity extends Activity implements CameraStreamingMa
         });
     }
 
-    protected void onShutterButtonClick() {
-        mHandler.removeMessages(MSG_UPDATE_SHUTTER_BUTTON_STATE);
-        mHandler.sendMessageDelayed(mHandler.obtainMessage(MSG_UPDATE_SHUTTER_BUTTON_STATE), 50);
+    protected void startStreaming() {
+        mHandler.removeCallbacksAndMessages(null);
+        mHandler.sendMessageDelayed(mHandler.obtainMessage(MSG_START_STREAMING), 50);
+    }
+
+    protected void stopStreaming() {
+        mHandler.removeCallbacksAndMessages(null);
+        mHandler.sendMessageDelayed(mHandler.obtainMessage(MSG_STOP_STREAMING), 50);
     }
 }

@@ -5,7 +5,8 @@
     <string name="action_settings">Settings</string>
     <string name="start">Start</string>
 
-    <string name="camera_streaming_txt">Camera Streaming</string>
+    <string name="hw_codec_camera_streaming_txt">HW Codec Camera Streaming</string>
+    <string name="sw_codec_camera_streaming_txt">SW Codec Camera Streaming</string>
     <string name="pure_audio_streaming_txt">Audio Streaming</string>
 
     <string name="string_state_ready">READY</string>

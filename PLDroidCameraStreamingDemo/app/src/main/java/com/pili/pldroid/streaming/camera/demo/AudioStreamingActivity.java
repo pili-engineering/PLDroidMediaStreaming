@@ -6,7 +6,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.pili.pldroid.streaming.CameraStreamingManager;
-import com.pili.pldroid.streaming.CameraStreamingSetting;
+import com.pili.pldroid.streaming.CameraStreamingManager.EncodingType;
 import com.pili.pldroid.streaming.StreamingProfile;
 
 public class AudioStreamingActivity extends StreamingBaseActivity {
@@ -26,14 +26,18 @@ public class AudioStreamingActivity extends StreamingBaseActivity {
         profile.setStream(stream)
                 .setAudioQuality(StreamingProfile.AUDIO_QUALITY_LOW1);
 
-        mCameraStreamingManager = new CameraStreamingManager(this);
+        mCameraStreamingManager = new CameraStreamingManager(this, EncodingType.SW_AUDIO_CODEC);
         mCameraStreamingManager.onPrepare(profile);
         mCameraStreamingManager.setStreamingStateListener(this);
 
         mShutterButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                onShutterButtonClick();
+                if (mShutterButtonPressed) {
+                    stopStreaming();
+                } else {
+                    startStreaming();
+                }
             }
         });
     }
