@@ -15,10 +15,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.pili.pldroid.streaming.CameraStreamingManager;
+import com.pili.pldroid.streaming.CameraStreamingManager.EncodingType;
 import com.pili.pldroid.streaming.CameraStreamingSetting;
 import com.pili.pldroid.streaming.FrameCapturedCallback;
 import com.pili.pldroid.streaming.StreamingProfile;
-import com.pili.pldroid.streaming.StreamingProfile.Stream;
 import com.pili.pldroid.streaming.widget.AspectFrameLayout;
 
 import java.io.BufferedOutputStream;
@@ -28,10 +28,10 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
- * Created by jerikc on 15/6/16.
+ * Created by jerikc on 15/10/29.
  */
-public class CameraStreamingActivity extends StreamingBaseActivity implements View.OnLayoutChangeListener {
-    private static final String TAG = "CameraStreamingActivity";
+public class HWCodecCameraStreamingActivity extends StreamingBaseActivity implements View.OnLayoutChangeListener {
+    private static final String TAG = "HWCodecCameraStreaming";
 
     private Button mTorchBtn;
     private boolean mIsTorchOn = false;
@@ -68,11 +68,11 @@ public class CameraStreamingActivity extends StreamingBaseActivity implements Vi
         mCameraSwitchBtn = (Button) findViewById(R.id.camera_switch_btn);
         mCaptureFrameBtn = (Button) findViewById(R.id.capture_btn);
 
-        Stream stream = new Stream(mJSONObject);
+        StreamingProfile.Stream stream = new StreamingProfile.Stream(mJSONObject);
         mProfile = new StreamingProfile();
         mProfile.setVideoQuality(StreamingProfile.VIDEO_QUALITY_MEDIUM1)
                 .setAudioQuality(StreamingProfile.AUDIO_QUALITY_MEDIUM2)
-                .setEncodingSizeLevel(StreamingProfile.VIDEO_ENCODING_SIZE_HD)
+                .setEncodingSizeLevel(StreamingProfile.VIDEO_ENCODING_SIZE_VGA)
                 .setStream(stream)
                 .setSendingBufferProfile(new StreamingProfile.SendingBufferProfile(0.2f, 0.8f, 3.0f, 20 * 1000));
 
@@ -84,7 +84,7 @@ public class CameraStreamingActivity extends StreamingBaseActivity implements Vi
                 .setCameraPrvSizeLevel(CameraStreamingSetting.PREVIEW_SIZE_LEVEL.SMALL)
                 .setCameraPrvSizeRatio(CameraStreamingSetting.PREVIEW_SIZE_RATIO.RATIO_16_9);
 
-        mCameraStreamingManager = new CameraStreamingManager(this, afl, glSurfaceView);
+        mCameraStreamingManager = new CameraStreamingManager(this, afl, glSurfaceView, EncodingType.HW_VIDEO_WITH_HW_AUDIO_CODEC); // hw codec
         mCameraStreamingManager.onPrepare(setting, mProfile);
         // update the StreamingProfile
 //        mProfile.setStream(new Stream(mJSONObject1));
@@ -95,7 +95,11 @@ public class CameraStreamingActivity extends StreamingBaseActivity implements Vi
         mShutterButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                onShutterButtonClick();
+                if (mShutterButtonPressed) {
+                    stopStreaming();
+                } else {
+                    startStreaming();
+                }
             }
         });
 
@@ -146,8 +150,6 @@ public class CameraStreamingActivity extends StreamingBaseActivity implements Vi
         super.onPause();
         Log.i(TAG, "onPause");
         mHandler.removeCallbacksAndMessages(null);
-        mSwitcher = null;
-        mScreenshooter = null;
     }
 
     private Switcher mSwitcher = new Switcher();
@@ -169,7 +171,7 @@ public class CameraStreamingActivity extends StreamingBaseActivity implements Vi
         @Override
         public void run() {
             final String fileName = "PLStreaming_" + System.currentTimeMillis() + ".jpg";
-            mCameraStreamingManager.captureFrame(540, 960, new FrameCapturedCallback() {
+            mCameraStreamingManager.captureFrame(272, 480, new FrameCapturedCallback() {
                 private Bitmap bitmap;
 
                 @Override
@@ -258,13 +260,9 @@ public class CameraStreamingActivity extends StreamingBaseActivity implements Vi
         super.onStateHandled(state, extra);
         switch (state) {
             case CameraStreamingManager.STATE.SENDING_BUFFER_HAS_FEW_ITEMS:
-                mProfile.improveVideoQuality(1);
-                mCameraStreamingManager.notifyProfileChanged(mProfile);
-                return true;
+                return false;
             case CameraStreamingManager.STATE.SENDING_BUFFER_HAS_MANY_ITEMS:
-                mProfile.reduceVideoQuality(1);
-                mCameraStreamingManager.notifyProfileChanged(mProfile);
-                return true;
+                return false;
         }
         return false;
     }

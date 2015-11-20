@@ -28,7 +28,13 @@
 
         <activity
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
-            android:name=".CameraStreamingActivity"
+            android:name=".HWCodecCameraStreamingActivity"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar" >
+        </activity>
+
+        <activity
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
+            android:name=".SWCodecCameraStreamingActivity"
             android:theme="@android:style/Theme.Holo.Light.NoActionBar" >
         </activity>
         <!--android:theme="@android:style/Theme.Holo.Light.NoActionBar.Fullscreen" >-->
