@@ -580,7 +580,7 @@ mCameraStreamingManager.setNativeLoggingEnabled(false);
 
 * 1.4.3 ([Release Notes][23])
   - 发布 pldroid-camera-streaming-1.4.3.jar
-  - 更新 libpldroid_streaming_core.so，libpldroid_streaming_aac_encoder.so 和 libpldroid_streaming_h264_encoder.so
+  - 更新 libpldroid_streaming_core.so
   - 新增 `SharedLibraryNameHelper` 绝对路径加载方式
   - 新增 `StreamingSessionListener`，可方便安全地实现重连策略及 Audio 数据获取失败时的策略
   - 新增 `EncodingType` 支持
