@@ -1,6 +1,7 @@
 package com.pili.pldroid.streaming.camera.demo;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Handler;
@@ -10,6 +11,7 @@ import android.util.Log;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.pili.pldroid.streaming.CameraStreamingManager;
 import com.pili.pldroid.streaming.SharedLibraryNameHelper;
@@ -20,7 +22,9 @@ import org.json.JSONObject;
 /**
  * Created by jerikc on 15/7/6.
  */
-public class StreamingBaseActivity extends Activity implements CameraStreamingManager.StreamingStateListener {
+public class StreamingBaseActivity extends Activity implements
+        CameraStreamingManager.StreamingSessionListener,
+        CameraStreamingManager.StreamingStateListener {
 
     private static final String TAG = "StreamingBaseActivity";
 
@@ -83,10 +87,11 @@ public class StreamingBaseActivity extends Activity implements CameraStreamingMa
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
 //        SharedLibraryNameHelper.getInstance().renameSharedLibrary(
-//                SharedLibraryNameHelper.PLSharedLibraryType.PL_SO_TYPE_AAC, "pldroid_streaming_aac_encoder_v7a");
-//
+//                SharedLibraryNameHelper.PLSharedLibraryType.PL_SO_TYPE_AAC,
+//                getApplicationInfo().nativeLibraryDir + "/libpldroid_streaming_aac_encoder_v7a.so");
+
 //        SharedLibraryNameHelper.getInstance().renameSharedLibrary(
-//                SharedLibraryNameHelper.PLSharedLibraryType.PL_SO_TYPE_CORE, "pldroid_streaming_core_v7a");
+//                SharedLibraryNameHelper.PLSharedLibraryType.PL_SO_TYPE_CORE, "pldroid_streaming_core");
 //
 //        SharedLibraryNameHelper.getInstance().renameSharedLibrary(
 //                SharedLibraryNameHelper.PLSharedLibraryType.PL_SO_TYPE_H264, "pldroid_streaming_h264_encoder_v7a");
@@ -104,7 +109,11 @@ public class StreamingBaseActivity extends Activity implements CameraStreamingMa
     @Override
     protected void onResume() {
         super.onResume();
-        mCameraStreamingManager.onResume();
+        try {
+            mCameraStreamingManager.onResume();
+        } catch (Exception e) {
+            Toast.makeText(StreamingBaseActivity.this, "Device open error!", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
@@ -140,6 +149,7 @@ public class StreamingBaseActivity extends Activity implements CameraStreamingMa
             case CameraStreamingManager.STATE.STREAMING:
                 mStatusMsgContent = getString(R.string.string_state_streaming);
                 setShutterButtonEnabled(true);
+                setShutterButtonPressed(true);
                 break;
             case CameraStreamingManager.STATE.SHUTDOWN:
                 mStatusMsgContent = getString(R.string.string_state_ready);
@@ -164,6 +174,7 @@ public class StreamingBaseActivity extends Activity implements CameraStreamingMa
             case CameraStreamingManager.STATE.SENDING_BUFFER_FULL:
                 break;
             case CameraStreamingManager.STATE.AUDIO_RECORDING_FAIL:
+
                 break;
         }
         runOnUiThread(new Runnable() {
@@ -209,5 +220,17 @@ public class StreamingBaseActivity extends Activity implements CameraStreamingMa
     protected void stopStreaming() {
         mHandler.removeCallbacksAndMessages(null);
         mHandler.sendMessageDelayed(mHandler.obtainMessage(MSG_STOP_STREAMING), 50);
+    }
+
+    @Override
+    public boolean onRecordAudioFailedHandled(int err) {
+        mCameraStreamingManager.updateEncodingType(CameraStreamingManager.EncodingType.SW_VIDEO_CODEC);
+        mCameraStreamingManager.startStreaming();
+        return true;
+    }
+
+    @Override
+    public boolean onRestartStreamingHandled(int err) {
+        return mCameraStreamingManager.startStreaming();
     }
 }

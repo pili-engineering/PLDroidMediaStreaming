@@ -16,7 +16,7 @@ PLDroidCameraStreaming 是一个适用于 Android 的 RTMP 直播推流 SDK，�
   - [x] 支持闪光灯操作
   - [x] 支持纯音频推流，以及后台运行
   - [x] 支持截帧功能
-  - [x] 支持 ARM, ARMv7a, ARM64v8a, X86 主流芯片平台
+  - [x] 支持 ARM, ARMv7a, ARM64v8a, X86 主流芯片体系架构
   
 ## 测试通过的机型清单
 以下是目前已经在真机上验证通过的机型列表，您也可以在 Issue 中添加您测试通过的机型信息，感谢！
@@ -61,6 +61,7 @@ PLDroidCameraStreaming 是一个适用于 Android 的 RTMP 直播推流 SDK，�
 | 红米 | NOTE | 4.4.4 |
 | 魅族 | Mx 4 Pro | 4.4.2 |
 | 魅族 | Mx 5 | 5.0.1 |
+| vivo | X5M | 5.0.2 |
 | vivo | Y17W | 4.2.2 |
 | vivo | Y17T | 4.2.2 |
 | vivo | S7T | 4.2.2 |
@@ -79,7 +80,8 @@ PLDroidCameraStreaming 是一个适用于 Android 的 RTMP 直播推流 SDK，�
 | 索尼 | Z3 | 5.0.2 |
 | 金立 | GN9000L | 4.3 |
 | Alcatel One Touch | 6040D | 4.4.2 |
-| 美图 | | 4.4.4 |
+| 美图 | M4 | 4.4.4 |
+| 锤子 | SM701 | 4.4.2 |
 
 ## 内容摘要
 - [使用方法](#使用方法)
@@ -311,6 +313,17 @@ mCameraStreamingManager.onPrepare(setting, profile);
 mCameraStreamingManager.setStreamingStateListener(this);
 ```
 
+目前支持的 `EncodingType` 有：
+```
+HW_VIDEO_WITH_HW_AUDIO_CODEC,
+SW_VIDEO_WITH_HW_AUDIO_CODEC,
+SW_VIDEO_WITH_SW_AUDIO_CODEC,
+SW_AUDIO_CODEC,
+HW_AUDIO_CODEC,
+SW_VIDEO_CODEC,
+HW_VIDEO_CODEC
+```
+
 您需要实现 `StreamingStateListener`，
 以便通过回调函数 `onStateChanged` 接收如下消息：
 - STATE.PREPARING
@@ -432,9 +445,9 @@ case CameraStreamingManager.STATE.SENDING_BUFFER_HAS_MANY_ITEMS:
 
 9) 截帧
 
-在调用 `captureFrame` 的时候，您需要传入 width 和 height，以及 `FrameCapturedCallback`。SDK 完成截帧之后，会回调 `onFrameCaptured` ，并将结果以参数的形式返回给调用者。
+在调用 `captureFrame` 的时候，您需要传入 width 和 height，以及 `FrameCapturedCallback`，如果传入的 width 或者 height 小于等于 0，SDK 返回的 `Bitmap` 将会是预览的尺寸 。SDK 完成截帧之后，会回调 `onFrameCaptured`，并将结果以参数的形式返回给调用者。
 
-> 调用者有义务对 Bitmap 进行释放
+> 注意：调用者有义务对 Bitmap 进行回收释放
 
 ```
 mCameraStreamingManager.captureFrame(w, h, new FrameCapturedCallback() {
@@ -505,6 +518,18 @@ SharedLibraryNameHelper.getInstance().renameSharedLibrary(
         SharedLibraryNameHelper.PLSharedLibraryType.PL_SO_TYPE_H264, "pldroid_streaming_h264_encoder_xxx");
 ```
 
+或带路径的方式
+```
+SharedLibraryNameHelper.getInstance().renameSharedLibrary(
+        SharedLibraryNameHelper.PLSharedLibraryType.PL_SO_TYPE_AAC, getApplicationInfo().nativeLibraryDir + "/libpldroid_streaming_aac_encoder_xxx.so");
+
+SharedLibraryNameHelper.getInstance().renameSharedLibrary(
+        SharedLibraryNameHelper.PLSharedLibraryType.PL_SO_TYPE_CORE, getApplicationInfo().nativeLibraryDir + "/libpldroid_streaming_core_xxx.so");
+
+SharedLibraryNameHelper.getInstance().renameSharedLibrary(
+        SharedLibraryNameHelper.PLSharedLibraryType.PL_SO_TYPE_H264, getApplicationInfo().nativeLibraryDir + "/libpldroid_streaming_h264_encoder_xxx.so");
+```
+
 13）软编的 `EncoderRCModes`
 目前支持的类型：
 - EncoderRCModes.QUALITY_PRIORITY: 质量优先，实际的码率可能高于设置的码率
@@ -516,7 +541,34 @@ StreamingProfile profile;
 profile.setEncoderRCMode(StreamingProfile.EncoderRCModes.QUALITY_PRIORITY);
 ```
 
-14) `setNativeLoggingEnabled(enabled)`
+14）`StreamingSessionListener`
+该 Listener 的原型如下：
+```
+public interface StreamingSessionListener {
+    boolean onRecordAudioFailedHandled(int code);
+    boolean onRestartStreamingHandled(int code);
+}
+```
+您可以实现 `StreamingSessionListener`，比如：
+```
+@Override
+public boolean onRecordAudioFailedHandled(int err) {
+    mCameraStreamingManager.updateEncodingType(CameraStreamingManager.EncodingType.SW_VIDEO_CODEC);
+    mCameraStreamingManager.startStreaming();
+    return true;
+}
+
+@Override
+public boolean onRestartStreamingHandled(int err) {
+    return mCameraStreamingManager.startStreaming();
+}
+```
+
+在消费了 `onRecordAudioFailedHandled` 或 `onRestartStreamingHandled` 之后，您应该返回 true 通知 SDK；若不做任何处理，返回 false。
+- `onRecordAudioFailedHandled`：在 Audio 数据读取失败后，会回调该方法，如前面的代码，您可以继续继续纯视频推流
+- `onRestartStreamingHandled`：在网络链接失败之后，SDK 会回调 `STATE.DISCONNECTED` 消息，并在合适的时刻回调 `onRestartStreamingHandled` 方法，您可以在此方法中安全地实现重连策略。若网络不可达，会回调 `STATE.IOERROR`。
+
+15) `setNativeLoggingEnabled(enabled)`
 
 当 enabled 设置为 true ，SDK Native 层的 log 将会被打开；当设置为 false，SDK Native 层的 log 将会被关闭。默认处于打开状态。
 
@@ -525,6 +577,20 @@ mCameraStreamingManager.setNativeLoggingEnabled(false);
 ```
 
 ### 版本历史
+
+* 1.4.3 ([Release Notes][23])
+  - 发布 pldroid-camera-streaming-1.4.3.jar
+  - 更新 libpldroid_streaming_core.so
+  - 新增 `SharedLibraryNameHelper` 绝对路径加载方式
+  - 新增 `StreamingSessionListener`，可方便安全地实现重连策略及 Audio 数据获取失败时的策略
+  - 新增 `EncodingType` 支持
+  - 修复硬编模式下，多次切换前后置摄像头 crash 问题
+  - 修复硬编模式下，部分机型截图 crash 问题
+  - 修复 metadata 格式问题
+  - 修复软编模式下，推流过程中概率性 crash 问题
+  - 修复概率性无视频帧问题
+  - 更新 demo 展示代码
+  - 增加支持的机型信息 
 
 * 1.4.1 ([Release Notes][22])
   - 发布 pldroid-camera-streaming-1.4.1.jar
@@ -709,3 +775,4 @@ mCameraStreamingManager.setNativeLoggingEnabled(false);
 [20]: /ReleaseNotes/release-notes-1.3.8.md
 [21]: /ReleaseNotes/release-notes-1.3.9.md
 [22]: /ReleaseNotes/release-notes-1.4.1.md
+[23]: /ReleaseNotes/release-notes-1.4.3.md
