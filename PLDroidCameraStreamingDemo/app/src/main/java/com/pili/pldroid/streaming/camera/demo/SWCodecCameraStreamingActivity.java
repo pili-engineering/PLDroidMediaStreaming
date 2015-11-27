@@ -72,7 +72,7 @@ public class SWCodecCameraStreamingActivity extends StreamingBaseActivity
 
         StreamingProfile.Stream stream = new StreamingProfile.Stream(mJSONObject);
         mProfile = new StreamingProfile();
-        mProfile.setVideoQuality(StreamingProfile.VIDEO_QUALITY_MEDIUM1)
+        mProfile.setVideoQuality(StreamingProfile.VIDEO_QUALITY_LOW3)
                 .setAudioQuality(StreamingProfile.AUDIO_QUALITY_MEDIUM2)
                 .setEncodingSizeLevel(StreamingProfile.VIDEO_ENCODING_SIZE_VGA)
                 .setEncoderRCMode(StreamingProfile.EncoderRCModes.QUALITY_PRIORITY)
@@ -93,6 +93,7 @@ public class SWCodecCameraStreamingActivity extends StreamingBaseActivity
         mCameraStreamingManager.setStreamingStateListener(this);
         mCameraStreamingManager.setStreamingPreviewCallback(this);
         mCameraStreamingManager.setSurfaceTextureCallback(this);
+        mCameraStreamingManager.setStreamingSessionListener(this);
 //        mCameraStreamingManager.setNativeLoggingEnabled(false);
 
         mShutterButton.setOnClickListener(new View.OnClickListener() {
@@ -208,7 +209,7 @@ public class SWCodecCameraStreamingActivity extends StreamingBaseActivity
         @Override
         public void run() {
             final String fileName = "PLStreaming_" + System.currentTimeMillis() + ".jpg";
-            mCameraStreamingManager.captureFrame(272, 480, new FrameCapturedCallback() {
+            mCameraStreamingManager.captureFrame(0, 0, new FrameCapturedCallback() {
                 private Bitmap bitmap;
 
                 @Override

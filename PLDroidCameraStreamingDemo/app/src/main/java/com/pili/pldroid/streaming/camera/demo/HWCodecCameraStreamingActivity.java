@@ -19,6 +19,7 @@ import com.pili.pldroid.streaming.CameraStreamingManager.EncodingType;
 import com.pili.pldroid.streaming.CameraStreamingSetting;
 import com.pili.pldroid.streaming.FrameCapturedCallback;
 import com.pili.pldroid.streaming.StreamingProfile;
+import com.pili.pldroid.streaming.SurfaceTextureCallback;
 import com.pili.pldroid.streaming.widget.AspectFrameLayout;
 
 import java.io.BufferedOutputStream;
@@ -30,7 +31,9 @@ import java.util.Map;
 /**
  * Created by jerikc on 15/10/29.
  */
-public class HWCodecCameraStreamingActivity extends StreamingBaseActivity implements View.OnLayoutChangeListener {
+public class HWCodecCameraStreamingActivity extends StreamingBaseActivity implements
+        SurfaceTextureCallback,
+        View.OnLayoutChangeListener {
     private static final String TAG = "HWCodecCameraStreaming";
 
     private Button mTorchBtn;
@@ -70,7 +73,7 @@ public class HWCodecCameraStreamingActivity extends StreamingBaseActivity implem
 
         StreamingProfile.Stream stream = new StreamingProfile.Stream(mJSONObject);
         mProfile = new StreamingProfile();
-        mProfile.setVideoQuality(StreamingProfile.VIDEO_QUALITY_MEDIUM1)
+        mProfile.setVideoQuality(StreamingProfile.VIDEO_QUALITY_LOW3)
                 .setAudioQuality(StreamingProfile.AUDIO_QUALITY_MEDIUM2)
                 .setEncodingSizeLevel(StreamingProfile.VIDEO_ENCODING_SIZE_VGA)
                 .setStream(stream)
@@ -90,6 +93,8 @@ public class HWCodecCameraStreamingActivity extends StreamingBaseActivity implem
 //        mProfile.setStream(new Stream(mJSONObject1));
 //        mCameraStreamingManager.setStreamingProfile(mProfile);
         mCameraStreamingManager.setStreamingStateListener(this);
+//        mCameraStreamingManager.setSurfaceTextureCallback(this);
+        mCameraStreamingManager.setStreamingSessionListener(this);
 //        mCameraStreamingManager.setNativeLoggingEnabled(false);
 
         mShutterButton.setOnClickListener(new View.OnClickListener() {
@@ -157,6 +162,27 @@ public class HWCodecCameraStreamingActivity extends StreamingBaseActivity implem
     @Override
     public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
         Log.i(TAG, "view!!!!:" + v);
+    }
+
+    @Override
+    public void onSurfaceCreated() {
+        Log.i(TAG, "onSurfaceCreated");
+    }
+
+    @Override
+    public void onSurfaceChanged(int width, int height) {
+        Log.i(TAG, "onSurfaceChanged");
+    }
+
+    @Override
+    public void onSurfaceDestroyed() {
+        Log.i(TAG, "onSurfaceDestroyed");
+    }
+
+    @Override
+    public int onDrawFrame(int texId, int texWidth, int texHeight) {
+        Log.i(TAG, "onDrawFrame: texId=" + texId);
+        return texId;
     }
 
     private class Switcher implements Runnable {
