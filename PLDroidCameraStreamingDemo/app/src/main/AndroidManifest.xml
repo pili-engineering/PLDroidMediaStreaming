@@ -34,6 +34,7 @@
 
         <activity
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
+            android:configChanges="orientation|screenSize"
             android:name=".SWCodecCameraStreamingActivity"
             android:theme="@android:style/Theme.Holo.Light.NoActionBar" >
         </activity>
