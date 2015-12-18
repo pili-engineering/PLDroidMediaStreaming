@@ -3,6 +3,7 @@ package com.pili.pldroid.streaming.camera.demo;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
+import android.hardware.Camera;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -18,6 +19,8 @@ import com.pili.pldroid.streaming.SharedLibraryNameHelper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.List;
 
 /**
  * Created by jerikc on 15/7/6.
@@ -36,10 +39,12 @@ public class StreamingBaseActivity extends Activity implements
 
     protected String mStatusMsgContent;
     protected TextView mSatusTextView;
+    protected String mLogContent = "\n";
 
     protected CameraStreamingManager mCameraStreamingManager;
 
     protected JSONObject mJSONObject;
+    protected boolean isEncOrientationPort = true;
 
     protected Handler mHandler = new Handler(Looper.getMainLooper()) {
         @Override
@@ -84,12 +89,17 @@ public class StreamingBaseActivity extends Activity implements
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-
+        if (Config.SCREEN_ORIENTATION == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
+            isEncOrientationPort = true;
+        } else if (Config.SCREEN_ORIENTATION == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
+            isEncOrientationPort = false;
+        }
+        setRequestedOrientation(Config.SCREEN_ORIENTATION);
+//
 //        SharedLibraryNameHelper.getInstance().renameSharedLibrary(
 //                SharedLibraryNameHelper.PLSharedLibraryType.PL_SO_TYPE_AAC,
 //                getApplicationInfo().nativeLibraryDir + "/libpldroid_streaming_aac_encoder_v7a.so");
-
+//
 //        SharedLibraryNameHelper.getInstance().renameSharedLibrary(
 //                SharedLibraryNameHelper.PLSharedLibraryType.PL_SO_TYPE_CORE, "pldroid_streaming_core");
 //
@@ -97,8 +107,6 @@ public class StreamingBaseActivity extends Activity implements
 //                SharedLibraryNameHelper.PLSharedLibraryType.PL_SO_TYPE_H264, "pldroid_streaming_h264_encoder_v7a");
 
         String streamJsonStrFromServer = getIntent().getStringExtra("stream_json_str");
-//        Log.i(TAG, "streamJsonStrFromServer:" + streamJsonStrFromServer);
-
         try {
             mJSONObject = new JSONObject(streamJsonStrFromServer);
         } catch (JSONException e) {
@@ -109,11 +117,7 @@ public class StreamingBaseActivity extends Activity implements
     @Override
     protected void onResume() {
         super.onResume();
-        try {
-            mCameraStreamingManager.onResume();
-        } catch (Exception e) {
-            Toast.makeText(StreamingBaseActivity.this, "Device open error!", Toast.LENGTH_SHORT).show();
-        }
+        mCameraStreamingManager.onResume();
     }
 
     @Override
@@ -157,13 +161,16 @@ public class StreamingBaseActivity extends Activity implements
                 setShutterButtonPressed(false);
                 break;
             case CameraStreamingManager.STATE.IOERROR:
+                mLogContent += "IOERROR\n";
                 mStatusMsgContent = getString(R.string.string_state_ready);
                 setShutterButtonEnabled(true);
                 break;
             case CameraStreamingManager.STATE.NETBLOCKING:
+                mLogContent += "NETBLOCKING\n";
                 mStatusMsgContent = getString(R.string.string_state_netblocking);
                 break;
             case CameraStreamingManager.STATE.CONNECTION_TIMEOUT:
+                mLogContent += "CONNECTION_TIMEOUT\n";
                 mStatusMsgContent = getString(R.string.string_state_con_timeout);
                 break;
             case CameraStreamingManager.STATE.UNKNOWN:
@@ -174,7 +181,12 @@ public class StreamingBaseActivity extends Activity implements
             case CameraStreamingManager.STATE.SENDING_BUFFER_FULL:
                 break;
             case CameraStreamingManager.STATE.AUDIO_RECORDING_FAIL:
-
+                break;
+            case CameraStreamingManager.STATE.OPEN_CAMERA_FAIL:
+                Log.e(TAG, "Open Camera Fail. id:" + extra);
+                break;
+            case CameraStreamingManager.STATE.DISCONNECTED:
+                mLogContent += "DISCONNECTED\n";
                 break;
         }
         runOnUiThread(new Runnable() {
@@ -231,6 +243,18 @@ public class StreamingBaseActivity extends Activity implements
 
     @Override
     public boolean onRestartStreamingHandled(int err) {
+        Log.i(TAG, "onRestartStreamingHandled");
         return mCameraStreamingManager.startStreaming();
+    }
+
+    @Override
+    public Camera.Size onPreviewSizeSelected(List<Camera.Size> list) {
+        if (list != null) {
+            for (Camera.Size s : list) {
+                Log.i(TAG, "w:" + s.width + ", h:" + s.height);
+            }
+//            return "your choice";
+        }
+        return null;
     }
 }

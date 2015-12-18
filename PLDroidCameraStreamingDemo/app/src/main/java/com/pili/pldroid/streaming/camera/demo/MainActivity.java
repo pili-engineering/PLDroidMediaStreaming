@@ -35,7 +35,6 @@ public class MainActivity extends Activity {
     private Button mHWCodecCameraStreamingBtn;
     private Button mSWCodecCameraStreamingBtn;
     private Button mAudioStreamingBtn;
-    private TextView mVersionInfoTextView;
 
     public String requestByHttpPost() {
         try {
@@ -74,9 +73,6 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        mVersionInfoTextView = (TextView)findViewById(R.id.version_info);
-        mVersionInfoTextView.setText("v1.5");
 
         mHWCodecCameraStreamingBtn = (Button) findViewById(R.id.hw_codec_camera_streaming_btn);
         if (!isSupportHWEncode()) {

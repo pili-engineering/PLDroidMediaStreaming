@@ -130,12 +130,6 @@ public class HWCodecCameraStreamingActivity extends StreamingBaseActivity implem
         mCameraSwitchBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                new Thread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        mCameraStreamingManager.switchCamera();
-//                    }
-//                }).start();
                 mHandler.removeCallbacks(mSwitcher);
                 mHandler.postDelayed(mSwitcher, 100);
             }
@@ -269,13 +263,18 @@ public class HWCodecCameraStreamingActivity extends StreamingBaseActivity implem
                 break;
             case CameraStreamingManager.STATE.TORCH_INFO:
                 if (extra != null) {
-                    boolean isSupportedTorch = (Boolean) extra;
+                    final boolean isSupportedTorch = (Boolean) extra;
                     Log.i(TAG, "isSupportedTorch=" + isSupportedTorch);
-                    if (isSupportedTorch) {
-                        mTorchBtn.setVisibility(View.VISIBLE);
-                    } else {
-                        mTorchBtn.setVisibility(View.GONE);
-                    }
+                    this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (isSupportedTorch) {
+                                mTorchBtn.setVisibility(View.VISIBLE);
+                            } else {
+                                mTorchBtn.setVisibility(View.GONE);
+                            }
+                        }
+                    });
                 }
                 break;
         }

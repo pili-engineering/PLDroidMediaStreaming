@@ -1,6 +1,7 @@
 package com.pili.pldroid.streaming.camera.demo;
 
 import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.hardware.Camera;
 import android.opengl.GLSurfaceView;
@@ -20,6 +21,7 @@ import com.pili.pldroid.streaming.CameraStreamingSetting;
 import com.pili.pldroid.streaming.FrameCapturedCallback;
 import com.pili.pldroid.streaming.StreamingPreviewCallback;
 import com.pili.pldroid.streaming.StreamingProfile;
+import com.pili.pldroid.streaming.StreamingProfile.ENCODING_ORIENTATION;
 import com.pili.pldroid.streaming.SurfaceTextureCallback;
 import com.pili.pldroid.streaming.widget.AspectFrameLayout;
 
@@ -40,9 +42,14 @@ public class SWCodecCameraStreamingActivity extends StreamingBaseActivity
     private boolean mIsTorchOn = false;
     private Button mCameraSwitchBtn;
     private Button mCaptureFrameBtn;
+    private Button mEncodingOrientationSwitcherBtn;
     private StreamingProfile mProfile;
     private Context mContext;
     private View mRootView;
+
+    private Screenshooter mScreenshooter = new Screenshooter();
+    private EncodingOrientationSwitcher mEncodingOrientationSwitcher = new EncodingOrientationSwitcher();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,17 +79,19 @@ public class SWCodecCameraStreamingActivity extends StreamingBaseActivity
 
         StreamingProfile.Stream stream = new StreamingProfile.Stream(mJSONObject);
         mProfile = new StreamingProfile();
-        mProfile.setVideoQuality(StreamingProfile.VIDEO_QUALITY_LOW3)
+        mProfile.setVideoQuality(StreamingProfile.VIDEO_QUALITY_MEDIUM1)
                 .setAudioQuality(StreamingProfile.AUDIO_QUALITY_MEDIUM2)
+//                .setPreferredVideoEncodingSize(960, 544)
                 .setEncodingSizeLevel(StreamingProfile.VIDEO_ENCODING_SIZE_VGA)
                 .setEncoderRCMode(StreamingProfile.EncoderRCModes.QUALITY_PRIORITY)
                 .setStream(stream)
+//                .setEncodingOrientation(StreamingProfile.ENCODING_ORIENTATION.PORT)
                 .setSendingBufferProfile(new StreamingProfile.SendingBufferProfile(0.2f, 0.8f, 3.0f, 20 * 1000));
 
         CameraStreamingSetting setting = new CameraStreamingSetting();
         setting.setCameraId(Camera.CameraInfo.CAMERA_FACING_BACK)
                 .setContinuousFocusModeEnabled(true)
-                .setCameraPrvSizeLevel(CameraStreamingSetting.PREVIEW_SIZE_LEVEL.SMALL)
+                .setCameraPrvSizeLevel(CameraStreamingSetting.PREVIEW_SIZE_LEVEL.MEDIUM)
                 .setCameraPrvSizeRatio(CameraStreamingSetting.PREVIEW_SIZE_RATIO.RATIO_16_9);
 
         mCameraStreamingManager = new CameraStreamingManager(this, afl, glSurfaceView, EncodingType.SW_VIDEO_WITH_SW_AUDIO_CODEC);  // soft codec
@@ -129,12 +138,6 @@ public class SWCodecCameraStreamingActivity extends StreamingBaseActivity
         mCameraSwitchBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                new Thread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        mCameraStreamingManager.switchCamera();
-//                    }
-//                }).start();
                 mHandler.removeCallbacks(mSwitcher);
                 mHandler.postDelayed(mSwitcher, 100);
             }
@@ -145,6 +148,15 @@ public class SWCodecCameraStreamingActivity extends StreamingBaseActivity
             public void onClick(View view) {
                 mHandler.removeCallbacks(mScreenshooter);
                 mHandler.postDelayed(mScreenshooter, 100);
+            }
+        });
+
+        mEncodingOrientationSwitcherBtn = (Button) findViewById(R.id.orientation_btn);
+        mEncodingOrientationSwitcherBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mHandler.removeCallbacks(mEncodingOrientationSwitcher);
+                mHandler.post(mEncodingOrientationSwitcher);
             }
         });
     }
@@ -165,12 +177,18 @@ public class SWCodecCameraStreamingActivity extends StreamingBaseActivity
 
     @Override
     public void onPreviewFrame(byte[] bytes, Camera camera) {
+
+    }
+
+    @Override
+    public boolean onPreviewFrame(byte[] bytes, int width, int height) {
 //        deal with the yuv data.
 //        long start = System.currentTimeMillis();
 //        for (int i = 0; i < bytes.length; i++) {
 //            bytes[i] = 0x00;
 //        }
-//        Log.i(TAG, "cost :" + (System.currentTimeMillis() - start));
+//        Log.i(TAG, "old onPreviewFrame cost :" + (System.currentTimeMillis() - start));
+        return true;
     }
 
     @Override
@@ -200,11 +218,26 @@ public class SWCodecCameraStreamingActivity extends StreamingBaseActivity
     private class Switcher implements Runnable {
         @Override
         public void run() {
+
             mCameraStreamingManager.switchCamera();
         }
     }
 
-    private Screenshooter mScreenshooter = new Screenshooter();
+    private class EncodingOrientationSwitcher implements Runnable {
+
+        @Override
+        public void run() {
+            Log.i(TAG, "isEncOrientationPort:" + isEncOrientationPort);
+            isEncOrientationPort = !isEncOrientationPort;
+            mProfile.setEncodingOrientation(isEncOrientationPort ? ENCODING_ORIENTATION.PORT : ENCODING_ORIENTATION.LAND);
+            mCameraStreamingManager.setStreamingProfile(mProfile);
+            setRequestedOrientation(isEncOrientationPort ? ActivityInfo.SCREEN_ORIENTATION_PORTRAIT : ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            mCameraStreamingManager.notifyActivityOrientationChanged();
+            Toast.makeText(SWCodecCameraStreamingActivity.this, Config.HINT_ENCODING_ORIENTATION_CHANGED,
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
+
     private class Screenshooter implements Runnable {
         @Override
         public void run() {
@@ -281,13 +314,18 @@ public class SWCodecCameraStreamingActivity extends StreamingBaseActivity
                 break;
             case CameraStreamingManager.STATE.TORCH_INFO:
                 if (extra != null) {
-                    boolean isSupportedTorch = (Boolean) extra;
+                    final boolean isSupportedTorch = (Boolean) extra;
                     Log.i(TAG, "isSupportedTorch=" + isSupportedTorch);
-                    if (isSupportedTorch) {
-                        mTorchBtn.setVisibility(View.VISIBLE);
-                    } else {
-                        mTorchBtn.setVisibility(View.GONE);
-                    }
+                    this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (isSupportedTorch) {
+                                mTorchBtn.setVisibility(View.VISIBLE);
+                            } else {
+                                mTorchBtn.setVisibility(View.GONE);
+                            }
+                        }
+                    });
                 }
                 break;
         }

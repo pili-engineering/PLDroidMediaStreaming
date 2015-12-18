@@ -16,6 +16,8 @@ PLDroidCameraStreaming 是一个适用于 Android 的 RTMP 直播推流 SDK，�
   - [x] 支持闪光灯操作
   - [x] 支持纯音频推流，以及后台运行
   - [x] 支持截帧功能
+  - [x] 支持动态更改 Encoding Orientation
+  - [x] 支持动态切换横竖屏
   - [x] 支持 ARM, ARMv7a, ARM64v8a, X86 主流芯片体系架构
   
 ## 测试通过的机型清单
@@ -184,6 +186,8 @@ setting.setCameraId(Camera.CameraInfo.CAMERA_FACING_BACK)
        .setCameraPrvSizeRatio(CameraStreamingSetting.PREVIEW_SIZE_RATIO.RATIO_4_3);
 ```
 
+用户可调用 `profile.setPreferredVideoEncodingSize(int w, int h)` 设置一个偏好 Video Encoding size。
+
 - SDK 预定义的 Video Quality 列表：
 ```JAVA
 public static final int VIDEO_QUALITY_LOW1;
@@ -213,10 +217,11 @@ public static final int AUDIO_QUALITY_HIGH2;
 
 - SDK 预定义的 Video Encoding Size 列表：
 ```JAVA
-public static final int VIDEO_ENCODING_SIZE_QVGA;
-public static final int VIDEO_ENCODING_SIZE_VGA;
-public static final int VIDEO_ENCODING_SIZE_HD;
-public static final int VIDEO_ENCODING_SIZE_FHD;
+public static final int VIDEO_ENCODING_HEIGHT_240;
+public static final int VIDEO_ENCODING_HEIGHT_480;
+public static final int VIDEO_ENCODING_HEIGHT_544;
+public static final int VIDEO_ENCODING_HEIGHT_720;
+public static final int VIDEO_ENCODING_HEIGHT_1088;
 ```
 
 - Video Quality 配置表
@@ -248,10 +253,11 @@ public static final int VIDEO_ENCODING_SIZE_FHD;
 
 | Level | Resolution(16:9) | Resolution(4:3)|
 |---|---|---|
-|VIDEO_ENCODING_SIZE_QVGA|480 x 272|320 x 240|
-|VIDEO_ENCODING_SIZE_VGA|848 x 480|640 x 480|
-|VIDEO_ENCODING_SIZE_HD|1280 x 720|960 x 720|
-|VIDEO_ENCODING_SIZE_FHD|1920 x 1088|1440 x 1088|
+|VIDEO_ENCODING_HEIGHT_240|424 x 240|320 x 240|
+|VIDEO_ENCODING_HEIGHT_480|848 x 480|640 x 480|
+|VIDEO_ENCODING_HEIGHT_544|960 x 544|720 x 544|
+|VIDEO_ENCODING_HEIGHT_720|1280 x 720|960 x 720|
+|VIDEO_ENCODING_HEIGHT_1088|1920 x 1088|1440 x 1088|
 
 >若设置一个未被 SDK 支持的 quality，将会得到 `IllegalArgumentException("Cannot support the quality:" + quality)` 异常。
 
@@ -459,6 +465,7 @@ mCameraStreamingManager.captureFrame(w, h, new FrameCapturedCallback() {
 ```
 
 10) Filter 实现
+
 您可以通过如下 Callback 获取数据源或 Texture id，并定制化滤镜效果。
 
 - `onPreviewFrame` 会回调 NV21 格式的 YUV 数据，您 Filter 之后，会进行后续的编码和封包等操作。
@@ -467,7 +474,7 @@ mCameraStreamingManager.captureFrame(w, h, new FrameCapturedCallback() {
 
 ```JAVA
 public interface StreamingPreviewCallback {
-    void onPreviewFrame(byte[] datas, Camera camera);
+    public boolean onPreviewFrame(byte[] bytes, int width, int height)
 }
 ```
 
@@ -531,6 +538,7 @@ SharedLibraryNameHelper.getInstance().renameSharedLibrary(
 ```
 
 13）软编的 `EncoderRCModes`
+
 目前支持的类型：
 - EncoderRCModes.QUALITY_PRIORITY: 质量优先，实际的码率可能高于设置的码率
 - EncoderRCModes.BITRATE_PRIORITY: 码率优先，更精确地码率控制
@@ -542,11 +550,13 @@ profile.setEncoderRCMode(StreamingProfile.EncoderRCModes.QUALITY_PRIORITY);
 ```
 
 14）`StreamingSessionListener`
+
 该 Listener 的原型如下：
 ```
 public interface StreamingSessionListener {
     boolean onRecordAudioFailedHandled(int code);
     boolean onRestartStreamingHandled(int code);
+    Size onPreviewSizeSelected(List<Size> supportedList);
 }
 ```
 您可以实现 `StreamingSessionListener`，比如：
@@ -562,13 +572,70 @@ public boolean onRecordAudioFailedHandled(int err) {
 public boolean onRestartStreamingHandled(int err) {
     return mCameraStreamingManager.startStreaming();
 }
+
+@Override
+public Camera.Size onPreviewSizeSelected(List<Camera.Size> list) {
+    if (list != null) {
+        for (Camera.Size s : list) {
+            Log.i(TAG, "w:" + s.width + ", h:" + s.height);
+        }
+//            return "your choice";
+    }
+    return null;
+}
 ```
 
 在消费了 `onRecordAudioFailedHandled` 或 `onRestartStreamingHandled` 之后，您应该返回 true 通知 SDK；若不做任何处理，返回 false。
 - `onRecordAudioFailedHandled`：在 Audio 数据读取失败后，会回调该方法，如前面的代码，您可以继续继续纯视频推流
 - `onRestartStreamingHandled`：在网络链接失败之后，SDK 会回调 `STATE.DISCONNECTED` 消息，并在合适的时刻回调 `onRestartStreamingHandled` 方法，您可以在此方法中安全地实现重连策略。若网络不可达，会回调 `STATE.IOERROR`。
+- `onPreviewSizeSelected`：可以在此回调中选择您认为合适的 preview size；否则，返回 null 告知 SDK，放弃选择，SDK 将会采取默认的策略进行选择 camera preview size。若在初始化 `CameraStreamingSetting` 时，
+  - 未指定 preview size ratio，`onPreviewSizeSelected` 方法的行参 list 将会是该系统所有支持的 camera preview size 全集
+  - 指定了 preview size ratio，即调用了 `setCameraPrvSizeRatio` 并传入合法 ratio 后，`onPreviewSizeSelected` 方法的行参 list 将是该系统所有支持的 camera preview size 并匹配 ratio 的子集。这种情况下，可能返回 null。
 
-15) `setNativeLoggingEnabled(enabled)`
+15) 动态更改 Orientation
+
+包括动态更改 Encoding Orientation 以及动态切换横竖屏
+
+- 动态更改 Encoding Orientation
+
+本质上更改的是编码后图像的方向，但需要重新推流才会生效；目前支持的 `ENCODING_ORIENTATION` 的类型有：`PORT` 和 `LAND`
+
+用户不设置的情况下， Encoding Orientation 会依赖 Activity 的 Orientation，即有如下对应关系：
+
+// 不调用 `setEncodingOrientation` 情况下，SDK 会默认根据如下关系进行设置 Encoding Orientation
+
+| Activity Orientation | -> | Encoding Orientation |
+|---|---|---|
+|ActivityInfo.SCREEN_ORIENTATION_PORTRAIT|->|PORT|
+|ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE|->|LAND|
+
+设置 `ENCODING_ORIENTATION.PORT` 之后，播放端会观看竖屏的画面；
+设置 `ENCODING_ORIENTATION.LAND` 之后，播放端会观看横屏的画面。
+
+其设置方式如下：
+```
+mProfile.setEncodingOrientation(StreamingProfile.ENCODING_ORIENTATION.PORT);
+mCameraStreamingManager.setStreamingProfile(mProfile); // notify CameraStreamingManager that StreamingProfile had been changed.
+```
+
+- 动态切换横竖屏
+本质上是用户切换 Activity 方向后，相应地调整 Camera 的预览显示效果。
+在更改了 Activity Orientation 之后，需要调用 `notifyActivityOrientationChanged` 通知 `CameraStreamingManager`。
+
+比如：
+```
+setRequestedOrientation(isEncOrientationPort ? ActivityInfo.SCREEN_ORIENTATION_PORTRAIT : ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+mCameraStreamingManager.notifyActivityOrientationChanged();
+```
+
+需要注意的是，为了防止 `setRequestedOrientation` 调用后 Activity 的重建，需要在 AndroidManifest.xml 里面配置对应的 Activity 的如下属性：
+```
+android:configChanges="orientation|screenSize"
+```
+
+可查看 Demo 中的 `.SWCodecCameraStreamingActivity` 的[配置](/PLDroidCameraStreamingDemo/app/src/main/AndroidManifest.xml)。
+
+16) `setNativeLoggingEnabled(enabled)`
 
 当 enabled 设置为 true ，SDK Native 层的 log 将会被打开；当设置为 false，SDK Native 层的 log 将会被关闭。默认处于打开状态。
 
@@ -578,9 +645,25 @@ mCameraStreamingManager.setNativeLoggingEnabled(false);
 
 ### 版本历史
 
+* 1.4.5 ([Release Notes][24])
+  - 发布 pldroid-camera-streaming-1.4.5.jar
+  - 更新 libpldroid_streaming_core.so，libpldroid_streaming_aac_encoder.so 和 libpldroid_streaming_h264_encoder.so
+  - 新增动态更改 Encoding Orientation 支持
+  - 新增动态切换横竖屏支持
+  - 新增 `onPreviewSizeSelected` 支持
+  - 新增 `setPreferredVideoEncodingSize` 支持
+  - 新增 `VIDEO_ENCODING_HEIGHT_544` 支持
+  - 优化网络传输
+  - 提升画质
+  - 优化前后置切换
+  - 标记 `VIDEO_ENCODING_SIZE_QVGA` 等 Deprecated
+  - 标记 `onPreviewFrame(byte[] datas, Camera camera)` Deprecated
+  - 修复部分机型概率性 ANR
+  - 更新 demo 样例代码
+  
 * 1.4.3 ([Release Notes][23])
   - 发布 pldroid-camera-streaming-1.4.3.jar
-  - 更新 libpldroid_streaming_core.so
+  - 更新 libpldroid_streaming_core.so，libpldroid_streaming_aac_encoder.so 和 libpldroid_streaming_h264_encoder.so
   - 新增 `SharedLibraryNameHelper` 绝对路径加载方式
   - 新增 `StreamingSessionListener`，可方便安全地实现重连策略及 Audio 数据获取失败时的策略
   - 新增 `EncodingType` 支持
@@ -776,3 +859,4 @@ mCameraStreamingManager.setNativeLoggingEnabled(false);
 [21]: /ReleaseNotes/release-notes-1.3.9.md
 [22]: /ReleaseNotes/release-notes-1.4.1.md
 [23]: /ReleaseNotes/release-notes-1.4.3.md
+[24]: /ReleaseNotes/release-notes-1.4.5.md

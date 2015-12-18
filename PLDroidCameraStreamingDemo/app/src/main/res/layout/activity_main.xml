@@ -24,9 +24,5 @@
         android:layout_below="@id/sw_codec_camera_streaming_btn"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" />
-    <TextView
-        android:id="@+id/version_info"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
 
 </RelativeLayout>
