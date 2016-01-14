@@ -107,6 +107,7 @@ public class StreamingBaseActivity extends Activity implements
 //                SharedLibraryNameHelper.PLSharedLibraryType.PL_SO_TYPE_H264, "pldroid_streaming_h264_encoder_v7a");
 
         String streamJsonStrFromServer = getIntent().getStringExtra("stream_json_str");
+
         try {
             mJSONObject = new JSONObject(streamJsonStrFromServer);
         } catch (JSONException e) {

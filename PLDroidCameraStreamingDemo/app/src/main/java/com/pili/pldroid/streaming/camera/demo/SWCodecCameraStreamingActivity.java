@@ -19,22 +19,33 @@ import com.pili.pldroid.streaming.CameraStreamingManager;
 import com.pili.pldroid.streaming.CameraStreamingManager.EncodingType;
 import com.pili.pldroid.streaming.CameraStreamingSetting;
 import com.pili.pldroid.streaming.FrameCapturedCallback;
+import com.pili.pldroid.streaming.StreamStatusCallback;
 import com.pili.pldroid.streaming.StreamingPreviewCallback;
 import com.pili.pldroid.streaming.StreamingProfile;
+import com.pili.pldroid.streaming.StreamingProfile.StreamStatusConfig;
+import com.pili.pldroid.streaming.StreamingProfile.StreamStatus;
 import com.pili.pldroid.streaming.StreamingProfile.ENCODING_ORIENTATION;
 import com.pili.pldroid.streaming.SurfaceTextureCallback;
 import com.pili.pldroid.streaming.widget.AspectFrameLayout;
+import com.qiniu.android.dns.DnsManager;
+import com.qiniu.android.dns.IResolver;
+import com.qiniu.android.dns.NetworkInfo;
+import com.qiniu.android.dns.http.DnspodFree;
+import com.qiniu.android.dns.local.AndroidDnsServer;
+import com.qiniu.android.dns.local.Resolver;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.InetAddress;
 
 /**
  * Created by jerikc on 15/10/29.
  */
 public class SWCodecCameraStreamingActivity extends StreamingBaseActivity
         implements View.OnLayoutChangeListener,
+        StreamStatusCallback,
         StreamingPreviewCallback,
         SurfaceTextureCallback {
     private static final String TAG = "SWCodecCameraStreaming";
@@ -46,10 +57,22 @@ public class SWCodecCameraStreamingActivity extends StreamingBaseActivity
     private StreamingProfile mProfile;
     private Context mContext;
     private View mRootView;
+    private TextView mStreamStatus;
 
     private Screenshooter mScreenshooter = new Screenshooter();
     private EncodingOrientationSwitcher mEncodingOrientationSwitcher = new EncodingOrientationSwitcher();
 
+    public static DnsManager getMyDnsManager() {
+        IResolver r0 = new DnspodFree();
+        IResolver r1 = AndroidDnsServer.defaultResolver();
+        IResolver r2 = null;
+        try {
+            r2 = new Resolver(InetAddress.getByName("119.29.29.29"));
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        return new DnsManager(NetworkInfo.normal, new IResolver[]{r0, r1, r2});
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,21 +99,25 @@ public class SWCodecCameraStreamingActivity extends StreamingBaseActivity
         mTorchBtn = (Button) findViewById(R.id.torch_btn);
         mCameraSwitchBtn = (Button) findViewById(R.id.camera_switch_btn);
         mCaptureFrameBtn = (Button) findViewById(R.id.capture_btn);
+        mStreamStatus = (TextView) findViewById(R.id.stream_status);
 
         StreamingProfile.Stream stream = new StreamingProfile.Stream(mJSONObject);
         mProfile = new StreamingProfile();
-        mProfile.setVideoQuality(StreamingProfile.VIDEO_QUALITY_MEDIUM1)
+        mProfile.setVideoQuality(StreamingProfile.VIDEO_QUALITY_HIGH3)
                 .setAudioQuality(StreamingProfile.AUDIO_QUALITY_MEDIUM2)
 //                .setPreferredVideoEncodingSize(960, 544)
-                .setEncodingSizeLevel(StreamingProfile.VIDEO_ENCODING_SIZE_VGA)
+                .setEncodingSizeLevel(Config.ENCODING_LEVEL)
                 .setEncoderRCMode(StreamingProfile.EncoderRCModes.QUALITY_PRIORITY)
                 .setStream(stream)
+                .setDnsManager(getMyDnsManager())
+                .setStreamStatusConfig(new StreamStatusConfig(3))
 //                .setEncodingOrientation(StreamingProfile.ENCODING_ORIENTATION.PORT)
                 .setSendingBufferProfile(new StreamingProfile.SendingBufferProfile(0.2f, 0.8f, 3.0f, 20 * 1000));
 
         CameraStreamingSetting setting = new CameraStreamingSetting();
         setting.setCameraId(Camera.CameraInfo.CAMERA_FACING_BACK)
                 .setContinuousFocusModeEnabled(true)
+                .setRecordingHint(false)
                 .setCameraPrvSizeLevel(CameraStreamingSetting.PREVIEW_SIZE_LEVEL.MEDIUM)
                 .setCameraPrvSizeRatio(CameraStreamingSetting.PREVIEW_SIZE_RATIO.RATIO_16_9);
 
@@ -103,6 +130,7 @@ public class SWCodecCameraStreamingActivity extends StreamingBaseActivity
         mCameraStreamingManager.setStreamingPreviewCallback(this);
         mCameraStreamingManager.setSurfaceTextureCallback(this);
         mCameraStreamingManager.setStreamingSessionListener(this);
+        mCameraStreamingManager.setStreamStatusCallback(this);
 //        mCameraStreamingManager.setNativeLoggingEnabled(false);
 
         mShutterButton.setOnClickListener(new View.OnClickListener() {
@@ -213,6 +241,18 @@ public class SWCodecCameraStreamingActivity extends StreamingBaseActivity
         int newTexId = texId;
 //        Log.i(TAG, "onDrawFrame texId:" + texId + ",newTexId:" + newTexId + ",texWidth:" + texWidth + ",texHeight:" + texHeight);
         return newTexId;
+    }
+
+    @Override
+    public void notifyStreamStatusChanged(final StreamStatus streamStatus) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mStreamStatus.setText("bitrate:" + streamStatus.totalAVBitrate / 1024 + " kbps"
+                        + "\naudio:" + streamStatus.audioFps + " fps"
+                        + "\nvideo:" + streamStatus.videoFps + " fps");
+            }
+        });
     }
 
     private class Switcher implements Runnable {
