@@ -358,7 +358,7 @@ HW_VIDEO_CODEC
 
 5) 开始推流
 ```JAVA
-// should be invoked after getting STATE.READY message
+// should be invoked after getting STATE.READY message and in non-ui thread
 mCameraStreamingManager.startStreaming();
 ```
 
