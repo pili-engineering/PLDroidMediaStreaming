@@ -285,9 +285,13 @@ public class HWCodecCameraStreamingActivity extends StreamingBaseActivity implem
         super.onStateHandled(state, extra);
         switch (state) {
             case CameraStreamingManager.STATE.SENDING_BUFFER_HAS_FEW_ITEMS:
-                return false;
+                mProfile.improveVideoQuality(1);
+                mCameraStreamingManager.notifyProfileChanged(mProfile);
+                return true;
             case CameraStreamingManager.STATE.SENDING_BUFFER_HAS_MANY_ITEMS:
-                return false;
+                mProfile.reduceVideoQuality(1);
+                mCameraStreamingManager.notifyProfileChanged(mProfile);
+                return true;
         }
         return false;
     }

@@ -85,13 +85,19 @@ public class MainActivity extends Activity {
                     @Override
                     public void run() {
                         try {
-                            String res = requestByHttpPost();
-                            if (res == null) {
-                                showToast("Stream Json Got Fail!");
-                                return;
+                            String res = null;
+                            if (!Config.DEBUG_MODE) {
+                                res = requestByHttpPost();
+                                if (res == null) {
+                                    showToast("Stream Json Got Fail!");
+                                    return;
+                                }
                             }
                             Intent intent = new Intent(MainActivity.this, HWCodecCameraStreamingActivity.class);
-                            intent.putExtra("stream_json_str", res);
+
+                            if (!Config.DEBUG_MODE) {
+                                intent.putExtra("stream_json_str", res);
+                            }
                             startActivity(intent);
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -110,13 +116,18 @@ public class MainActivity extends Activity {
                     @Override
                     public void run() {
                         try {
-                            String res = requestByHttpPost();
-                            if (res == null) {
-                                showToast("Stream Json Got Fail!");
-                                return;
+                            String res = null;
+                            if (!Config.DEBUG_MODE) {
+                                res = requestByHttpPost();
+                                if (res == null) {
+                                    showToast("Stream Json Got Fail!");
+                                    return;
+                                }
                             }
                             Intent intent = new Intent(MainActivity.this, SWCodecCameraStreamingActivity.class);
-                            intent.putExtra("stream_json_str", res);
+                            if (!Config.DEBUG_MODE) {
+                                intent.putExtra("stream_json_str", res);
+                            }
                             startActivity(intent);
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -135,13 +146,18 @@ public class MainActivity extends Activity {
                     @Override
                     public void run() {
                         try {
-                            String res = requestByHttpPost();
-                            if (res == null) {
-                                showToast("Stream Json Got Fail!");
-                                return;
+                            String res = null;
+                            if (!Config.DEBUG_MODE) {
+                                res = requestByHttpPost();
+                                if (res == null) {
+                                    showToast("Stream Json Got Fail!");
+                                    return;
+                                }
                             }
                             Intent intent = new Intent(MainActivity.this, AudioStreamingActivity.class);
-                            intent.putExtra("stream_json_str", res);
+                            if (!Config.DEBUG_MODE) {
+                                intent.putExtra("stream_json_str", res);
+                            }
                             startActivity(intent);
                         } catch (Exception e) {
                             e.printStackTrace();

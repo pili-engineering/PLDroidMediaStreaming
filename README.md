@@ -26,6 +26,7 @@ PLDroidCameraStreaming 是一个适用于 Android 的 RTMP 直播推流 SDK，�
 | 品牌 | 机型 | 版本 |
 |---|---|---|
 | 三星 | GALAXY S5 | 5.0 |
+| 三星 | GALAXY A5 | 5.0.2 |
 | 三星 | GALAXY S4 i9500 | 5.0.0 |
 | 三星 | GALAXY Trend Duos S7562C | 4.1.2 |
 | 三星 | GALAXY Note II N7108 | 4.3 |
@@ -53,7 +54,8 @@ PLDroidCameraStreaming 是一个适用于 Android 的 RTMP 直播推流 SDK，�
 | 华为 | u9500 | 4.0.3 |
 | 华为 | Honor 6 | 4.4.2 |
 | 华为 | 畅玩4 | 4.4.4 |
-| 华为 | C199 | v4.4.2 |
+| 华为 | C199 | 4.4.2 |
+| 华为 | Honor PLK-AL10 | 5.0.2 |
 | 小米 | Xiaomi 2A | 4.1.1 |
 | 小米 | Xiaomi 3 | 4.4.4 |
 | 小米 | Xiaomi 2S | 5.0.2 |
@@ -63,6 +65,7 @@ PLDroidCameraStreaming 是一个适用于 Android 的 RTMP 直播推流 SDK，�
 | 红米 | NOTE | 4.4.4 |
 | 魅族 | Mx 4 Pro | 4.4.2 |
 | 魅族 | Mx 5 | 5.0.1 |
+| 魅蓝 | Note2 | 5.1 |
 | vivo | X5M | 5.0.2 |
 | vivo | Y17W | 4.2.2 |
 | vivo | Y17T | 4.2.2 |
@@ -635,7 +638,88 @@ android:configChanges="orientation|screenSize"
 
 可查看 Demo 中的 `.SWCodecCameraStreamingActivity` 的[配置](/PLDroidCameraStreamingDemo/app/src/main/AndroidManifest.xml)。
 
-16) `setNativeLoggingEnabled(enabled)`
+16) 获取 `StreamStatus` 信息
+
+您可以获取 StreamStatus 信息，其定义如下：
+```
+public static class StreamStatus {
+  public int audioFps;
+  public int videoFps;
+  public int totalAVBitrate; // bps
+}
+```
+
+如果需要获取该信息，您需要实现 `StreamStatusCallback` 接口的 `notifyStreamStatusChanged(final StreamStatus)` 方法：
+```
+public class SWCodecCameraStreamingActivity implements StreamStatusCallback {
+    // register StreamStatusCallback by setStreamStatusCallback
+    mCameraStreamingManager.setStreamStatusCallback(this);
+
+    // set the StreamStatusConfig of StreamStatus , only including interval time (the unit is second) at present
+    // 3 means notifyStreamStatusChanged will be invoked per 3 seconds
+    mStreamingProfileProfile.setStreamStatusConfig(new StreamStatusConfig(3))
+    
+    @Override
+    public void notifyStreamStatusChanged(final StreamStatus streamStatus) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mStreamStatus.setText("bitrate:" + streamStatus.totalAVBitrate / 1024 + " kbps"
+                        + "\naudio:" + streamStatus.audioFps + " fps"
+                        + "\nvideo:" + streamStatus.videoFps + " fps");
+            }
+        });
+    }
+}
+```
+
+需要注意的是，`notifyStreamStatusChanged` 不在 UI 线程中。
+
+17) HappyDns 支持
+
+为了防止 Dns 被劫持，SDK 加入了 HappyDns 支持，可以从[这里](https://github.com/qiniu/happy-dns-android)查阅源码。
+从 *v1.4.6* 版本开始，需要在宿主项目中的 build.gradle 中加入如下语句：
+
+```
+dependencies {
+    ...
+    compile 'com.qiniu:happy-dns:0.2.5'
+    ...
+}
+```
+
+通过 `StreamingProfile` 设定自定义 `DnsManager`，如下：
+```
+  public static DnsManager getMyDnsManager() {
+      IResolver r0 = new DnspodFree();
+      IResolver r1 = AndroidDnsServer.defaultResolver();
+      IResolver r2 = null;
+      try {
+          r2 = new Resolver(InetAddress.getByName("119.29.29.29"));
+      } catch (IOException ex) {
+          ex.printStackTrace();
+      }
+      return new DnsManager(NetworkInfo.normal, new IResolver[]{r0, r1, r2});
+  }
+
+  
+  StreamingProfile mProfile = new StreamingProfile();
+  mProfile.setDnsManager(getMyDnsManager()); // set your DnsManager
+```
+
+如果不进行设置，SDK 会默认的设置一个 `DnsManager`。
+
+18) 高 FPS 推流
+
+可以通过 `CameraStreamingSetting` 对象设置 Recording hint，以此来提升数据源的帧率。
+```
+CameraStreamingSetting setting = new CameraStreamingSetting();
+setting.setRecordingHint(false);
+```
+
+需要注意的是，在部分机型开启 Recording Hint 之后，会出现画面卡帧等风险，所以请慎用该 API。如果需要实现高 fps 推流，可以考虑开启并加入白名单机制。
+
+19) `setNativeLoggingEnabled(enabled)`
 
 当 enabled 设置为 true ，SDK Native 层的 log 将会被打开；当设置为 false，SDK Native 层的 log 将会被关闭。默认处于打开状态。
 
@@ -643,7 +727,25 @@ android:configChanges="orientation|screenSize"
 mCameraStreamingManager.setNativeLoggingEnabled(false);
 ```
 
+建议 Release 版本置为 false。
+
 ### 版本历史
+
+### 推流 SDK
+
+* 1.4.6 ([Release Notes][25])
+  - 发布 pldroid-camera-streaming-1.4.6.jar
+  - 更新 libpldroid_streaming_core.so，libpldroid_streaming_aac_encoder.so 和 libpldroid_streaming_h264_encoder.so
+  - 提升软编编码帧率
+  - 优化推流过程中前后置摄像头切换体验
+  - 新增 happydns 支持，并提供 `setDnsManager` API，用户可自定义 `DnsManager`
+  - 新增 `StreamStatus` 回调，实现 `StreamStatusCallback` 获取音视频帧率和码率
+  - 新增 `setRecordingHint` API，可实现高帧率推流
+  - 修复推流过程中，特殊操作后，推流无图像问题
+  - 修复推流过程中，HOME 键退出，再次启动 app，无法切换 camera 问题
+  - 修复部分机型音画不同步，包括切换前后置
+  - 修复推流过程中，概率性 crash 问题
+  - 更新 demo 样例代码
 
 * 1.4.5 ([Release Notes][24])
   - 发布 pldroid-camera-streaming-1.4.5.jar
@@ -860,3 +962,4 @@ mCameraStreamingManager.setNativeLoggingEnabled(false);
 [22]: /ReleaseNotes/release-notes-1.4.1.md
 [23]: /ReleaseNotes/release-notes-1.4.3.md
 [24]: /ReleaseNotes/release-notes-1.4.5.md
+[25]: /ReleaseNotes/release-notes-1.4.6.md

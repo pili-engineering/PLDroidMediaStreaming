@@ -11,4 +11,5 @@
     <dimen name="pldroid_streaming_square_corner_radius">8dip</dimen>
     <dimen name="pldroid_streaming_red_circle_padding">8dip</dimen>
     <dimen name="pldroid_streaming_red_square_padding">16dip</dimen>
+    <dimen name="pldroid_streaming_streaming_status_padding">50dp</dimen>
 </resources>

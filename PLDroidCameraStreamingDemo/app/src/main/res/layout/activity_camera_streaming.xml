@@ -22,6 +22,10 @@
             android:layout_gravity="center" />
 
     </com.pili.pldroid.streaming.widget.AspectFrameLayout>
+    <TextView
+        android:id="@+id/log_info"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
     <EditText
         android:layout_alignParentBottom="true"
         android:layout_width="match_parent"
@@ -30,6 +34,16 @@
         android:id="@+id/camera_switch_btn"
         android:layout_marginTop="@dimen/pldroid_streaming_item_padding"
         android:layout_centerHorizontal="true"
+        android:textColor="@color/pldroid_streaming_white"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/stream_status"
+        android:layout_marginLeft="@dimen/pldroid_streaming_streaming_status_padding"
+        android:layout_marginTop="@dimen/pldroid_streaming_streaming_status_padding"
+        android:background="@android:color/transparent"
+        android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="@color/pldroid_streaming_white"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
