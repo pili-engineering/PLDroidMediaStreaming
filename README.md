@@ -13,13 +13,16 @@ PLDroidCameraStreaming 是一个适用于 Android 的 RTMP 直播推流 SDK，�
   - [x] 支持数据源回调接口，可自定义 Filter (滤镜) 特效处理
   - [x] 支持前后置摄像头，以及动态切换
   - [x] 支持自动对焦
+  - [x] 支持手动对焦
+  - [x] 支持 Zoom 操作
+  - [x] 支持 Mute/Unmute
   - [x] 支持闪光灯操作
   - [x] 支持纯音频推流，以及后台运行
   - [x] 支持截帧功能
   - [x] 支持动态更改 Encoding Orientation
   - [x] 支持动态切换横竖屏
   - [x] 支持 ARM, ARMv7a, ARM64v8a, X86 主流芯片体系架构
-  
+
 ## 测试通过的机型清单
 以下是目前已经在真机上验证通过的机型列表，您也可以在 Issue 中添加您测试通过的机型信息，感谢！
 
@@ -93,6 +96,7 @@ PLDroidCameraStreaming 是一个适用于 Android 的 RTMP 直播推流 SDK，�
   - [配置工程](#项目配置)
   - [权限](#权限)
   - [示例代码](#示例代码)
+  - [混淆](#混淆)
 - [版本历史](#版本历史)
 
 ## 使用方法
@@ -174,7 +178,7 @@ try {
 } catch (JSONException e) {
     e.printStackTrace();
 }
-        
+
 Stream stream = new Stream(streamJson);
 
 StreamingProfile profile = new StreamingProfile();
@@ -292,33 +296,33 @@ Prv Size Ratio : RATIO_16_9
 4) 实例化并初始化核心类 `CameraStreamingManager`
 - Camera Streaming
 
-硬编初始化 
+硬编初始化
 ```JAVA
 mCameraStreamingManager = new CameraStreamingManager(this, afl, glSurfaceView, EncodingType.HW_VIDEO_WITH_HW_AUDIO_CODEC);
-mCameraStreamingManager.onPrepare(setting, profile);
+mCameraStreamingManager.prepare(setting, profile);
 mCameraStreamingManager.setStreamingStateListener(this);
 ```
-软编初始化 
+软编初始化
 
 ```JAVA
 mCameraStreamingManager = new CameraStreamingManager(this, afl, glSurfaceView, EncodingType.SW_VIDEO_WITH_SW_AUDIO_CODEC);
-mCameraStreamingManager.onPrepare(setting, profile);
+mCameraStreamingManager.prepare(setting, profile);
 mCameraStreamingManager.setStreamingStateListener(this);
 ```
 
 - 纯音频推流
 
-软编初始化 
+软编初始化
 ```JAVA
 mCameraStreamingManager = new CameraStreamingManager(this, EncodingType.SW_AUDIO_CODEC);
-mCameraStreamingManager.onPrepare(profile);
+mCameraStreamingManager.prepare(profile);
 mCameraStreamingManager.setStreamingStateListener(this);
 ```
 
 硬编初始化
 ```JAVA
 mCameraStreamingManager = new CameraStreamingManager(this, EncodingType.HW_AUDIO_CODEC);
-mCameraStreamingManager.onPrepare(setting, profile);
+mCameraStreamingManager.prepare(setting, profile);
 mCameraStreamingManager.setStreamingStateListener(this);
 ```
 
@@ -354,7 +358,7 @@ HW_VIDEO_CODEC
 - STATE.SENDING_BUFFER_HAS_FEW_ITEMS
 - STATE.SENDING_BUFFER_HAS_MANY_ITEMS
 
->您需要注意的是，`onStateChanged` 回调函数可能被非 UI 线程调用，可参考 [CameraStreamingActivity][3] 
+>您需要注意的是，`onStateChanged` 回调函数可能被非 UI 线程调用，可参考 [CameraStreamingActivity][3]
 
 5) 开始推流
 ```JAVA
@@ -367,32 +371,32 @@ mCameraStreamingManager.startStreaming();
 mCameraStreamingManager.stopStreaming();
 ```
 
-7) `CameraStreamingManager` 另外几个重要的状态周期函数 `onResume()`、`onPause()`、`onDestory()`
+7) `CameraStreamingManager` 另外几个重要的状态周期函数 `resume()`、`pause()`、`destory()`
 
-如果 `CameraStreamingManager` 存在于某一个 Activity 中，建议在 Activity 的 `onResume()`、`onPause()`、`onDestory()` 中分别进行调用 `CameraStreamingManager` 的周期函数，即：
+如果 `CameraStreamingManager` 存在于某一个 Activity 中，建议在 Activity 的 `resume()`、`pause()`、`destory()` 中分别进行调用 `CameraStreamingManager` 的周期函数，即：
 
 ```JAVA
 @Override
 protected void onResume() {
   super.onResume();
-  mCameraStreamingManager.onResume();
+  mCameraStreamingManager.resume();
 }
 
 @Override
 protected void onPause() {
   super.onPause();
-  mCameraStreamingManager.onPause();
+  mCameraStreamingManager.pause();
   getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 }
-    
+
 @Override
 protected void onDestroy() {
   super.onDestroy();
-  mCameraStreamingManager.onDestroy();
+  mCameraStreamingManager.destroy();
 }
 ```
 
->纯音频推流支持后台运行，只需要控制好 `onPause()` 及 `onDestory()` 周期函数即可。
+>纯音频推流支持后台运行，只需要控制好 `pause()` 及 `destory()` 周期函数即可。
 
 8) 自适应码率
 
@@ -462,7 +466,7 @@ case CameraStreamingManager.STATE.SENDING_BUFFER_HAS_MANY_ITEMS:
 mCameraStreamingManager.captureFrame(w, h, new FrameCapturedCallback() {
     @Override
     public void onFrameCaptured(Bitmap bmp) {
-    
+
     }
 }
 ```
@@ -495,9 +499,13 @@ public interface SurfaceTextureCallback {
 }
 ```
 
+注意：
+- 软编模式下：推流端预览具有滤镜效果需实现 `SurfaceTextureCallback`；播放端具有滤镜效果需实现 `StreamingPreviewCallback`。
+- 硬编模式下：预览和播放端具有滤镜效果仅需实现 `SurfaceTextureCallback`。
+
 11) FULL & REAL mode
 
-在获得 `AspectFrameLayout` 对象之后，您可以调用 `setShowMode` 方法来选择您需要的显示方式 。
+在获得 `AspectFrameLayout` 对象之后，您可以调用 `setShowMode` 方法来选择您需要的显示方式。
 
 - SHOW_MODE.FULL，可以全屏显示（没有黑边），但是预览的图像和播放的效果有出入
 - SHOW_MODE.REAL，所见即所得
@@ -653,12 +661,13 @@ public static class StreamStatus {
 ```
 public class SWCodecCameraStreamingActivity implements StreamStatusCallback {
     // register StreamStatusCallback by setStreamStatusCallback
+    // should be called after prepare()
     mCameraStreamingManager.setStreamStatusCallback(this);
 
     // set the StreamStatusConfig of StreamStatus , only including interval time (the unit is second) at present
     // 3 means notifyStreamStatusChanged will be invoked per 3 seconds
     mStreamingProfileProfile.setStreamStatusConfig(new StreamStatusConfig(3))
-    
+
     @Override
     public void notifyStreamStatusChanged(final StreamStatus streamStatus) {
         runOnUiThread(new Runnable() {
@@ -702,12 +711,13 @@ dependencies {
       return new DnsManager(NetworkInfo.normal, new IResolver[]{r0, r1, r2});
   }
 
-  
+
   StreamingProfile mProfile = new StreamingProfile();
+  // Setting null explicitly, means give up {@link DnsManager} and access by the original host.
   mProfile.setDnsManager(getMyDnsManager()); // set your DnsManager
 ```
 
-如果不进行设置，SDK 会默认的设置一个 `DnsManager`。
+如果不进行设置，SDK 会默认的设置一个 `DnsManager`; 若显示地设置 null，SDK 不使用 DNS 解析。
 
 18) 高 FPS 推流
 
@@ -719,7 +729,65 @@ setting.setRecordingHint(false);
 
 需要注意的是，在部分机型开启 Recording Hint 之后，会出现画面卡帧等风险，所以请慎用该 API。如果需要实现高 fps 推流，可以考虑开启并加入白名单机制。
 
-19) `setNativeLoggingEnabled(enabled)`
+19) Mute/Unmute
+
+SDK 支持推流过程中静音和取消静音的操作。
+
+```
+// mute
+// You should call this after {@link #prepare(CameraStreamingSetting, StreamingProfile)}
+mCameraStreamingManager.mute(true);
+
+// unmute
+// You should call this after {@link #prepare(CameraStreamingSetting, StreamingProfile)}
+mCameraStreamingManager.mute(false);
+```
+
+20) 手动对焦
+
+对焦之前传入 Focus Indicator , 如果不进行设置，对焦过程中将会没有对应的 UI 显示。
+
+```
+// You should call this after getting {@link STATE#READY}.
+mCameraStreamingManager.setFocusAreaIndicator(mRotateLayout,
+                    mRotateLayout.findViewById(R.id.focus_indicator));
+```
+
+点击屏幕触发手动对焦，并设置对应的坐标值。
+
+```
+// You should call this after getting {@link STATE#READY}.
+mCameraStreamingManager.doSingleTapUp((int) e.getX(), (int) e.getY());
+```
+
+
+21) Zoom 操作
+
+```
+// mCurrentZoom must be in the range of [0, mCameraStreamingManager.getMaxZoom()]
+// You should call this after getting {@link STATE#READY}.
+if (mCameraStreamingManager.isZoomSupported()) {
+  mCameraStreamingManager.setZoomValue(mCurrentZoom);
+}
+```
+
+22) 设置 `AVProfile`
+
+当需要自定义 video 的 fps/video bitrate/GOP size 或者 audio 的 sample rate/audio bitrate，可以通过设置 `AVProfile`。
+```
+// audio sample rate is 44100, audio bitrate is 96 * 1024 bps
+StreamingProfile.AudioProfile aProfile = new StreamingProfile.AudioProfile(44100, 96 * 1024);
+
+// fps is 30, video bitrate is 1000 * 1024 bps, maxKeyFrameInterval is 48
+StreamingProfile.VideoProfile vProfile = new StreamingProfile.VideoProfile(30, 1000 * 1024, 48);
+
+StreamingProfile.AVProfile avProfile = new StreamingProfile.AVProfile(vProfile, aProfile);
+
+mStreamingProfile.setAVProfile(avProfile)
+
+```
+
+23) `setNativeLoggingEnabled(enabled)`
 
 当 enabled 设置为 true ，SDK Native 层的 log 将会被打开；当设置为 false，SDK Native 层的 log 将会被关闭。默认处于打开状态。
 
@@ -729,9 +797,31 @@ mCameraStreamingManager.setNativeLoggingEnabled(false);
 
 建议 Release 版本置为 false。
 
+### 混淆
+
+为了保证正常使用 SDK ，请在 proguard-rules.pro 文件中添加以下代码：
+
+```
+-keep class com.pili.pldroid.streaming.** { *; }
+```
+
 ### 版本历史
 
 ### 推流 SDK
+
+* 1.5.0 ([Release Notes][26])
+  - 发布 pldroid-camera-streaming-1.5.0.jar
+  - 更新 libpldroid_streaming_core.so 和 libpldroid_streaming_h264_encoder.so
+  - 支持手动对焦
+  - 支持 Zoom
+  - 支持 mute/unmute
+  - 新增 `setSendTimeoutInSecond` API 
+  - 对回调方法 `sortCameraPrvSize` 的行参 supportedPreviewSizeList 进行从小到大排序
+  - 当 DnsManager 设置为 null 后，不进行 Dns 解析，[Issue 78](https://github.com/pili-engineering/PLDroidCameraStreaming/issues/78)
+  - 优化数据源采集和显示效率，避免 UI 卡顿
+  - 修复硬编模式下，重连导致概率性 crash 问题
+  - 方法 onPrepare(), onResume(), onPause(), onDestroy() 分别重命名为 prepare(), resume(), pause(), destroy()
+  - 更新 demo 样例代码
 
 * 1.4.6 ([Release Notes][25])
   - 发布 pldroid-camera-streaming-1.4.6.jar
@@ -762,7 +852,7 @@ mCameraStreamingManager.setNativeLoggingEnabled(false);
   - 标记 `onPreviewFrame(byte[] datas, Camera camera)` Deprecated
   - 修复部分机型概率性 ANR
   - 更新 demo 样例代码
-  
+
 * 1.4.3 ([Release Notes][23])
   - 发布 pldroid-camera-streaming-1.4.3.jar
   - 更新 libpldroid_streaming_core.so，libpldroid_streaming_aac_encoder.so 和 libpldroid_streaming_h264_encoder.so
@@ -775,7 +865,7 @@ mCameraStreamingManager.setNativeLoggingEnabled(false);
   - 修复软编模式下，推流过程中概率性 crash 问题
   - 修复概率性无视频帧问题
   - 更新 demo 展示代码
-  - 增加支持的机型信息 
+  - 增加支持的机型信息
 
 * 1.4.1 ([Release Notes][22])
   - 发布 pldroid-camera-streaming-1.4.1.jar
@@ -929,7 +1019,7 @@ mCameraStreamingManager.setNativeLoggingEnabled(false);
   - 修复正常启动后无 READY 消息返回问题
   - 更新 `Stream` 定义，并与服务端保持一致
   - 增加相机正常启动后即开始推流功能
-  
+
 * 1.0.1 ([Release Notes][5])
   - 发布 pldroid-camera-streaming-1.0.1.jar
   - 更新 `Stream` 类结构
@@ -963,3 +1053,4 @@ mCameraStreamingManager.setNativeLoggingEnabled(false);
 [23]: /ReleaseNotes/release-notes-1.4.3.md
 [24]: /ReleaseNotes/release-notes-1.4.5.md
 [25]: /ReleaseNotes/release-notes-1.4.6.md
+[26]: /ReleaseNotes/release-notes-1.5.0.md
