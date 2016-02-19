@@ -27,7 +27,7 @@ public class AudioStreamingActivity extends StreamingBaseActivity {
                 .setAudioQuality(StreamingProfile.AUDIO_QUALITY_LOW1);
 
         mCameraStreamingManager = new CameraStreamingManager(this, EncodingType.SW_AUDIO_CODEC);
-        mCameraStreamingManager.onPrepare(profile);
+        mCameraStreamingManager.prepare(profile);
         mCameraStreamingManager.setStreamingStateListener(this);
 
         mShutterButton.setOnClickListener(new View.OnClickListener() {

@@ -55,14 +55,13 @@ public class HWCodecCameraStreamingActivity extends StreamingBaseActivity implem
         super.onCreate(savedInstanceState);
         mContext = this;
 
-        setContentView(R.layout.activity_camera_streaming);
-
         mRootView = findViewById(R.id.content);
         mRootView.addOnLayoutChangeListener(this);
 
         AspectFrameLayout afl = (AspectFrameLayout) findViewById(R.id.cameraPreview_afl);
         afl.setShowMode(AspectFrameLayout.SHOW_MODE.REAL);
-        GLSurfaceView glSurfaceView = (GLSurfaceView) findViewById(R.id.cameraPreview_surfaceView);
+        CameraPreviewFrameView cameraPreviewFrameView = (CameraPreviewFrameView) findViewById(R.id.cameraPreview_surfaceView);
+        cameraPreviewFrameView.setListener(this);
 
         mShutterButton = (Button) findViewById(R.id.toggleRecording_button);
 
@@ -71,12 +70,16 @@ public class HWCodecCameraStreamingActivity extends StreamingBaseActivity implem
         mCameraSwitchBtn = (Button) findViewById(R.id.camera_switch_btn);
         mCaptureFrameBtn = (Button) findViewById(R.id.capture_btn);
 
+        StreamingProfile.VideoProfile vProfile = new StreamingProfile.VideoProfile(30, 1000 * 1024);
+        StreamingProfile.AVProfile avProfile = new StreamingProfile.AVProfile(vProfile, null);
+
         StreamingProfile.Stream stream = new StreamingProfile.Stream(mJSONObject);
         mProfile = new StreamingProfile();
         mProfile.setVideoQuality(StreamingProfile.VIDEO_QUALITY_LOW3)
                 .setAudioQuality(StreamingProfile.AUDIO_QUALITY_MEDIUM2)
-                .setEncodingSizeLevel(StreamingProfile.VIDEO_ENCODING_SIZE_VGA)
+                .setEncodingSizeLevel(StreamingProfile.VIDEO_ENCODING_HEIGHT_480)
                 .setStream(stream)
+                .setAVProfile(avProfile)
                 .setSendingBufferProfile(new StreamingProfile.SendingBufferProfile(0.2f, 0.8f, 3.0f, 20 * 1000));
 
         mSupportVideoQualities = mProfile.getSupportVideoQualities();
@@ -87,8 +90,8 @@ public class HWCodecCameraStreamingActivity extends StreamingBaseActivity implem
                 .setCameraPrvSizeLevel(CameraStreamingSetting.PREVIEW_SIZE_LEVEL.SMALL)
                 .setCameraPrvSizeRatio(CameraStreamingSetting.PREVIEW_SIZE_RATIO.RATIO_16_9);
 
-        mCameraStreamingManager = new CameraStreamingManager(this, afl, glSurfaceView, EncodingType.HW_VIDEO_WITH_HW_AUDIO_CODEC); // hw codec
-        mCameraStreamingManager.onPrepare(setting, mProfile);
+        mCameraStreamingManager = new CameraStreamingManager(this, afl, cameraPreviewFrameView, EncodingType.HW_VIDEO_WITH_HW_AUDIO_CODEC); // hw codec
+        mCameraStreamingManager.prepare(setting, mProfile);
         // update the StreamingProfile
 //        mProfile.setStream(new Stream(mJSONObject1));
 //        mCameraStreamingManager.setStreamingProfile(mProfile);
@@ -286,11 +289,11 @@ public class HWCodecCameraStreamingActivity extends StreamingBaseActivity implem
         switch (state) {
             case CameraStreamingManager.STATE.SENDING_BUFFER_HAS_FEW_ITEMS:
                 mProfile.improveVideoQuality(1);
-                mCameraStreamingManager.notifyProfileChanged(mProfile);
+                mCameraStreamingManager.setStreamingProfile(mProfile);
                 return true;
             case CameraStreamingManager.STATE.SENDING_BUFFER_HAS_MANY_ITEMS:
                 mProfile.reduceVideoQuality(1);
-                mCameraStreamingManager.notifyProfileChanged(mProfile);
+                mCameraStreamingManager.setStreamingProfile(mProfile);
                 return true;
         }
         return false;

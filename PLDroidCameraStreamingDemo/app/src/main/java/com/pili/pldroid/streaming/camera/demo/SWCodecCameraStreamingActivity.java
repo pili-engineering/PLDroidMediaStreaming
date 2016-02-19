@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -26,6 +27,7 @@ import com.pili.pldroid.streaming.StreamingProfile.StreamStatusConfig;
 import com.pili.pldroid.streaming.StreamingProfile.StreamStatus;
 import com.pili.pldroid.streaming.StreamingProfile.ENCODING_ORIENTATION;
 import com.pili.pldroid.streaming.SurfaceTextureCallback;
+import com.pili.pldroid.streaming.camera.demo.ui.RotateLayout;
 import com.pili.pldroid.streaming.widget.AspectFrameLayout;
 import com.qiniu.android.dns.DnsManager;
 import com.qiniu.android.dns.IResolver;
@@ -84,14 +86,13 @@ public class SWCodecCameraStreamingActivity extends StreamingBaseActivity
         super.onCreate(savedInstanceState);
         mContext = this;
 
-        setContentView(R.layout.activity_camera_streaming);
-
         mRootView = findViewById(R.id.content);
         mRootView.addOnLayoutChangeListener(this);
 
         AspectFrameLayout afl = (AspectFrameLayout) findViewById(R.id.cameraPreview_afl);
         afl.setShowMode(AspectFrameLayout.SHOW_MODE.REAL);
-        GLSurfaceView glSurfaceView = (GLSurfaceView) findViewById(R.id.cameraPreview_surfaceView);
+        CameraPreviewFrameView cameraPreviewFrameView = (CameraPreviewFrameView) findViewById(R.id.cameraPreview_surfaceView);
+        cameraPreviewFrameView.setListener(this);
 
         mShutterButton = (Button) findViewById(R.id.toggleRecording_button);
 
@@ -101,6 +102,10 @@ public class SWCodecCameraStreamingActivity extends StreamingBaseActivity
         mCaptureFrameBtn = (Button) findViewById(R.id.capture_btn);
         mStreamStatus = (TextView) findViewById(R.id.stream_status);
 
+        StreamingProfile.AudioProfile aProfile = new StreamingProfile.AudioProfile(44100, 96 * 1024);
+        StreamingProfile.VideoProfile vProfile = new StreamingProfile.VideoProfile(30, 1000 * 1024, 48);
+        StreamingProfile.AVProfile avProfile = new StreamingProfile.AVProfile(vProfile, aProfile);
+
         StreamingProfile.Stream stream = new StreamingProfile.Stream(mJSONObject);
         mProfile = new StreamingProfile();
         mProfile.setVideoQuality(StreamingProfile.VIDEO_QUALITY_HIGH3)
@@ -109,6 +114,7 @@ public class SWCodecCameraStreamingActivity extends StreamingBaseActivity
                 .setEncodingSizeLevel(Config.ENCODING_LEVEL)
                 .setEncoderRCMode(StreamingProfile.EncoderRCModes.QUALITY_PRIORITY)
                 .setStream(stream)
+                .setAVProfile(avProfile)
                 .setDnsManager(getMyDnsManager())
                 .setStreamStatusConfig(new StreamStatusConfig(3))
 //                .setEncodingOrientation(StreamingProfile.ENCODING_ORIENTATION.PORT)
@@ -118,11 +124,16 @@ public class SWCodecCameraStreamingActivity extends StreamingBaseActivity
         setting.setCameraId(Camera.CameraInfo.CAMERA_FACING_BACK)
                 .setContinuousFocusModeEnabled(true)
                 .setRecordingHint(false)
+                .setResetTouchFocusDelayInMs(3000)
+                .setFocusMode(CameraStreamingSetting.FOCUS_MODE_CONTINUOUS_PICTURE)
                 .setCameraPrvSizeLevel(CameraStreamingSetting.PREVIEW_SIZE_LEVEL.MEDIUM)
                 .setCameraPrvSizeRatio(CameraStreamingSetting.PREVIEW_SIZE_RATIO.RATIO_16_9);
 
-        mCameraStreamingManager = new CameraStreamingManager(this, afl, glSurfaceView, EncodingType.SW_VIDEO_WITH_SW_AUDIO_CODEC);  // soft codec
-        mCameraStreamingManager.onPrepare(setting, mProfile);
+        mCameraStreamingManager = new CameraStreamingManager(this, afl, cameraPreviewFrameView, EncodingType.SW_VIDEO_WITH_SW_AUDIO_CODEC);  // soft codec
+        mCameraStreamingManager.prepare(setting, mProfile);
+
+        setFocusAreaIndicator();
+
         // update the StreamingProfile
 //        mProfile.setStream(new Stream(mJSONObject1));
 //        mCameraStreamingManager.setStreamingProfile(mProfile);
@@ -258,7 +269,6 @@ public class SWCodecCameraStreamingActivity extends StreamingBaseActivity
     private class Switcher implements Runnable {
         @Override
         public void run() {
-
             mCameraStreamingManager.switchCamera();
         }
     }

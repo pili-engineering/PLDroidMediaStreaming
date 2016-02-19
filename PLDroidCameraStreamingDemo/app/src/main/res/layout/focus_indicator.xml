@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.pili.pldroid.streaming.camera.demo.ui.FocusIndicatorRotateLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/focus_indicator_rotate_layout"
+    android:layout_height="wrap_content"
+    android:layout_width="wrap_content"
+    android:layout_centerInParent="true">
+    <View android:id="@+id/focus_indicator"
+        android:layout_height="120dp"
+        android:layout_width="120dp"/>
+</com.pili.pldroid.streaming.camera.demo.ui.FocusIndicatorRotateLayout>
