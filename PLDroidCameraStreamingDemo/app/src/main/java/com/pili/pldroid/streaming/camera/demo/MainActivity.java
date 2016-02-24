@@ -4,56 +4,44 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.protocol.HTTP;
-import org.apache.http.util.EntityUtils;
-
-import java.util.ArrayList;
-import java.util.List;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 public class MainActivity extends Activity {
     private static final String TAG = "MainActivity";
-    private static final String URL = "your app server address.";
+    private static final String url = "your app server address.";
 
     private static boolean isSupportHWEncode() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2;
     }
 
-    private Button mHWCodecCameraStreamingBtn;
-    private Button mSWCodecCameraStreamingBtn;
-    private Button mAudioStreamingBtn;
-
-    public String requestByHttpPost() {
+    private String requestStreamJson() {
         try {
-            HttpPost httpPost = new HttpPost(URL);
-            List<NameValuePair> params = new ArrayList<NameValuePair>();
-            params.add(new BasicNameValuePair("model", android.os.Build.MODEL));
-            HttpEntity entity = new UrlEncodedFormEntity(params, HTTP.UTF_8);
-            httpPost.setEntity(entity);
-            HttpClient httpClient = new DefaultHttpClient();
-            HttpResponse httpResp = httpClient.execute(httpPost);
-            int statusCode = httpResp.getStatusLine().getStatusCode();
-            Log.i(TAG, "statusCode:" + statusCode);
-            if (statusCode == 200) {
-                Log.i(TAG, "HttpPost success!");
-                return EntityUtils.toString(httpResp.getEntity(), HTTP.UTF_8);
-            } else {
-                Log.i(TAG, "HttpPost failed!");
+            HttpURLConnection httpConn = (HttpURLConnection) new URL(url).openConnection();
+            httpConn.setConnectTimeout(5000);
+            httpConn.setReadTimeout(10000);
+            int responseCode = httpConn.getResponseCode();
+            if (responseCode != HttpURLConnection.HTTP_OK) {
                 return null;
             }
+
+            int length = httpConn.getContentLength();
+            if (length <= 0) {
+                return null;
+            }
+            InputStream is = httpConn.getInputStream();
+            byte[] data = new byte[length];
+            int read = is.read(data);
+            is.close();
+            if (read <= 0) {
+                return null;
+            }
+            return new String(data, 0, read);
         } catch (Exception e) {
             showToast("Network error!");
         }
@@ -74,7 +62,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mHWCodecCameraStreamingBtn = (Button) findViewById(R.id.hw_codec_camera_streaming_btn);
+        Button mHWCodecCameraStreamingBtn = (Button) findViewById(R.id.hw_codec_camera_streaming_btn);
         if (!isSupportHWEncode()) {
             mHWCodecCameraStreamingBtn.setVisibility(View.INVISIBLE);
         }
@@ -87,7 +75,7 @@ public class MainActivity extends Activity {
                         try {
                             String res = null;
                             if (!Config.DEBUG_MODE) {
-                                res = requestByHttpPost();
+                                res = requestStreamJson();
                                 if (res == null) {
                                     showToast("Stream Json Got Fail!");
                                     return;
@@ -108,7 +96,7 @@ public class MainActivity extends Activity {
             }
         });
 
-        mSWCodecCameraStreamingBtn = (Button) findViewById(R.id.sw_codec_camera_streaming_btn);
+        Button mSWCodecCameraStreamingBtn = (Button) findViewById(R.id.sw_codec_camera_streaming_btn);
         mSWCodecCameraStreamingBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -118,7 +106,7 @@ public class MainActivity extends Activity {
                         try {
                             String res = null;
                             if (!Config.DEBUG_MODE) {
-                                res = requestByHttpPost();
+                                res = requestStreamJson();
                                 if (res == null) {
                                     showToast("Stream Json Got Fail!");
                                     return;
@@ -138,7 +126,7 @@ public class MainActivity extends Activity {
             }
         });
 
-        mAudioStreamingBtn = (Button) findViewById(R.id.start_pure_audio_streaming_btn);
+        Button mAudioStreamingBtn = (Button) findViewById(R.id.start_pure_audio_streaming_btn);
         mAudioStreamingBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -148,7 +136,7 @@ public class MainActivity extends Activity {
                         try {
                             String res = null;
                             if (!Config.DEBUG_MODE) {
-                                res = requestByHttpPost();
+                                res = requestStreamJson();
                                 if (res == null) {
                                     showToast("Stream Json Got Fail!");
                                     return;
