@@ -34,13 +34,16 @@ public class FBO {
     }
 
     public void initialize(Context context) {
+        if (mFullScreen != null) {
+            mFullScreen.release(false);
+        }
         mFullScreen = new FullFrameRect(new CameraFilterToneCurve(context,
                 context.getResources().openRawResource(mCurveArrays[mCurveIndex])));
+        mOffscreenTexture = 0;
     }
 
     public void release() {
         mFullScreen.release(true);
-        mOffscreenTexture = 0;
     }
 
     /**
