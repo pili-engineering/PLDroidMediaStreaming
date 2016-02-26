@@ -144,6 +144,7 @@ public class SWCodecCameraStreamingActivity extends StreamingBaseActivity
         mCameraStreamingManager.setStreamStatusCallback(this);
 //        mCameraStreamingManager.setNativeLoggingEnabled(false);
 
+
         mShutterButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

@@ -3,7 +3,6 @@ package com.pili.pldroid.streaming.camera.demo;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.hardware.Camera;
-import android.opengl.GLSurfaceView;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -20,6 +19,7 @@ import com.pili.pldroid.streaming.CameraStreamingSetting;
 import com.pili.pldroid.streaming.FrameCapturedCallback;
 import com.pili.pldroid.streaming.StreamingProfile;
 import com.pili.pldroid.streaming.SurfaceTextureCallback;
+import com.pili.pldroid.streaming.camera.demo.gles.FBO;
 import com.pili.pldroid.streaming.widget.AspectFrameLayout;
 
 import java.io.BufferedOutputStream;
@@ -44,6 +44,8 @@ public class HWCodecCameraStreamingActivity extends StreamingBaseActivity implem
     private Map<Integer, Integer> mSupportVideoQualities;
     private Context mContext;
     private View mRootView;
+
+    private FBO mFBO = new FBO();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,7 +98,7 @@ public class HWCodecCameraStreamingActivity extends StreamingBaseActivity implem
 //        mProfile.setStream(new Stream(mJSONObject1));
 //        mCameraStreamingManager.setStreamingProfile(mProfile);
         mCameraStreamingManager.setStreamingStateListener(this);
-//        mCameraStreamingManager.setSurfaceTextureCallback(this);
+        mCameraStreamingManager.setSurfaceTextureCallback(this);
         mCameraStreamingManager.setStreamingSessionListener(this);
 //        mCameraStreamingManager.setNativeLoggingEnabled(false);
 
@@ -145,6 +147,7 @@ public class HWCodecCameraStreamingActivity extends StreamingBaseActivity implem
                 mHandler.postDelayed(mScreenshooter, 100);
             }
         });
+
     }
 
     @Override
@@ -164,22 +167,25 @@ public class HWCodecCameraStreamingActivity extends StreamingBaseActivity implem
     @Override
     public void onSurfaceCreated() {
         Log.i(TAG, "onSurfaceCreated");
+        mFBO.initialize(this);
     }
 
     @Override
     public void onSurfaceChanged(int width, int height) {
         Log.i(TAG, "onSurfaceChanged");
+        mFBO.updateSurfaceSize(width, height);
     }
 
     @Override
     public void onSurfaceDestroyed() {
         Log.i(TAG, "onSurfaceDestroyed");
+        mFBO.release();
     }
 
     @Override
     public int onDrawFrame(int texId, int texWidth, int texHeight) {
-        Log.i(TAG, "onDrawFrame: texId=" + texId);
-        return texId;
+//        Log.i(TAG, "onDrawFrame: texId=" + texId);
+        return mFBO.drawFrame(texId, texWidth, texHeight);
     }
 
     private class Switcher implements Runnable {
@@ -288,13 +294,9 @@ public class HWCodecCameraStreamingActivity extends StreamingBaseActivity implem
         super.onStateHandled(state, extra);
         switch (state) {
             case CameraStreamingManager.STATE.SENDING_BUFFER_HAS_FEW_ITEMS:
-                mProfile.improveVideoQuality(1);
-                mCameraStreamingManager.setStreamingProfile(mProfile);
-                return true;
+                return false;
             case CameraStreamingManager.STATE.SENDING_BUFFER_HAS_MANY_ITEMS:
-                mProfile.reduceVideoQuality(1);
-                mCameraStreamingManager.setStreamingProfile(mProfile);
-                return true;
+                return false;
         }
         return false;
     }

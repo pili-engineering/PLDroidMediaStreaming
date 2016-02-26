@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -23,6 +24,7 @@ public class MainActivity extends Activity {
     private String requestStreamJson() {
         try {
             HttpURLConnection httpConn = (HttpURLConnection) new URL(url).openConnection();
+            httpConn.setRequestMethod("POST");
             httpConn.setConnectTimeout(5000);
             httpConn.setReadTimeout(10000);
             int responseCode = httpConn.getResponseCode();
@@ -57,6 +59,29 @@ public class MainActivity extends Activity {
         });
     }
 
+    private void startStreamingActivity(final Intent intent) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String resByHttp = null;
+
+                if (!Config.DEBUG_MODE) {
+                    resByHttp = requestStreamJson();
+                    Log.i(TAG, "resByHttp:" + resByHttp);
+                    if (resByHttp == null) {
+                        showToast("Stream Json Got Fail!");
+                        return;
+                    }
+                    intent.putExtra(Config.EXTRA_KEY_STREAM_JSON, resByHttp);
+                } else {
+                    showToast("Stream Json Got Fail!");
+                }
+
+                startActivity(intent);
+            }
+        }).start();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,30 +94,8 @@ public class MainActivity extends Activity {
         mHWCodecCameraStreamingBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            String res = null;
-                            if (!Config.DEBUG_MODE) {
-                                res = requestStreamJson();
-                                if (res == null) {
-                                    showToast("Stream Json Got Fail!");
-                                    return;
-                                }
-                            }
-                            Intent intent = new Intent(MainActivity.this, HWCodecCameraStreamingActivity.class);
-
-                            if (!Config.DEBUG_MODE) {
-                                intent.putExtra("stream_json_str", res);
-                            }
-                            startActivity(intent);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }).start();
-
+                Intent intent = new Intent(MainActivity.this, HWCodecCameraStreamingActivity.class);
+                startStreamingActivity(intent);
             }
         });
 
@@ -100,29 +103,8 @@ public class MainActivity extends Activity {
         mSWCodecCameraStreamingBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            String res = null;
-                            if (!Config.DEBUG_MODE) {
-                                res = requestStreamJson();
-                                if (res == null) {
-                                    showToast("Stream Json Got Fail!");
-                                    return;
-                                }
-                            }
-                            Intent intent = new Intent(MainActivity.this, SWCodecCameraStreamingActivity.class);
-                            if (!Config.DEBUG_MODE) {
-                                intent.putExtra("stream_json_str", res);
-                            }
-                            startActivity(intent);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }).start();
-
+                Intent intent = new Intent(MainActivity.this, SWCodecCameraStreamingActivity.class);
+                startStreamingActivity(intent);
             }
         });
 
@@ -130,28 +112,8 @@ public class MainActivity extends Activity {
         mAudioStreamingBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            String res = null;
-                            if (!Config.DEBUG_MODE) {
-                                res = requestStreamJson();
-                                if (res == null) {
-                                    showToast("Stream Json Got Fail!");
-                                    return;
-                                }
-                            }
-                            Intent intent = new Intent(MainActivity.this, AudioStreamingActivity.class);
-                            if (!Config.DEBUG_MODE) {
-                                intent.putExtra("stream_json_str", res);
-                            }
-                            startActivity(intent);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }).start();
+                Intent intent = new Intent(MainActivity.this, AudioStreamingActivity.class);
+                startStreamingActivity(intent);
             }
         });
     }
