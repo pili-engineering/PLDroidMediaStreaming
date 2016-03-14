@@ -27,6 +27,7 @@ import com.pili.pldroid.streaming.StreamingProfile.StreamStatusConfig;
 import com.pili.pldroid.streaming.StreamingProfile.StreamStatus;
 import com.pili.pldroid.streaming.StreamingProfile.ENCODING_ORIENTATION;
 import com.pili.pldroid.streaming.SurfaceTextureCallback;
+import com.pili.pldroid.streaming.camera.demo.gles.FBO;
 import com.pili.pldroid.streaming.camera.demo.ui.RotateLayout;
 import com.pili.pldroid.streaming.widget.AspectFrameLayout;
 import com.qiniu.android.dns.DnsManager;
@@ -60,6 +61,8 @@ public class SWCodecCameraStreamingActivity extends StreamingBaseActivity
     private Context mContext;
     private View mRootView;
     private TextView mStreamStatus;
+
+    private FBO mFBO = new FBO();
 
     private Screenshooter mScreenshooter = new Screenshooter();
     private EncodingOrientationSwitcher mEncodingOrientationSwitcher = new EncodingOrientationSwitcher();
@@ -108,6 +111,7 @@ public class SWCodecCameraStreamingActivity extends StreamingBaseActivity
 
         StreamingProfile.Stream stream = new StreamingProfile.Stream(mJSONObject);
         mProfile = new StreamingProfile();
+
         mProfile.setVideoQuality(StreamingProfile.VIDEO_QUALITY_HIGH3)
                 .setAudioQuality(StreamingProfile.AUDIO_QUALITY_MEDIUM2)
 //                .setPreferredVideoEncodingSize(960, 544)
@@ -234,23 +238,26 @@ public class SWCodecCameraStreamingActivity extends StreamingBaseActivity
     @Override
     public void onSurfaceCreated() {
         Log.i(TAG, "onSurfaceCreated");
+        mFBO.initialize(this);
     }
 
     @Override
     public void onSurfaceChanged(int width, int height) {
         Log.i(TAG, "onSurfaceChanged width:" + width + ",height:" + height);
+        mFBO.updateSurfaceSize(width, height);
     }
 
     @Override
     public void onSurfaceDestroyed() {
         Log.i(TAG, "onSurfaceDestroyed");
+        mFBO.release();
     }
 
     @Override
     public int onDrawFrame(int texId, int texWidth, int texHeight) {
         // newTexId should not equal with texId. texId is from the SurfaceTexture.
         // Otherwise, there is no filter effect.
-        int newTexId = texId;
+        int newTexId = mFBO.drawFrame(texId, texWidth, texHeight);
 //        Log.i(TAG, "onDrawFrame texId:" + texId + ",newTexId:" + newTexId + ",texWidth:" + texWidth + ",texHeight:" + texHeight);
         return newTexId;
     }

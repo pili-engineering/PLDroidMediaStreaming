@@ -5,6 +5,8 @@ import android.opengl.GLES20;
 import android.util.Log;
 
 import com.pili.pldroid.streaming.camera.demo.R;
+import com.pili.pldroid.streaming.camera.demo.filter.CameraFilterBeauty;
+import com.pili.pldroid.streaming.camera.demo.filter.CameraFilterMosaic;
 import com.pili.pldroid.streaming.camera.demo.filter.CameraFilterToneCurve;
 
 /**
@@ -37,8 +39,16 @@ public class FBO {
         if (mFullScreen != null) {
             mFullScreen.release(false);
         }
-        mFullScreen = new FullFrameRect(new CameraFilterToneCurve(context,
-                context.getResources().openRawResource(mCurveArrays[mCurveIndex])));
+
+        /**
+         * Create a new full frame renderer with beauty filter.
+         * There are two another filter, you can have a try.
+         */
+//        mFullScreen = new FullFrameRect(new CameraFilterToneCurve(context,
+//                context.getResources().openRawResource(mCurveArrays[mCurveIndex])));
+//        mFullScreen = new FullFrameRect(new CameraFilterMosaic(context));
+        mFullScreen = new FullFrameRect(new CameraFilterBeauty(context));
+
         mOffscreenTexture = 0;
     }
 
