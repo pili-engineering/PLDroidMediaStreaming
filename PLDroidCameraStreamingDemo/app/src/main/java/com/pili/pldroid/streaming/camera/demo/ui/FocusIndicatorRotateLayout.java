@@ -40,6 +40,9 @@ public class FocusIndicatorRotateLayout extends RotateLayout implements FocusInd
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     public void showStart() {
         Log.i(TAG, "showStart");
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+            return;
+        }
         if (mState == STATE_IDLE) {
             setDrawable(R.drawable.ic_focus_focusing);
             animate().withLayer().setDuration(SCALING_UP_TIME)
@@ -52,6 +55,9 @@ public class FocusIndicatorRotateLayout extends RotateLayout implements FocusInd
     @Override
     public void showSuccess(boolean timeout) {
         Log.i(TAG, "showSuccess");
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+            return;
+        }
         if (mState == STATE_FOCUSING) {
             setDrawable(R.drawable.ic_focus_focused);
             animate().withLayer().setDuration(SCALING_DOWN_TIME).scaleX(1f)
@@ -64,6 +70,9 @@ public class FocusIndicatorRotateLayout extends RotateLayout implements FocusInd
     @Override
     public void showFail(boolean timeout) {
         Log.i(TAG, "showFail");
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+            return;
+        }
         if (mState == STATE_FOCUSING) {
             setDrawable(R.drawable.ic_focus_failed);
             animate().withLayer().setDuration(SCALING_DOWN_TIME).scaleX(1f)
@@ -76,6 +85,9 @@ public class FocusIndicatorRotateLayout extends RotateLayout implements FocusInd
     @Override
     public void clear() {
         Log.i(TAG, "clear");
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+            return;
+        }
         animate().cancel();
         removeCallbacks(mDisappear);
         mDisappear.run();

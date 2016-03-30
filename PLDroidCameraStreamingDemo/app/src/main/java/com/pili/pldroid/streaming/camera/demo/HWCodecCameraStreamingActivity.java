@@ -17,6 +17,7 @@ import com.pili.pldroid.streaming.CameraStreamingManager;
 import com.pili.pldroid.streaming.CameraStreamingManager.EncodingType;
 import com.pili.pldroid.streaming.CameraStreamingSetting;
 import com.pili.pldroid.streaming.FrameCapturedCallback;
+import com.pili.pldroid.streaming.StreamStatusCallback;
 import com.pili.pldroid.streaming.StreamingProfile;
 import com.pili.pldroid.streaming.SurfaceTextureCallback;
 import com.pili.pldroid.streaming.camera.demo.gles.FBO;
@@ -33,7 +34,8 @@ import java.util.Map;
  */
 public class HWCodecCameraStreamingActivity extends StreamingBaseActivity implements
         SurfaceTextureCallback,
-        View.OnLayoutChangeListener {
+        View.OnLayoutChangeListener,
+        StreamStatusCallback{
     private static final String TAG = "HWCodecCameraStreaming";
 
     private Button mTorchBtn;
@@ -44,6 +46,7 @@ public class HWCodecCameraStreamingActivity extends StreamingBaseActivity implem
     private Map<Integer, Integer> mSupportVideoQualities;
     private Context mContext;
     private View mRootView;
+    private TextView mStreamStatus;
 
     private FBO mFBO = new FBO();
 
@@ -71,6 +74,7 @@ public class HWCodecCameraStreamingActivity extends StreamingBaseActivity implem
         mTorchBtn = (Button) findViewById(R.id.torch_btn);
         mCameraSwitchBtn = (Button) findViewById(R.id.camera_switch_btn);
         mCaptureFrameBtn = (Button) findViewById(R.id.capture_btn);
+        mStreamStatus = (TextView) findViewById(R.id.stream_status);
 
         StreamingProfile.VideoProfile vProfile = new StreamingProfile.VideoProfile(30, 1000 * 1024);
         StreamingProfile.AVProfile avProfile = new StreamingProfile.AVProfile(vProfile, null);
@@ -101,7 +105,7 @@ public class HWCodecCameraStreamingActivity extends StreamingBaseActivity implem
         mCameraStreamingManager.setSurfaceTextureCallback(this);
         mCameraStreamingManager.setStreamingSessionListener(this);
 //        mCameraStreamingManager.setNativeLoggingEnabled(false);
-
+        mCameraStreamingManager.setStreamStatusCallback(this);
         mShutterButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -299,5 +303,17 @@ public class HWCodecCameraStreamingActivity extends StreamingBaseActivity implem
                 return false;
         }
         return false;
+    }
+
+    @Override
+    public void notifyStreamStatusChanged(final StreamingProfile.StreamStatus streamStatus) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mStreamStatus.setText("bitrate:" + streamStatus.totalAVBitrate / 1024 + " kbps"
+                        + "\naudio:" + streamStatus.audioFps + " fps"
+                        + "\nvideo:" + streamStatus.videoFps + " fps");
+            }
+        });
     }
 }

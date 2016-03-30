@@ -20,6 +20,7 @@ import com.pili.pldroid.streaming.CameraStreamingManager;
 import com.pili.pldroid.streaming.CameraStreamingManager.EncodingType;
 import com.pili.pldroid.streaming.CameraStreamingSetting;
 import com.pili.pldroid.streaming.FrameCapturedCallback;
+import com.pili.pldroid.streaming.MicrophoneStreamingSetting;
 import com.pili.pldroid.streaming.StreamStatusCallback;
 import com.pili.pldroid.streaming.StreamingPreviewCallback;
 import com.pili.pldroid.streaming.StreamingProfile;
@@ -133,8 +134,11 @@ public class SWCodecCameraStreamingActivity extends StreamingBaseActivity
                 .setCameraPrvSizeLevel(CameraStreamingSetting.PREVIEW_SIZE_LEVEL.MEDIUM)
                 .setCameraPrvSizeRatio(CameraStreamingSetting.PREVIEW_SIZE_RATIO.RATIO_16_9);
 
+        MicrophoneStreamingSetting microphoneSetting = new MicrophoneStreamingSetting();
+        microphoneSetting.setBluetoothSCOEnabled(false);
+
         mCameraStreamingManager = new CameraStreamingManager(this, afl, cameraPreviewFrameView, EncodingType.SW_VIDEO_WITH_SW_AUDIO_CODEC);  // soft codec
-        mCameraStreamingManager.prepare(setting, mProfile);
+        mCameraStreamingManager.prepare(setting, microphoneSetting, mProfile);
 
         setFocusAreaIndicator();
 

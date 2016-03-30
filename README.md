@@ -21,6 +21,7 @@ PLDroidCameraStreaming 是一个适用于 Android 的 RTMP 直播推流 SDK，�
   - [x] 支持截帧功能
   - [x] 支持动态更改 Encoding Orientation
   - [x] 支持动态切换横竖屏
+  - [x] 支持蓝牙麦克风
   - [x] 支持 ARM, ARMv7a, ARM64v8a, X86 主流芯片体系架构
 
 ## 测试通过的机型清单
@@ -809,13 +810,25 @@ mCameraStreamingManager.setNativeLoggingEnabled(false);
 
 ### 推流 SDK
 
+* 1.5.1 ([Release Notes][27])
+  - 发布 pldroid-camera-streaming-1.5.1.jar
+  - 更新 libpldroid_streaming_core.so 和 libpldroid_streaming_h264_encoder.so
+  - 新增蓝牙麦克风支持
+  - 新增质量上报支持
+  - 优化启用／关闭输入法弹框导致的屏闪现象
+  - 修复部分机型手动对焦引起的 crash 问题
+  - 修复部分机型推流过程中概率性 crash 问题
+  - 修复部分机型频繁切换输入法导致黑屏问题
+  - 修复特殊机型硬编音画不同步问题
+  - 更新 demo 样例代码
+
 * 1.5.0 ([Release Notes][26])
   - 发布 pldroid-camera-streaming-1.5.0.jar
   - 更新 libpldroid_streaming_core.so 和 libpldroid_streaming_h264_encoder.so
   - 支持手动对焦
   - 支持 Zoom
   - 支持 mute/unmute
-  - 新增 `setSendTimeoutInSecond` API 
+  - 新增 `setSendTimeoutInSecond` API
   - 对回调方法 `sortCameraPrvSize` 的行参 supportedPreviewSizeList 进行从小到大排序
   - 当 DnsManager 设置为 null 后，不进行 Dns 解析，[Issue 78](https://github.com/pili-engineering/PLDroidCameraStreaming/issues/78)
   - 优化数据源采集和显示效率，避免 UI 卡顿
@@ -1054,3 +1067,4 @@ mCameraStreamingManager.setNativeLoggingEnabled(false);
 [24]: /ReleaseNotes/release-notes-1.4.5.md
 [25]: /ReleaseNotes/release-notes-1.4.6.md
 [26]: /ReleaseNotes/release-notes-1.5.0.md
+[27]: /ReleaseNotes/release-notes-1.5.1.md
