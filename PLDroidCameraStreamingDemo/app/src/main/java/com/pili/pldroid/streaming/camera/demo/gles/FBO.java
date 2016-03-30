@@ -4,6 +4,7 @@ import android.content.Context;
 import android.opengl.GLES20;
 import android.util.Log;
 
+import com.pili.pldroid.streaming.camera.demo.Config;
 import com.pili.pldroid.streaming.camera.demo.R;
 import com.pili.pldroid.streaming.camera.demo.filter.CameraFilterBeauty;
 import com.pili.pldroid.streaming.camera.demo.filter.CameraFilterMosaic;
@@ -14,6 +15,7 @@ import com.pili.pldroid.streaming.camera.demo.filter.CameraFilterToneCurve;
  */
 public class FBO {
     private static final String TAG = "FBO";
+    private boolean mEnable = Config.FILTER_ENABLED;
 
     private int mSurfaceWidth;
     private int mSurfaceHeight;
@@ -31,11 +33,19 @@ public class FBO {
     private FullFrameRect mFullScreen;
 
     public void updateSurfaceSize(int width, int height) {
+        if (!mEnable) {
+            return;
+        }
+
         mSurfaceWidth = width;
         mSurfaceHeight = height;
     }
 
     public void initialize(Context context) {
+        if (!mEnable) {
+            return;
+        }
+
         if (mFullScreen != null) {
             mFullScreen.release(false);
         }
@@ -53,6 +63,9 @@ public class FBO {
     }
 
     public void release() {
+        if (!mEnable) {
+            return;
+        }
         mFullScreen.release(true);
     }
 
@@ -111,6 +124,9 @@ public class FBO {
     }
 
     public int drawFrame(int texId, int texWidth, int texHeight) {
+        if (!mEnable) {
+            return texId;
+        }
         GLES20.glViewport(0, 0, texWidth, texHeight);
         if (mOffscreenTexture == 0) {
             prepareFramebuffer(texWidth, texHeight);

@@ -9,6 +9,7 @@ import com.pili.pldroid.streaming.StreamingProfile;
  */
 public class Config {
     public static final boolean DEBUG_MODE = false;
+    public static final boolean FILTER_ENABLED = false;
     public static final int ENCODING_LEVEL = StreamingProfile.VIDEO_ENCODING_HEIGHT_480;
     public static final int SCREEN_ORIENTATION = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
 
