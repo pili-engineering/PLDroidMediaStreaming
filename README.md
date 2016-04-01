@@ -810,9 +810,10 @@ mCameraStreamingManager.setNativeLoggingEnabled(false);
 
 ### 推流 SDK
 
-* 1.5.2 ([Release Notes][28])
-  - 发布 pldroid-camera-streaming-1.5.2.jar
+* 1.5.3 ([Release Notes][28])
+  - 发布 pldroid-camera-streaming-1.5.3.jar
   - 修复特殊机型概率性 crash 问题
+  - 优化 Jar 包体积
 
 * 1.5.1 ([Release Notes][27])
   - 发布 pldroid-camera-streaming-1.5.1.jar
@@ -1072,4 +1073,4 @@ mCameraStreamingManager.setNativeLoggingEnabled(false);
 [25]: /ReleaseNotes/release-notes-1.4.6.md
 [26]: /ReleaseNotes/release-notes-1.5.0.md
 [27]: /ReleaseNotes/release-notes-1.5.1.md
-[28]: /ReleaseNotes/release-notes-1.5.2.md
+[28]: /ReleaseNotes/release-notes-1.5.3.md
