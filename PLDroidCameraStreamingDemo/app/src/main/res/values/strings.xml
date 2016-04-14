@@ -19,4 +19,12 @@
 
     <string name="flash_light_on">ON</string>
     <string name="flash_light_off">OFF</string>
+    
+    <string name="server_address">Server address</string>
+    <string name="stream_id">Stream ID</string>
+    <string name="hub_name">Hub name</string>
+    <string name="ak">Access Key</string>
+    <string name="sk">Secret Key</string>
+    <string name="has_server">If you have a server, fill content below.</string>
+    <string name="no_server">If you do not have a server, fill content below.</string>
 </resources>
