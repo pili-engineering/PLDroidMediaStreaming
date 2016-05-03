@@ -6,6 +6,7 @@
 
     <TextView
         android:id="@+id/streamingStatus"
+        android:contentDescription="@string/cd_tv_streaming_state_hint"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/pldroid_streaming_item_padding"

@@ -11,7 +11,6 @@ PLDroidCameraStreaming 是为 Android 开发者提供的 RTMP 直播推流 SDK
   - 新增蓝牙麦克风支持
     - 新增 `MicrophoneStreamingSetting` 类
     - 新增 `CameraStreamingManager#prepare(CameraStreamingSetting, MicrophoneStreamingSetting, StreamingProfile)` 方法
-  - 新增质量上报支持
   - 优化启用／关闭输入法弹框导致的屏闪现象
   - 修复部分机型手动对焦引起的 crash 问题
   - 修复部分机型推流过程中概率性 crash 问题

@@ -21,10 +21,11 @@ public class AudioStreamingActivity extends StreamingBaseActivity {
         mSatusTextView = (TextView) findViewById(R.id.streamingStatus);
         mShutterButton = (Button) findViewById(R.id.toggleRecording_button);
 
-        StreamingProfile.Stream stream = new StreamingProfile.Stream(mJSONObject);
         StreamingProfile profile = new StreamingProfile();
-        profile.setStream(stream)
-                .setAudioQuality(StreamingProfile.AUDIO_QUALITY_LOW1);
+        StreamingProfile.Stream stream = new StreamingProfile.Stream(mJSONObject);
+        profile.setStream(stream);
+
+        profile.setAudioQuality(StreamingProfile.AUDIO_QUALITY_LOW1);
 
         mCameraStreamingManager = new CameraStreamingManager(this, EncodingType.SW_AUDIO_CODEC);
         mCameraStreamingManager.prepare(profile);

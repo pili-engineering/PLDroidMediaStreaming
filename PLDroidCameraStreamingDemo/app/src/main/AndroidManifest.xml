@@ -15,6 +15,7 @@
 
     <application
         android:allowBackup="true"
+        android:name=".StreamingApplication"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
@@ -30,6 +31,7 @@
 
         <activity
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
+            android:configChanges="orientation|screenSize"
             android:name=".HWCodecCameraStreamingActivity"
             android:theme="@android:style/Theme.Holo.Light.NoActionBar" >
         </activity>
