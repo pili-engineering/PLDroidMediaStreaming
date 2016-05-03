@@ -14,6 +14,7 @@ PLDroidCameraStreaming 是一个适用于 Android 的 RTMP 直播推流 SDK，�
   - [x] 支持前后置摄像头，以及动态切换
   - [x] 支持自动对焦
   - [x] 支持手动对焦
+  - [x] 支持 Encoding Mirror 设置
   - [x] 支持 Zoom 操作
   - [x] 支持 Mute/Unmute
   - [x] 支持闪光灯操作
@@ -810,6 +811,20 @@ mCameraStreamingManager.setNativeLoggingEnabled(false);
 
 ### 推流 SDK
 
+* 1.6.0 ([Release Notes][29])
+  - 发布 pldroid-camera-streaming-1.6.0.jar
+  - 更新 libpldroid_streaming_core.so 和 libpldroid_streaming_h264_encoder.so 
+  - 新增 mirror 支持
+  - 新增 `StreamingEnv`
+  - 修复特殊机型硬编闪屏问题
+  - 修复禁播导致的 crash 问题
+  - 改善部分机型硬编 tearing 现象
+  - 兼容异常输入的情况，并提供回调
+  - 新增质量上报支持
+  - 修复资源泄漏问题
+  - 修复特殊机型 crash 问题
+  - 重构 Demo 代码
+
 * 1.5.3 ([Release Notes][28])
   - 发布 pldroid-camera-streaming-1.5.3.jar
   - 修复特殊机型概率性 crash 问题
@@ -819,7 +834,6 @@ mCameraStreamingManager.setNativeLoggingEnabled(false);
   - 发布 pldroid-camera-streaming-1.5.1.jar
   - 更新 libpldroid_streaming_core.so 和 libpldroid_streaming_h264_encoder.so
   - 新增蓝牙麦克风支持
-  - 新增质量上报支持
   - 优化启用／关闭输入法弹框导致的屏闪现象
   - 修复部分机型手动对焦引起的 crash 问题
   - 修复部分机型推流过程中概率性 crash 问题
@@ -1074,3 +1088,4 @@ mCameraStreamingManager.setNativeLoggingEnabled(false);
 [26]: /ReleaseNotes/release-notes-1.5.0.md
 [27]: /ReleaseNotes/release-notes-1.5.1.md
 [28]: /ReleaseNotes/release-notes-1.5.3.md
+[29]: /ReleaseNotes/release-notes-1.6.0.md
