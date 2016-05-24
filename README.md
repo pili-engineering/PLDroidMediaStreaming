@@ -811,6 +811,19 @@ mCameraStreamingManager.setNativeLoggingEnabled(false);
 
 ### 推流 SDK
 
+* 1.6.1 ([Release Notes][30])
+  - 发布 pldroid-camera-streaming-1.6.1.jar
+  - 新增 libpldroid_mmprocessing.so
+  - 更新 libpldroid_streaming_core.so 和 libpldroid_streaming_h264_encoder.so 
+  - 增加水印支持
+  - 优化软编 codec，提升画质和码控能力
+  - 兼容特殊的直播设备
+  - 新增 TransformMatrix 到 SurfaceTextureCallback#onDrawFrame
+  - 修复 `CameraStreamingManager#pause` 耗时较长
+  - 修复硬编纯音频无法正常停止推流
+  - 修复硬编推流过程中特殊步骤导致的概率性 crash
+  - 更新 Demo 代码
+
 * 1.6.0 ([Release Notes][29])
   - 发布 pldroid-camera-streaming-1.6.0.jar
   - 更新 libpldroid_streaming_core.so 和 libpldroid_streaming_h264_encoder.so 
@@ -1089,3 +1102,4 @@ mCameraStreamingManager.setNativeLoggingEnabled(false);
 [27]: /ReleaseNotes/release-notes-1.5.1.md
 [28]: /ReleaseNotes/release-notes-1.5.3.md
 [29]: /ReleaseNotes/release-notes-1.6.0.md
+[30]: /ReleaseNotes/release-notes-1.6.1.md
