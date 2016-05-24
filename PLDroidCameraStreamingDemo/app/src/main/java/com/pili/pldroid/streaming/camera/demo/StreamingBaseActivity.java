@@ -81,7 +81,6 @@ public class StreamingBaseActivity extends Activity implements
     protected boolean mShutterButtonPressed = false;
     private boolean mIsTorchOn = false;
     private boolean mIsNeedMute = false;
-    private boolean mIsNeedFB = false;
     private boolean isEncOrientationPort = true;
 
     protected static final int MSG_START_STREAMING  = 0;
@@ -100,6 +99,7 @@ public class StreamingBaseActivity extends Activity implements
     protected MicrophoneStreamingSetting mMicrophoneStreamingSetting;
     protected StreamingProfile mProfile;
     protected JSONObject mJSONObject;
+    private boolean mOrientationChanged = false;
 
     protected boolean mIsReady = false;
 
@@ -193,7 +193,7 @@ public class StreamingBaseActivity extends Activity implements
 
         try {
             mJSONObject = new JSONObject(streamJsonStrFromServer);
-        } catch (JSONException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -224,9 +224,8 @@ public class StreamingBaseActivity extends Activity implements
                 .setRecordingHint(false)
                 .setResetTouchFocusDelayInMs(3000)
 //                .setFocusMode(CameraStreamingSetting.FOCUS_MODE_CONTINUOUS_PICTURE)
-                .setCameraPrvSizeLevel(CameraStreamingSetting.PREVIEW_SIZE_LEVEL.MEDIUM)
+                .setCameraPrvSizeLevel(CameraStreamingSetting.PREVIEW_SIZE_LEVEL.SMALL)
                 .setCameraPrvSizeRatio(CameraStreamingSetting.PREVIEW_SIZE_RATIO.RATIO_16_9);
-        mIsNeedFB = true;
         mMicrophoneStreamingSetting = new MicrophoneStreamingSetting();
         mMicrophoneStreamingSetting.setBluetoothSCOEnabled(false);
 
@@ -394,7 +393,7 @@ public class StreamingBaseActivity extends Activity implements
     }
 
     @Override
-    public int onDrawFrame(int texId, int texWidth, int texHeight) {
+    public int onDrawFrame(int texId, int texWidth, int texHeight, float[] transformMatrix) {
         // newTexId should not equal with texId. texId is from the SurfaceTexture.
         // Otherwise, there is no filter effect.
         int newTexId = mFBO.drawFrame(texId, texWidth, texHeight);
@@ -426,6 +425,8 @@ public class StreamingBaseActivity extends Activity implements
         @Override
         public void run() {
             Log.i(TAG, "isEncOrientationPort:" + isEncOrientationPort);
+            stopStreaming();
+            mOrientationChanged = !mOrientationChanged;
             isEncOrientationPort = !isEncOrientationPort;
             mProfile.setEncodingOrientation(isEncOrientationPort ? StreamingProfile.ENCODING_ORIENTATION.PORT : StreamingProfile.ENCODING_ORIENTATION.LAND);
             mCameraStreamingManager.setStreamingProfile(mProfile);
@@ -503,6 +504,10 @@ public class StreamingBaseActivity extends Activity implements
                 mStatusMsgContent = getString(R.string.string_state_ready);
                 setShutterButtonEnabled(true);
                 setShutterButtonPressed(false);
+                if (mOrientationChanged) {
+                    mOrientationChanged = false;
+                    startStreaming();
+                }
                 break;
             case CameraStreamingManager.STATE.IOERROR:
                 mLogContent += "IOERROR\n";

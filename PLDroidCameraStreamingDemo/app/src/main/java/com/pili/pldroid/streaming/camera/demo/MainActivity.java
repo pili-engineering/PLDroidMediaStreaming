@@ -74,8 +74,6 @@ public class MainActivity extends Activity {
                         return;
                     }
                     intent.putExtra(Config.EXTRA_KEY_STREAM_JSON, resByHttp);
-                } else {
-                    showToast("Stream Json Got Fail!");
                 }
 
                 startActivity(intent);
@@ -88,7 +86,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         TextView mVersionInfoTextView = (TextView) findViewById(R.id.version_info);
-        mVersionInfoTextView.setText("v1.6.0");
+        mVersionInfoTextView.setText("v1.6.1");
 
         Button mHWCodecCameraStreamingBtn = (Button) findViewById(R.id.hw_codec_camera_streaming_btn);
         if (!isSupportHWEncode()) {
