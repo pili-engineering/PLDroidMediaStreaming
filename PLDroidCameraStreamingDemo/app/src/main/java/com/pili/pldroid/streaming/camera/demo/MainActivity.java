@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -86,7 +87,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         TextView mVersionInfoTextView = (TextView) findViewById(R.id.version_info);
-        mVersionInfoTextView.setText("v1.6.1");
+        mVersionInfoTextView.setText("v1.6.2");
 
         Button mHWCodecCameraStreamingBtn = (Button) findViewById(R.id.hw_codec_camera_streaming_btn);
         if (!isSupportHWEncode()) {
