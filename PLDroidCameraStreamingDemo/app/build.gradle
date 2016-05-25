@@ -21,7 +21,7 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.qiniu:happy-dns:0.2.5'
+    compile 'com.qiniu:happy-dns:0.2.7'
     compile 'com.android.support:appcompat-v7:22.0.0'
-    compile files('libs/pldroid-camera-streaming-1.6.1.jar')
+    compile files('libs/pldroid-camera-streaming-1.6.2.jar')
 }
