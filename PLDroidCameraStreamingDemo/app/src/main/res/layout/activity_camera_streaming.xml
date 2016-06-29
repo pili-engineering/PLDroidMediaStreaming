@@ -97,6 +97,25 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
+    <Button
+        android:id="@+id/fb_btn"
+        android:contentDescription="@string/cd_btn_fb"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:layout_marginTop="150dp"
+        android:layout_below="@id/torch_btn"
+        android:layout_marginLeft="@dimen/pldroid_streaming_item_padding"
+        android:textColor="@color/pldroid_streaming_white"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <SeekBar
+        android:id="@+id/beautyLevel_seekBar"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="100dp"
+        android:max="100"
+        android:progress="100"/>
     <include layout="@layout/status" />
     <include layout="@layout/camera_button_holder" />
 </RelativeLayout>

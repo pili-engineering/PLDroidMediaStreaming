@@ -87,7 +87,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         TextView mVersionInfoTextView = (TextView) findViewById(R.id.version_info);
-        mVersionInfoTextView.setText("v1.6.2");
+        mVersionInfoTextView.setText("v1.7.0");
 
         Button mHWCodecCameraStreamingBtn = (Button) findViewById(R.id.hw_codec_camera_streaming_btn);
         if (!isSupportHWEncode()) {

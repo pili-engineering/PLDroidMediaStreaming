@@ -33,6 +33,7 @@
     <string name="cd_btn_capture">cd_btn_capture</string>
     <string name="cd_btn_orientation">cd_btn_orientation</string>
     <string name="cd_btn_mute">cd_btn_mute</string>
+    <string name="cd_btn_fb">cd_btn_fb</string>
     <string name="cd_tv_streaming_state_hint">cd_tv_streaming_state_hint</string>
     <string name="cd_shutter_button">cd_shutter_button</string>
 </resources>
