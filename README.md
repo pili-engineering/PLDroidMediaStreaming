@@ -10,6 +10,7 @@ PLDroidCameraStreaming 是一个适用于 Android 的 RTMP 直播推流 SDK，�
   - [x] 支持构造带安全授权凭证的 RTMP 推流地址
   - [x] 支持 RTMP 封包及推流
   - [x] 支持 RTMP 推流自适应网络质量动态切换码率或自定义策略
+  - [x] 支持内置美颜，以及可动态调节美颜效果
   - [x] 支持数据源回调接口，可自定义 Filter (滤镜) 特效处理
   - [x] 支持前后置摄像头，以及动态切换
   - [x] 支持自动对焦
@@ -813,6 +814,19 @@ mCameraStreamingManager.setNativeLoggingEnabled(false);
 
 ### 推流 SDK
 
+* 1.7.0 ([Release Notes][32])
+  - 新增内置美颜功能，美颜效果可调节
+  - 新增采集帧率控制，避免帧率飙升不可控
+  - 修复特殊步骤下 Contex 泄露问题
+  - 修复硬编水印在特殊机型上（Meilan note 2）异常显示
+  - 优化采集，避免过度 UI 操作导致推流帧率降低
+  - 优化内存使用
+  - 发布 pldroid-camera-streaming-1.7.0.jar
+  - 更新 libpldroid_mmprocessing.so
+  - 更新 libpldroid_streaming_core.so
+  - 更新 libpldroid_streaming_h264_encoder.so
+  - 更新 Demo
+
 * 1.6.2 ([Release Notes][31])
   - 发布 pldroid-camera-streaming-1.6.2.jar
   - 修复特殊情况下导致的 crash 问题
@@ -821,7 +835,7 @@ mCameraStreamingManager.setNativeLoggingEnabled(false);
 * 1.6.1 ([Release Notes][30])
   - 发布 pldroid-camera-streaming-1.6.1.jar
   - 新增 libpldroid_mmprocessing.so
-  - 更新 libpldroid_streaming_core.so 和 libpldroid_streaming_h264_encoder.so 
+  - 更新 libpldroid_streaming_core.so 和 libpldroid_streaming_h264_encoder.so
   - 增加水印支持
   - 优化软编 codec，提升画质和码控能力
   - 兼容特殊的直播设备
@@ -833,7 +847,7 @@ mCameraStreamingManager.setNativeLoggingEnabled(false);
 
 * 1.6.0 ([Release Notes][29])
   - 发布 pldroid-camera-streaming-1.6.0.jar
-  - 更新 libpldroid_streaming_core.so 和 libpldroid_streaming_h264_encoder.so 
+  - 更新 libpldroid_streaming_core.so 和 libpldroid_streaming_h264_encoder.so
   - 新增 mirror 支持
   - 新增 `StreamingEnv`
   - 修复特殊机型硬编闪屏问题
@@ -1111,3 +1125,4 @@ mCameraStreamingManager.setNativeLoggingEnabled(false);
 [29]: /ReleaseNotes/release-notes-1.6.0.md
 [30]: /ReleaseNotes/release-notes-1.6.1.md
 [31]: /ReleaseNotes/release-notes-1.6.2.md
+[32]: /ReleaseNotes/release-notes-1.7.0.md

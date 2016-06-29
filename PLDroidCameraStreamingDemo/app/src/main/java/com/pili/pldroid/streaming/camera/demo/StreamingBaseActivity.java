@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -72,6 +73,7 @@ public class StreamingBaseActivity extends Activity implements
     private Button mCameraSwitchBtn;
     private Button mCaptureFrameBtn;
     private Button mEncodingOrientationSwitcherBtn;
+    private Button mFaceBeautyBtn;
     private RotateLayout mRotateLayout;
 
     protected TextView mSatusTextView;
@@ -81,12 +83,14 @@ public class StreamingBaseActivity extends Activity implements
     protected boolean mShutterButtonPressed = false;
     private boolean mIsTorchOn = false;
     private boolean mIsNeedMute = false;
+    private boolean mIsNeedFB = false;
     private boolean isEncOrientationPort = true;
 
     protected static final int MSG_START_STREAMING  = 0;
     protected static final int MSG_STOP_STREAMING   = 1;
     private static final int MSG_SET_ZOOM           = 2;
     private static final int MSG_MUTE               = 3;
+    private static final int MSG_FB                 = 4;
 
     protected String mStatusMsgContent;
 
@@ -99,6 +103,7 @@ public class StreamingBaseActivity extends Activity implements
     protected MicrophoneStreamingSetting mMicrophoneStreamingSetting;
     protected StreamingProfile mProfile;
     protected JSONObject mJSONObject;
+    private boolean mIsNeedSpeedCheck = true;
     private boolean mOrientationChanged = false;
 
     protected boolean mIsReady = false;
@@ -149,6 +154,13 @@ public class StreamingBaseActivity extends Activity implements
                     mIsNeedMute = !mIsNeedMute;
                     mCameraStreamingManager.mute(mIsNeedMute);
                     updateMuteButtonText();
+                    break;
+                case MSG_FB:
+                    mIsNeedFB = !mIsNeedFB;
+                    mCameraStreamingManager.setVideoFilterType(mIsNeedFB ?
+                            CameraStreamingSetting.VIDEO_FILTER_TYPE.VIDEO_FILTER_BEAUTY
+                            : CameraStreamingSetting.VIDEO_FILTER_TYPE.VIDEO_FILTER_NONE);
+                    updateFBButtonText();
                     break;
                 default:
                     Log.e(TAG, "Invalid message");
@@ -222,10 +234,14 @@ public class StreamingBaseActivity extends Activity implements
         mCameraStreamingSetting.setCameraId(Camera.CameraInfo.CAMERA_FACING_BACK)
                 .setContinuousFocusModeEnabled(true)
                 .setRecordingHint(false)
+                .setBuiltInFaceBeautyEnabled(true)
                 .setResetTouchFocusDelayInMs(3000)
 //                .setFocusMode(CameraStreamingSetting.FOCUS_MODE_CONTINUOUS_PICTURE)
                 .setCameraPrvSizeLevel(CameraStreamingSetting.PREVIEW_SIZE_LEVEL.SMALL)
-                .setCameraPrvSizeRatio(CameraStreamingSetting.PREVIEW_SIZE_RATIO.RATIO_16_9);
+                .setCameraPrvSizeRatio(CameraStreamingSetting.PREVIEW_SIZE_RATIO.RATIO_16_9)
+                .setFaceBeautySetting(new CameraStreamingSetting.FaceBeautySetting(1.0f, 1.0f, 0.8f))
+                .setVideoFilter(CameraStreamingSetting.VIDEO_FILTER_TYPE.VIDEO_FILTER_BEAUTY);
+        mIsNeedFB = true;
         mMicrophoneStreamingSetting = new MicrophoneStreamingSetting();
         mMicrophoneStreamingSetting.setBluetoothSCOEnabled(false);
 
@@ -443,11 +459,14 @@ public class StreamingBaseActivity extends Activity implements
         @Override
         public void run() {
             final String fileName = "PLStreaming_" + System.currentTimeMillis() + ".jpg";
-            mCameraStreamingManager.captureFrame(0, 0, new FrameCapturedCallback() {
+            mCameraStreamingManager.captureFrame(100, 100, new FrameCapturedCallback() {
                 private Bitmap bitmap;
 
                 @Override
                 public void onFrameCaptured(Bitmap bmp) {
+                    if (bmp == null) {
+                        return;
+                    }
                     bitmap = bmp;
                     new Thread(new Runnable() {
                         @Override
@@ -594,10 +613,20 @@ public class StreamingBaseActivity extends Activity implements
         mTorchBtn = (Button) findViewById(R.id.torch_btn);
         mCameraSwitchBtn = (Button) findViewById(R.id.camera_switch_btn);
         mCaptureFrameBtn = (Button) findViewById(R.id.capture_btn);
+        mFaceBeautyBtn = (Button) findViewById(R.id.fb_btn);
         mSatusTextView = (TextView) findViewById(R.id.streamingStatus);
 
         mLogTextView = (TextView) findViewById(R.id.log_info);
         mStreamStatus = (TextView) findViewById(R.id.stream_status);
+
+        mFaceBeautyBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!mHandler.hasMessages(MSG_FB)) {
+                    mHandler.sendEmptyMessage(MSG_FB);
+                }
+            }
+        });
 
         mMuteButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -663,12 +692,36 @@ public class StreamingBaseActivity extends Activity implements
                 mHandler.post(mEncodingOrientationSwitcher);
             }
         });
+
+        SeekBar seekBarBeauty = (SeekBar) findViewById(R.id.beautyLevel_seekBar);
+        seekBarBeauty.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                CameraStreamingSetting.FaceBeautySetting fbSetting = mCameraStreamingSetting.getFaceBeautySetting();
+                fbSetting.beautyLevel = progress / 100.0f;
+                fbSetting.whiten = progress / 100.0f;
+                fbSetting.redden = progress / 100.0f;
+
+                mCameraStreamingManager.updateFaceBeautySetting(fbSetting);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+        });
+
         initButtonText();
     }
 
     private void initButtonText() {
+        updateFBButtonText();
         updateCameraSwitcherButtonText(mCameraStreamingSetting.getReqCameraId());
         mCaptureFrameBtn.setText("Capture");
+        updateFBButtonText();
         updateMuteButtonText();
         updateOrientationBtnText();
     }
@@ -686,6 +739,12 @@ public class StreamingBaseActivity extends Activity implements
             mRotateLayout = (RotateLayout)findViewById(R.id.focus_indicator_rotate_layout);
             mCameraStreamingManager.setFocusAreaIndicator(mRotateLayout,
                     mRotateLayout.findViewById(R.id.focus_indicator));
+        }
+    }
+
+    private void updateFBButtonText() {
+        if (mFaceBeautyBtn != null) {
+            mFaceBeautyBtn.setText(mIsNeedFB ? "FB Off" : "FB On");
         }
     }
 
