@@ -28,7 +28,7 @@ PLDroidCameraStreaming 是为 Android 开发者提供的 RTMP 直播推流 SDK
     - 新增 CameraStreamingSetting#setFrontCameraPreviewMirror
 
 #### 缺陷
-  - 兼容软编码会导致 iOS 播放器硬解码失败
+  - 修复软编模式下 iOS 播放器硬解失败的问题
   - 修复透明水印有黑色背景问题
   - 修复特殊手机（奇酷）音画不同步
   - 修复内置美颜模式下，部分机型黑屏现象
