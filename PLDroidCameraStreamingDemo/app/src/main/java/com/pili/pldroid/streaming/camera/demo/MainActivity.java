@@ -23,7 +23,7 @@ public class MainActivity extends Activity {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2;
     }
 
-    private String requestStreamJson() {
+    private String requestStream() {
         try {
             HttpURLConnection httpConn = (HttpURLConnection) new URL(url).openConnection();
             httpConn.setRequestMethod("POST");
@@ -68,7 +68,7 @@ public class MainActivity extends Activity {
                 String resByHttp = null;
 
                 if (!Config.DEBUG_MODE) {
-                    resByHttp = requestStreamJson();
+                    resByHttp = requestStream();
                     Log.i(TAG, "resByHttp:" + resByHttp);
                     if (resByHttp == null) {
                         showToast("Stream Json Got Fail!");
@@ -86,14 +86,14 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        TextView mVersionInfoTextView = (TextView) findViewById(R.id.version_info);
-        mVersionInfoTextView.setText("v1.7.0");
+        TextView versionInfoTextView = (TextView) findViewById(R.id.version_info);
+        versionInfoTextView.setText("v1.7.1");
 
-        Button mHWCodecCameraStreamingBtn = (Button) findViewById(R.id.hw_codec_camera_streaming_btn);
+        Button hwCodecCameraStreamingBtn = (Button) findViewById(R.id.hw_codec_camera_streaming_btn);
         if (!isSupportHWEncode()) {
-            mHWCodecCameraStreamingBtn.setVisibility(View.INVISIBLE);
+            hwCodecCameraStreamingBtn.setVisibility(View.INVISIBLE);
         }
-        mHWCodecCameraStreamingBtn.setOnClickListener(new View.OnClickListener() {
+        hwCodecCameraStreamingBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, HWCodecCameraStreamingActivity.class);
@@ -101,8 +101,8 @@ public class MainActivity extends Activity {
             }
         });
 
-        Button mSWCodecCameraStreamingBtn = (Button) findViewById(R.id.sw_codec_camera_streaming_btn);
-        mSWCodecCameraStreamingBtn.setOnClickListener(new View.OnClickListener() {
+        Button swCodecCameraStreamingBtn = (Button) findViewById(R.id.sw_codec_camera_streaming_btn);
+        swCodecCameraStreamingBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, SWCodecCameraStreamingActivity.class);
@@ -110,8 +110,8 @@ public class MainActivity extends Activity {
             }
         });
 
-        Button mAudioStreamingBtn = (Button) findViewById(R.id.start_pure_audio_streaming_btn);
-        mAudioStreamingBtn.setOnClickListener(new View.OnClickListener() {
+        Button audioStreamingBtn = (Button) findViewById(R.id.start_pure_audio_streaming_btn);
+        audioStreamingBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, AudioStreamingActivity.class);

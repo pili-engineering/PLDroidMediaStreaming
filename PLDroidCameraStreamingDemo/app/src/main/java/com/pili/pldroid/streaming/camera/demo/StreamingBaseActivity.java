@@ -23,6 +23,7 @@ import android.widget.Toast;
 
 import com.pili.pldroid.streaming.CameraStreamingManager;
 import com.pili.pldroid.streaming.CameraStreamingSetting;
+import com.pili.pldroid.streaming.CameraStreamingSetting.CAMERA_FACING_ID;
 import com.pili.pldroid.streaming.FrameCapturedCallback;
 import com.pili.pldroid.streaming.MicrophoneStreamingSetting;
 import com.pili.pldroid.streaming.SharedLibraryNameHelper;
@@ -103,7 +104,6 @@ public class StreamingBaseActivity extends Activity implements
     protected MicrophoneStreamingSetting mMicrophoneStreamingSetting;
     protected StreamingProfile mProfile;
     protected JSONObject mJSONObject;
-    private boolean mIsNeedSpeedCheck = true;
     private boolean mOrientationChanged = false;
 
     protected boolean mIsReady = false;
@@ -114,7 +114,10 @@ public class StreamingBaseActivity extends Activity implements
     private FBO mFBO = new FBO();
 
     private Screenshooter mScreenshooter = new Screenshooter();
+    private Switcher mSwitcher = new Switcher();
     private EncodingOrientationSwitcher mEncodingOrientationSwitcher = new EncodingOrientationSwitcher();
+
+    private int mCurrentCamFacingIndex = Config.DEFAULT_CAMERA_FACING_ID.ordinal();
 
     protected Handler mHandler = new Handler(Looper.getMainLooper()) {
         @Override
@@ -138,14 +141,16 @@ public class StreamingBaseActivity extends Activity implements
                     }).start();
                     break;
                 case MSG_STOP_STREAMING:
-                    // disable the shutter button before stopStreaming
-                    setShutterButtonEnabled(false);
-                    boolean res = mCameraStreamingManager.stopStreaming();
-                    if (!res) {
-                        mShutterButtonPressed = true;
-                        setShutterButtonEnabled(true);
+                    if (mShutterButtonPressed) {
+                        // disable the shutter button before stopStreaming
+                        setShutterButtonEnabled(false);
+                        boolean res = mCameraStreamingManager.stopStreaming();
+                        if (!res) {
+                            mShutterButtonPressed = true;
+                            setShutterButtonEnabled(true);
+                        }
+                        setShutterButtonPressed(mShutterButtonPressed);
                     }
-                    setShutterButtonPressed(mShutterButtonPressed);
                     break;
                 case MSG_SET_ZOOM:
                     mCameraStreamingManager.setZoomValue(mCurrentZoom);
@@ -234,6 +239,7 @@ public class StreamingBaseActivity extends Activity implements
         mCameraStreamingSetting.setCameraId(Camera.CameraInfo.CAMERA_FACING_BACK)
                 .setContinuousFocusModeEnabled(true)
                 .setRecordingHint(false)
+                .setCameraFacingId(Config.DEFAULT_CAMERA_FACING_ID)
                 .setBuiltInFaceBeautyEnabled(true)
                 .setResetTouchFocusDelayInMs(3000)
 //                .setFocusMode(CameraStreamingSetting.FOCUS_MODE_CONTINUOUS_PICTURE)
@@ -265,8 +271,8 @@ public class StreamingBaseActivity extends Activity implements
 
         mIsReady = false;
         mShutterButtonPressed = false;
-        mCameraStreamingManager.pause();
         mHandler.removeCallbacksAndMessages(null);
+        mCameraStreamingManager.pause();
     }
 
     @Override
@@ -367,8 +373,6 @@ public class StreamingBaseActivity extends Activity implements
         return false;
     }
 
-    private Switcher mSwitcher = new Switcher();
-
     @Override
     public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
         Log.i(TAG, "view!!!!:" + v);
@@ -427,65 +431,6 @@ public class StreamingBaseActivity extends Activity implements
                         + "\nvideo:" + streamStatus.videoFps + " fps");
             }
         });
-    }
-
-    private class Switcher implements Runnable {
-        @Override
-        public void run() {
-            mCameraStreamingManager.switchCamera();
-        }
-    }
-
-    private class EncodingOrientationSwitcher implements Runnable {
-
-        @Override
-        public void run() {
-            Log.i(TAG, "isEncOrientationPort:" + isEncOrientationPort);
-            stopStreaming();
-            mOrientationChanged = !mOrientationChanged;
-            isEncOrientationPort = !isEncOrientationPort;
-            mProfile.setEncodingOrientation(isEncOrientationPort ? StreamingProfile.ENCODING_ORIENTATION.PORT : StreamingProfile.ENCODING_ORIENTATION.LAND);
-            mCameraStreamingManager.setStreamingProfile(mProfile);
-            setRequestedOrientation(isEncOrientationPort ? ActivityInfo.SCREEN_ORIENTATION_PORTRAIT : ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-            mCameraStreamingManager.notifyActivityOrientationChanged();
-            updateOrientationBtnText();
-            Toast.makeText(StreamingBaseActivity.this, Config.HINT_ENCODING_ORIENTATION_CHANGED,
-                    Toast.LENGTH_SHORT).show();
-            Log.i(TAG, "EncodingOrientationSwitcher -");
-        }
-    }
-
-    private class Screenshooter implements Runnable {
-        @Override
-        public void run() {
-            final String fileName = "PLStreaming_" + System.currentTimeMillis() + ".jpg";
-            mCameraStreamingManager.captureFrame(100, 100, new FrameCapturedCallback() {
-                private Bitmap bitmap;
-
-                @Override
-                public void onFrameCaptured(Bitmap bmp) {
-                    if (bmp == null) {
-                        return;
-                    }
-                    bitmap = bmp;
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                saveToSDCard(fileName, bitmap);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            } finally {
-                                if (bitmap != null) {
-                                    bitmap.recycle();
-                                    bitmap = null;
-                                }
-                            }
-                        }
-                    }).start();
-                }
-            });
-        }
     }
 
     private void setTorchEnabled(final boolean enabled) {
@@ -798,5 +743,75 @@ public class StreamingBaseActivity extends Activity implements
             ex.printStackTrace();
         }
         return new DnsManager(NetworkInfo.normal, new IResolver[]{r0, r1, r2});
+    }
+
+    private class Switcher implements Runnable {
+        @Override
+        public void run() {
+            mCurrentCamFacingIndex = (mCurrentCamFacingIndex + 1) % CameraStreamingSetting.getNumberOfCameras();
+
+            CAMERA_FACING_ID facingId;
+            if (mCurrentCamFacingIndex == CAMERA_FACING_ID.CAMERA_FACING_BACK.ordinal()) {
+                facingId = CAMERA_FACING_ID.CAMERA_FACING_BACK;
+            } else if (mCurrentCamFacingIndex == CAMERA_FACING_ID.CAMERA_FACING_FRONT.ordinal()) {
+                facingId = CAMERA_FACING_ID.CAMERA_FACING_FRONT;
+            } else {
+                facingId = CAMERA_FACING_ID.CAMERA_FACING_3RD;
+            }
+            Log.i(TAG, "switchCamera:" + facingId);
+            mCameraStreamingManager.switchCamera(facingId);
+        }
+    }
+
+    private class EncodingOrientationSwitcher implements Runnable {
+
+        @Override
+        public void run() {
+            Log.i(TAG, "isEncOrientationPort:" + isEncOrientationPort);
+            stopStreaming();
+            mOrientationChanged = !mOrientationChanged;
+            isEncOrientationPort = !isEncOrientationPort;
+            mProfile.setEncodingOrientation(isEncOrientationPort ? StreamingProfile.ENCODING_ORIENTATION.PORT : StreamingProfile.ENCODING_ORIENTATION.LAND);
+            mCameraStreamingManager.setStreamingProfile(mProfile);
+            setRequestedOrientation(isEncOrientationPort ? ActivityInfo.SCREEN_ORIENTATION_PORTRAIT : ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            mCameraStreamingManager.notifyActivityOrientationChanged();
+            updateOrientationBtnText();
+            Toast.makeText(StreamingBaseActivity.this, Config.HINT_ENCODING_ORIENTATION_CHANGED,
+                    Toast.LENGTH_SHORT).show();
+            Log.i(TAG, "EncodingOrientationSwitcher -");
+        }
+    }
+
+    private class Screenshooter implements Runnable {
+        @Override
+        public void run() {
+            final String fileName = "PLStreaming_" + System.currentTimeMillis() + ".jpg";
+            mCameraStreamingManager.captureFrame(100, 100, new FrameCapturedCallback() {
+                private Bitmap bitmap;
+
+                @Override
+                public void onFrameCaptured(Bitmap bmp) {
+                    if (bmp == null) {
+                        return;
+                    }
+                    bitmap = bmp;
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                saveToSDCard(fileName, bitmap);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            } finally {
+                                if (bitmap != null) {
+                                    bitmap.recycle();
+                                    bitmap = null;
+                                }
+                            }
+                        }
+                    }).start();
+                }
+            });
+        }
     }
 }
