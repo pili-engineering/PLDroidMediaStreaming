@@ -26,7 +26,11 @@ public class SWCodecCameraStreamingActivity extends StreamingBaseActivity {
                 (CameraPreviewFrameView) findViewById(R.id.cameraPreview_surfaceView);
         cameraPreviewFrameView.setListener(this);
 
-        WatermarkSetting watermarksetting = new WatermarkSetting(this, R.drawable.qiniu_logo, WatermarkSetting.WATERMARK_LOCATION.SOUTH_WEST, WatermarkSetting.WATERMARK_SIZE.MEDIUM, 100);
+        WatermarkSetting watermarksetting = new WatermarkSetting(this);
+        watermarksetting.setResourceId(R.drawable.qiniu_logo)
+                .setAlpha(100)
+                .setSize(WatermarkSetting.WATERMARK_SIZE.MEDIUM)
+                .setCustomPosition(0.5f, 0.5f);
 
         mCameraStreamingManager = new CameraStreamingManager(this, afl, cameraPreviewFrameView,
                 EncodingType.SW_VIDEO_WITH_SW_AUDIO_CODEC); // sw codec

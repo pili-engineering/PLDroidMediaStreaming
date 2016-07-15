@@ -16,6 +16,8 @@ import com.pili.pldroid.streaming.widget.AspectFrameLayout;
 public class HWCodecCameraStreamingActivity extends StreamingBaseActivity {
     private static final String TAG = "HWCodecCameraStreaming";
 
+    private Bitmap bitmap;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,7 +28,11 @@ public class HWCodecCameraStreamingActivity extends StreamingBaseActivity {
                 (CameraPreviewFrameView) findViewById(R.id.cameraPreview_surfaceView);
         cameraPreviewFrameView.setListener(this);
 
-        WatermarkSetting watermarksetting = new WatermarkSetting(this, R.drawable.qiniu_logo, WatermarkSetting.WATERMARK_LOCATION.SOUTH_WEST, 100);
+        WatermarkSetting watermarksetting = new WatermarkSetting(this);
+        watermarksetting.setResourceId(R.drawable.qiniu_logo)
+                .setSize(WatermarkSetting.WATERMARK_SIZE.MEDIUM)
+                .setAlpha(100)
+                .setCustomPosition(0.5f, 0.5f);
 
         mCameraStreamingManager = new CameraStreamingManager(this, afl, cameraPreviewFrameView,
                 EncodingType.HW_VIDEO_WITH_HW_AUDIO_CODEC); // hw codec

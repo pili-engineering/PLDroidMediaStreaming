@@ -2,6 +2,7 @@ package com.pili.pldroid.streaming.camera.demo;
 
 import android.content.pm.ActivityInfo;
 
+import com.pili.pldroid.streaming.CameraStreamingSetting.CAMERA_FACING_ID;
 import com.pili.pldroid.streaming.StreamingProfile;
 
 /**
@@ -12,6 +13,7 @@ public class Config {
     public static final boolean FILTER_ENABLED = false;
     public static final int ENCODING_LEVEL = StreamingProfile.VIDEO_ENCODING_HEIGHT_480;
     public static final int SCREEN_ORIENTATION = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
+    public static final CAMERA_FACING_ID DEFAULT_CAMERA_FACING_ID = CAMERA_FACING_ID.CAMERA_FACING_BACK;
 
     public static final String EXTRA_KEY_STREAM_JSON = "stream_json_str";
 
