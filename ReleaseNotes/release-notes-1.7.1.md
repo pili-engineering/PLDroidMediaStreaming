@@ -38,8 +38,9 @@ PLDroidCameraStreaming 是为 Android 开发者提供的 RTMP 直播推流 SDK
   - 修复 demo issue
 
 #### 版本
-  - 发布 pldroid-camera-streaming-1.7.0.jar
+  - 发布 pldroid-camera-streaming-1.7.1.jar
   - 更新 libpldroid_mmprocessing.so
   - 更新 libpldroid_streaming_core.so
+  - 更新 libpldroid_streaming_aac_encoder.so
   - 更新 libpldroid_streaming_h264_encoder.so 
   - 更新 Demo
