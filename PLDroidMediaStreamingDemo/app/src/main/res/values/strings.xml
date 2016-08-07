@@ -1,0 +1,41 @@
+<resources>
+    <string name="app_name">PLDroidMediaStreamingDemo</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="start">Start</string>
+
+    <string name="hw_codec_camera_streaming_txt">HW Codec Camera Streaming</string>
+    <string name="sw_codec_camera_streaming_txt">SW Codec Camera Streaming</string>
+    <string name="pure_audio_streaming_txt">Audio Streaming</string>
+    <string name="screen_recorder_streaming_txt">Screen Recorder Streaming</string>
+
+    <string name="string_state_ready">READY</string>
+    <string name="string_state_preparing">PREPARING</string>
+    <string name="string_state_connecting">CONNECTING</string>
+    <string name="string_state_streaming">STREAMING</string>
+    <string name="string_state_netblocking">NETBLOCKING, STOPPING</string>
+    <string name="string_state_con_timeout">CONNECTION TIMEOUT</string>
+    <string name="title_activity_audio_streaming">AudioStreamingActivity</string>
+
+    <string name="flash_light_on">ON</string>
+    <string name="flash_light_off">OFF</string>
+
+    <string name="cd_et_input_url">cd_et_input_url</string>
+    <string name="cd_btn_hw_codec">cd_btn_hw_codec</string>
+    <string name="cd_btn_sw_codec">cd_btn_sw_codec</string>
+    <string name="cd_btn_pure_audio">cd_btn_pure_audio</string>
+    <string name="cd_tv_version_info">cd_tv_version_info</string>
+    <string name="cd_tv_log_info">cd_tv_log_info</string>
+    <string name="cd_et_input_method">cd_et_input_method</string>
+    <string name="cd_btn_camera_switcher">cd_btn_camera_switcher</string>
+    <string name="cd_tv_stream_status">cd_tv_stream_status</string>
+    <string name="cd_btn_torch">cd_btn_torch</string>
+    <string name="cd_btn_capture">cd_btn_capture</string>
+    <string name="cd_btn_orientation">cd_btn_orientation</string>
+    <string name="cd_btn_mute">cd_btn_mute</string>
+    <string name="cd_btn_fb">cd_btn_fb</string>
+    <string name="cd_tv_streaming_state_hint">cd_tv_streaming_state_hint</string>
+    <string name="cd_shutter_button">cd_shutter_button</string>
+    <string name="cd_btn_screen_recorder">cd_btn_screen_recorder</string>
+</resources>

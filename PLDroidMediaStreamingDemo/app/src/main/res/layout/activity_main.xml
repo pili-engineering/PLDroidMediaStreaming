@@ -1,0 +1,50 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainActivity">
+
+    <TextView
+        android:id="@+id/version_info"
+        android:contentDescription="@string/cd_tv_version_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <EditText
+        android:id="@+id/input_url"
+        android:layout_marginTop="20dp"
+        android:contentDescription="@string/cd_et_input_url"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <Spinner android:id="@+id/spinner_input_type"
+        android:layout_below="@id/input_url"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:id="@+id/hw_codec_camera_streaming_btn"
+        android:layout_below="@id/spinner_input_type"
+        android:contentDescription="@string/cd_btn_hw_codec"
+        android:text="@string/hw_codec_camera_streaming_txt"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="200dp"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/sw_codec_camera_streaming_btn"
+        android:contentDescription="@string/cd_btn_sw_codec"
+        android:text="@string/sw_codec_camera_streaming_txt"
+        android:layout_below="@id/hw_codec_camera_streaming_btn"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/start_pure_audio_streaming_btn"
+        android:contentDescription="@string/cd_btn_pure_audio"
+        android:text="@string/pure_audio_streaming_txt"
+        android:layout_below="@id/sw_codec_camera_streaming_btn"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" />
+
+</RelativeLayout>
