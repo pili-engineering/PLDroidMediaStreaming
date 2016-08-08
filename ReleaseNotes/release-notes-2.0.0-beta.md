@@ -8,7 +8,7 @@ PLDroidMediaStreaming 是为 Android 开发者提供的 RTMP 直播推流 SDK
 ### 推流 SDK
 #### 功能
   - 更名为 PLDroidMediaStreaming
-  - 新增可直接设置推流地址的 API
+  - 新增可直接设置由七牛直播云生成的推流地址的 API
     - StreamingProfile#setPublishUrl(String url)
   - 新增推流节点调度机制
   - 新增 MediaStreamingManager 类，并废弃 CameraStreamingManager
