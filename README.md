@@ -1,6 +1,6 @@
-# PLDroidCameraStreaming
+# PLDroidMediaStreaming
 
-PLDroidCameraStreaming 是一个适用于 Android 的 RTMP 直播推流 SDK，可高度定制化和二次开发。特色是同时支持 H.264 软编／硬编和 AAC 软编／硬编。支持 Android Camera 画面捕获，并进行 H.264 编码，以及支持 Android 麦克风音频采样并进行 AAC 编码；还实现了一套可供开发者选择的编码参数集合，以便灵活调节相应的分辨率和码率；同时，SDK 提供数据源回调接口，用户可进行 Filter 处理。借助 PLDroidCameraStreaming ，开发者可以快速构建一款类似 [Meerkat](https://meerkatapp.co/) 或 [Periscope](https://www.periscope.tv/) 的 Android 直播应用。
+PLDroidMediaStreaming 是一个适用于 Android 的 RTMP 直播推流 SDK，可高度定制化和二次开发。特色是同时支持 H.264 软编／硬编和 AAC 软编／硬编。支持 Android Camera 画面捕获，并进行 H.264 编码，以及支持 Android 麦克风音频采样并进行 AAC 编码；还实现了一套可供开发者选择的编码参数集合，以便灵活调节相应的分辨率和码率；同时，SDK 提供数据源回调接口，用户可进行 Filter 处理。借助 PLDroidMediaStreaming ，开发者可以快速构建一款类似 [Meerkat](https://meerkatapp.co/) 或 [Periscope](https://www.periscope.tv/) 的 Android 直播应用。
 
 ## 功能特性
   - [x] 支持 H.264 和 AAC 软编（推荐）
@@ -26,9 +26,9 @@ PLDroidCameraStreaming 是一个适用于 Android 的 RTMP 直播推流 SDK，�
   - [x] 支持蓝牙麦克风
   - [x] 支持 ARM, ARMv7a, ARM64v8a, X86 主流芯片体系架构
   
-## PLDroidCameraStreaming Wiki
+## PLDroidMediaStreaming 文档
 
-请参考 wiki 文档：[PLDroidCameraStreaming 开发指南](https://github.com/pili-engineering/PLDroidCameraStreaming/wiki)
+请参考 wiki 文档：[PLDroidMediaStreaming 开发指南](https://github.com/pili-engineering/PLDroidMediaStreaming/wiki)
 
 ## 设备以及系统要求
 
@@ -36,6 +36,35 @@ PLDroidCameraStreaming 是一个适用于 Android 的 RTMP 直播推流 SDK，�
 - 系统要求：Android 4.0.3(API 15) 及其以上
 
 ## 版本升级须知
+
+### v2.0.0 Beta
+从 [v2.0.0 Beta](https://github.com/pili-engineering/PLDroidMediaStreaming/releases/tag/v2.0.0-beta) 开始，SDK 由 PLDroidCameraStreaming 更名为 PLDroidMediaStreaming，将会提供更丰富的功能接口。有如下重大更新：
+- 新增 `MediaStreamingManager`，`CameraStreamingManager` 被废弃
+- 新增一些辅助类并废弃相关的类
+  - 新增 `StreamingStateChangedListener`，并废弃 `CameraStreamingManager#StreamingStateListener`
+  - 新增 `StreamingState`，并废弃 `CameraStreamingManager#STATE`
+  - 新增 `StreamingSessionListener`，并废弃 `CameraStreamingManager#StreamingSessionListener`
+  - 新增 `AVCodecType`，并废弃 `CameraStreamingManager#EncodingType`
+
+### v1.6.1
+从 [v1.6.1](https://github.com/pili-engineering/PLDroidMediaStreaming/releases/tag/v1.6.1) 开始，为了便于用户更好地定制化，将 TransformMatrix 信息加入到 `SurfaceTextureCallback#onDrawFrame`。因此更新到 v1.6.1 版本之后，若实现了 `SurfaceTextureCallback` 接口，需要将
+
+``` java
+int onDrawFrame(int texId, int texWidth, int texHeight);
+```
+更改为：
+
+``` java
+int onDrawFrame(int texId, int texWidth, int texHeight, float[] transformMatrix);
+```
+
+### v1.6.0
+从 [v1.6.0](https://github.com/pili-engineering/PLDroidMediaStreaming/releases/tag/v1.6.0) 开始，在使用 SDK 之前，需要保证 `StreamingEnv` 被正确初始化 ，否则在构造核心类 `CameraStreamingManager` 的阶段会抛出异常。具体可参看 [Demo](https://github.com/pili-engineering/PLDroidMediaStreaming/blob/master/PLDroidCameraStreamingDemo/app/src/main/java/com/pili/pldroid/streaming/camera/demo/StreamingApplication.java)。
+
+``` java
+StreamingEnv.init(getApplicationContext());
+```
+
 ### v1.4.6
 从 v1.4.6 版本开始，需要在宿主项目中的 build.gradle 中加入如下语句：
 
@@ -48,28 +77,8 @@ dependencies {
 ```
 否则，在运行时会发生找不到 happydns 相关类的错误。
 
-### v1.6.0
-从 [v1.6.0](https://github.com/pili-engineering/PLDroidCameraStreaming/releases/tag/v1.6.0) 开始，在使用 SDK 之前，需要保证 `StreamingEnv` 被正确初始化 ，否则在构造核心类 `CameraStreamingManager` 的阶段会抛出异常。具体可参看 [Demo](https://github.com/pili-engineering/PLDroidCameraStreaming/blob/master/PLDroidCameraStreamingDemo/app/src/main/java/com/pili/pldroid/streaming/camera/demo/StreamingApplication.java)。
-
-``` java
-StreamingEnv.init(getApplicationContext());
-```
-
-### v1.6.1
-从 [v1.6.1](https://github.com/pili-engineering/PLDroidCameraStreaming/releases/tag/v1.6.1) 开始，为了便于用户更好地定制化，将 TransformMatrix 信息加入到 `SurfaceTextureCallback#onDrawFrame`。因此更新到 v1.6.1 版本之后，若实现了 `SurfaceTextureCallback` 接口，需要将
-
-``` java
-int onDrawFrame(int texId, int texWidth, int texHeight);
-```
-更改为：
-
-``` java
-int onDrawFrame(int texId, int texWidth, int texHeight, float[] transformMatrix);
-```
-
-
 ### 反馈及意见
 当你遇到任何问题时，可以通过在 GitHub 的 repo 提交 issues 来反馈问题，请尽可能的描述清楚遇到的问题，如果有错误信息也一同附带，并且在 Labels 中指明类型为 bug 或者其他。
 
-[通过这里查看已有的 issues 和提交 Bug。](https://github.com/pili-engineering/PLDroidCameraStreaming/issues)
+[通过这里查看已有的 issues 和提交 Bug。](https://github.com/pili-engineering/PLDroidMediaStreaming/issues)
 
