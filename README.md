@@ -36,46 +36,7 @@ PLDroidMediaStreaming 是一个适用于 Android 的 RTMP 直播推流 SDK，可
 - 系统要求：Android 4.0.3(API 15) 及其以上
 
 ## 版本升级须知
-
-### v2.0.0 Beta
-从 [v2.0.0 Beta](https://github.com/pili-engineering/PLDroidMediaStreaming/releases/tag/v2.0.0-beta) 开始，SDK 由 PLDroidCameraStreaming 更名为 PLDroidMediaStreaming，将会提供更丰富的功能接口。有如下重大更新：
-- 新增 `MediaStreamingManager`，`CameraStreamingManager` 被废弃
-- 新增一些辅助类并废弃相关的类
-  - 新增 `StreamingStateChangedListener`，并废弃 `CameraStreamingManager#StreamingStateListener`
-  - 新增 `StreamingState`，并废弃 `CameraStreamingManager#STATE`
-  - 新增 `StreamingSessionListener`，并废弃 `CameraStreamingManager#StreamingSessionListener`
-  - 新增 `AVCodecType`，并废弃 `CameraStreamingManager#EncodingType`
-
-### v1.6.1
-从 [v1.6.1](https://github.com/pili-engineering/PLDroidMediaStreaming/releases/tag/v1.6.1) 开始，为了便于用户更好地定制化，将 TransformMatrix 信息加入到 `SurfaceTextureCallback#onDrawFrame`。因此更新到 v1.6.1 版本之后，若实现了 `SurfaceTextureCallback` 接口，需要将
-
-``` java
-int onDrawFrame(int texId, int texWidth, int texHeight);
-```
-更改为：
-
-``` java
-int onDrawFrame(int texId, int texWidth, int texHeight, float[] transformMatrix);
-```
-
-### v1.6.0
-从 [v1.6.0](https://github.com/pili-engineering/PLDroidMediaStreaming/releases/tag/v1.6.0) 开始，在使用 SDK 之前，需要保证 `StreamingEnv` 被正确初始化 ，否则在构造核心类 `CameraStreamingManager` 的阶段会抛出异常。具体可参看 [Demo](https://github.com/pili-engineering/PLDroidMediaStreaming/blob/master/PLDroidCameraStreamingDemo/app/src/main/java/com/pili/pldroid/streaming/camera/demo/StreamingApplication.java)。
-
-``` java
-StreamingEnv.init(getApplicationContext());
-```
-
-### v1.4.6
-从 v1.4.6 版本开始，需要在宿主项目中的 build.gradle 中加入如下语句：
-
-```
-dependencies {
-    ...
-    compile 'com.qiniu:happy-dns:0.2.7'
-    ...
-}
-```
-否则，在运行时会发生找不到 happydns 相关类的错误。
+升级 SDK 之前，请在[这里](https://github.com/pili-engineering/PLDroidMediaStreaming/wiki#3.4)查看升级须知。
 
 ### 反馈及意见
 当你遇到任何问题时，可以通过在 GitHub 的 repo 提交 issues 来反馈问题，请尽可能的描述清楚遇到的问题，如果有错误信息也一同附带，并且在 Labels 中指明类型为 bug 或者其他。
