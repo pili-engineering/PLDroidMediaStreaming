@@ -16,7 +16,7 @@ public class Config {
     public static final String EXTRA_PUBLISH_URL_PREFIX = "URL:";
     public static final String EXTRA_PUBLISH_JSON_PREFIX = "JSON:";
 
-    public static final String VERSION_HINT = "v2.0.0";
+    public static final String VERSION_HINT = "v2.0.1";
 
     public static final String EXTRA_KEY_PUB_URL = "pub_url";
 

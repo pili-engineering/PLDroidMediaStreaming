@@ -389,11 +389,6 @@ public class StreamingBaseActivity extends Activity implements
     }
 
     @Override
-    public void onPreviewFrame(byte[] bytes, Camera camera) {
-
-    }
-
-    @Override
     public boolean onPreviewFrame(byte[] bytes, int width, int height) {
 //        deal with the yuv data.
 //        long start = System.currentTimeMillis();
@@ -432,7 +427,7 @@ public class StreamingBaseActivity extends Activity implements
     }
 
     @Override
-    public void onAudioSourceAvailable(ByteBuffer byteBuffer, int size, boolean eof) {
+    public void onAudioSourceAvailable(ByteBuffer byteBuffer, int size, long tsInNanoTime, boolean eof) {
 //        for (int i = 0; i < size; i++) {
 //            byteBuffer.put(i, (byte) 0x00);
 //        }
