@@ -19,7 +19,7 @@ public class SWCodecCameraStreamingActivity extends StreamingBaseActivity {
         super.onCreate(savedInstanceState);
 
         AspectFrameLayout afl = (AspectFrameLayout) findViewById(R.id.cameraPreview_afl);
-        afl.setShowMode(AspectFrameLayout.SHOW_MODE.REAL);
+        afl.setShowMode(AspectFrameLayout.SHOW_MODE.FULL);
         CameraPreviewFrameView cameraPreviewFrameView =
                 (CameraPreviewFrameView) findViewById(R.id.cameraPreview_surfaceView);
         cameraPreviewFrameView.setListener(this);
@@ -40,10 +40,18 @@ public class SWCodecCameraStreamingActivity extends StreamingBaseActivity {
         mMediaStreamingManager.setStreamingSessionListener(this);
 //        mMediaStreamingManager.setNativeLoggingEnabled(false);
         mMediaStreamingManager.setStreamStatusCallback(this);
+        mMediaStreamingManager.setStreamingPreviewCallback(this);
         mMediaStreamingManager.setAudioSourceCallback(this);
         // update the StreamingProfile
 //        mProfile.setStream(new Stream(mJSONObject1));
 //        mMediaStreamingManager.setStreamingProfile(mProfile);
         setFocusAreaIndicator();
+    }
+
+    @Override
+    public boolean onRecordAudioFailedHandled(int err) {
+        mMediaStreamingManager.updateEncodingType(AVCodecType.SW_VIDEO_CODEC);
+        mMediaStreamingManager.startStreaming();
+        return true;
     }
 }

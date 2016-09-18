@@ -44,7 +44,6 @@ import com.qiniu.pili.droid.streaming.SurfaceTextureCallback;
 import com.qiniu.pili.droid.streaming.demo.gles.FBO;
 import com.qiniu.pili.droid.streaming.demo.ui.RotateLayout;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedOutputStream;
@@ -329,9 +328,7 @@ public class StreamingBaseActivity extends Activity implements
 
     @Override
     public boolean onRecordAudioFailedHandled(int err) {
-        mMediaStreamingManager.updateEncodingType(AVCodecType.SW_VIDEO_CODEC);
-        mMediaStreamingManager.startStreaming();
-        return true;
+        return false;
     }
 
     @Override
@@ -455,9 +452,10 @@ public class StreamingBaseActivity extends Activity implements
         });
     }
 
-
     @Override
     public void onStateChanged(StreamingState streamingState, Object extra) {
+        Log.i(TAG, "StreamingState streamingState:" + streamingState + ",extra:" + extra);
+
         switch (streamingState) {
             case PREPARING:
                 mStatusMsgContent = getString(R.string.string_state_preparing);
