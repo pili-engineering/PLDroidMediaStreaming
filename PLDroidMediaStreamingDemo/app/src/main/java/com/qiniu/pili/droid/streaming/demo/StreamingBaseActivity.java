@@ -41,6 +41,7 @@ import com.qiniu.pili.droid.streaming.StreamingSessionListener;
 import com.qiniu.pili.droid.streaming.StreamingState;
 import com.qiniu.pili.droid.streaming.StreamingStateChangedListener;
 import com.qiniu.pili.droid.streaming.SurfaceTextureCallback;
+import com.qiniu.pili.droid.streaming.av.common.PLFourCC;
 import com.qiniu.pili.droid.streaming.demo.gles.FBO;
 import com.qiniu.pili.droid.streaming.demo.ui.RotateLayout;
 
@@ -241,13 +242,15 @@ public class StreamingBaseActivity extends Activity implements
             Toast.makeText(this, "Invalid Publish Url", Toast.LENGTH_LONG).show();
         }
 
-        mProfile.setVideoQuality(StreamingProfile.VIDEO_QUALITY_HIGH3)
+        mProfile.setVideoQuality(StreamingProfile.VIDEO_QUALITY_MEDIUM2)
                 .setAudioQuality(StreamingProfile.AUDIO_QUALITY_MEDIUM2)
 //                .setPreferredVideoEncodingSize(960, 544)
                 .setEncodingSizeLevel(Config.ENCODING_LEVEL)
-                .setEncoderRCMode(StreamingProfile.EncoderRCModes.QUALITY_PRIORITY)
-                .setAVProfile(avProfile)
+                .setEncoderRCMode(StreamingProfile.EncoderRCModes.BITRATE_PRIORITY)
+//                .setAVProfile(avProfile)
                 .setDnsManager(getMyDnsManager())
+                .setAdaptiveBitrateEnable(true)
+                .setFpsControllerEnable(true)
                 .setStreamStatusConfig(new StreamingProfile.StreamStatusConfig(3))
 //                .setEncodingOrientation(StreamingProfile.ENCODING_ORIENTATION.PORT)
                 .setSendingBufferProfile(new StreamingProfile.SendingBufferProfile(0.2f, 0.8f, 3.0f, 20 * 1000));
@@ -260,6 +263,8 @@ public class StreamingBaseActivity extends Activity implements
                 .setRecordingHint(false)
                 .setCameraFacingId(cameraFacingId)
                 .setBuiltInFaceBeautyEnabled(true)
+//                .setCameraSourceImproved(true)
+//                .setCaptureCameraFrameOnly(true)
                 .setResetTouchFocusDelayInMs(3000)
 //                .setFocusMode(CameraStreamingSetting.FOCUS_MODE_CONTINUOUS_PICTURE)
                 .setCameraPrvSizeLevel(CameraStreamingSetting.PREVIEW_SIZE_LEVEL.SMALL)
@@ -386,7 +391,8 @@ public class StreamingBaseActivity extends Activity implements
     }
 
     @Override
-    public boolean onPreviewFrame(byte[] bytes, int width, int height) {
+    public boolean onPreviewFrame(byte[] bytes, int width, int height, int rotation, int fmt, long tsInNanoTime) {
+        Log.i(TAG, "onPreviewFrame " + width + "x" + height + ",fmt:" + (fmt == PLFourCC.FOURCC_I420 ? "I420" : "NV21") + ",ts:" + tsInNanoTime + ",rotation:" + rotation);
 //        deal with the yuv data.
 //        long start = System.currentTimeMillis();
 //        for (int i = 0; i < bytes.length; i++) {

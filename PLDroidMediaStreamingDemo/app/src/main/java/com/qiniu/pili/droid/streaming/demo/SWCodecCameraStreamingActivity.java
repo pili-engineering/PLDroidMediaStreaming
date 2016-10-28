@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import com.qiniu.pili.droid.streaming.AVCodecType;
 import com.qiniu.pili.droid.streaming.MediaStreamingManager;
+import com.qiniu.pili.droid.streaming.PreviewAppearance;
 import com.qiniu.pili.droid.streaming.WatermarkSetting;
 import com.qiniu.pili.droid.streaming.widget.AspectFrameLayout;
 
@@ -33,6 +34,7 @@ public class SWCodecCameraStreamingActivity extends StreamingBaseActivity {
         mMediaStreamingManager = new MediaStreamingManager(this, afl, cameraPreviewFrameView,
                 AVCodecType.SW_VIDEO_WITH_SW_AUDIO_CODEC); // sw codec
 
+//        mMediaStreamingManager.prepare(mCameraStreamingSetting, mMicrophoneStreamingSetting, watermarksetting, mProfile, new PreviewAppearance(0.0f, 0.0f, 0.5f, 0.5f, PreviewAppearance.ScaleType.FIT));
         mMediaStreamingManager.prepare(mCameraStreamingSetting, mMicrophoneStreamingSetting, watermarksetting, mProfile);
 
         mMediaStreamingManager.setStreamingStateListener(this);
