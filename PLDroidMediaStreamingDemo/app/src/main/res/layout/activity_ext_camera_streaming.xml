@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_floating_material_dark"
+    tools:context=".ExtCapStreamingActivity" >
+
+    <SurfaceView
+        android:id="@+id/ext_camerapreview_surfaceview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/log_info"
+        android:contentDescription="@string/cd_tv_log_info"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <Button
+        android:id="@+id/camera_switch_btn"
+        android:contentDescription="@string/cd_btn_camera_switcher"
+        android:layout_marginTop="@dimen/pldroid_streaming_item_padding"
+        android:layout_centerHorizontal="true"
+        android:textColor="@color/pldroid_streaming_white"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/stream_status"
+        android:contentDescription="@string/cd_tv_stream_status"
+        android:layout_marginLeft="@dimen/pldroid_streaming_streaming_status_padding"
+        android:layout_marginTop="@dimen/pldroid_streaming_streaming_status_padding"
+        android:background="@android:color/transparent"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@color/pldroid_streaming_white"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <include layout="@layout/status" />
+    <include layout="@layout/camera_button_holder" />
+</RelativeLayout>

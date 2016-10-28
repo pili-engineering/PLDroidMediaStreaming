@@ -48,6 +48,25 @@
             android:theme="@android:style/Theme.Holo.Light.NoActionBar"
             android:label="@string/title_activity_audio_streaming" >
         </activity>
+
+        <activity
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
+            android:configChanges="orientation|screenSize"
+            android:name=".ScreenRecorderActivity"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar" >
+        </activity>
+
+        <activity
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
+            android:configChanges="orientation|screenSize"
+            android:name=".ExtCapStreamingActivity"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar" >
+        </activity>
+
+        <activity
+            android:name="com.qiniu.pili.droid.streaming.screen.ScreenCaptureRequestActivity"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" >
+        </activity>
     </application>
 
 </manifest>

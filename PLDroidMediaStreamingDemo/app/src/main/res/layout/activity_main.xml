@@ -46,5 +46,19 @@
         android:layout_below="@id/sw_codec_camera_streaming_btn"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/start_screen_recorder_streaming_btn"
+        android:contentDescription="@string/cd_btn_screen_recorder"
+        android:text="@string/screen_recorder_streaming_txt"
+        android:layout_below="@+id/start_pure_audio_streaming_btn"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/start_ext_cap_streaming_btn"
+        android:contentDescription="@string/cd_btn_screen_recorder"
+        android:text="@string/ext_cap_streaming_txt"
+        android:layout_below="@+id/start_screen_recorder_streaming_btn"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" />
 
 </RelativeLayout>
