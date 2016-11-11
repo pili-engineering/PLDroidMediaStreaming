@@ -107,7 +107,8 @@ PLDroidMediaStreaming 是为 Android 开发者提供的 RTMP 直播推流 SDK
   - 更新 libpldroid_mmprocessing.so
   - 更新 libpldroid_streaming_h264_encoder.so
 
-### 推流 SDK
+### Demo
+  - 新增避免 Android 6.0(+) 设备权限导致 crash 问题的 patch
   - 新增录屏功能的 Demo 展示
     - `ScreenRecorderActivity`
   - 新增外部数据源功能的 Demo 展示
