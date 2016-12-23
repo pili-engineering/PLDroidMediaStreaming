@@ -155,6 +155,9 @@ public class ScreenRecorderActivity extends Activity implements
             case SHUTDOWN:
                 mStartStreaming = false;
                 break;
+            case REQUEST_SCREEN_CAPTURING_FAIL:
+                Toast.makeText(this, "Requst screen captuing fail", Toast.LENGTH_LONG).show();
+                break;
         }
     }
 

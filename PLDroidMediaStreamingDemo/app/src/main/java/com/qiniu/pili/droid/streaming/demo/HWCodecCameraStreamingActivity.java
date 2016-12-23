@@ -41,17 +41,9 @@ public class HWCodecCameraStreamingActivity extends StreamingBaseActivity {
         mMediaStreamingManager.setStreamingSessionListener(this);
 //        mMediaStreamingManager.setNativeLoggingEnabled(false);
         mMediaStreamingManager.setStreamStatusCallback(this);
-        mMediaStreamingManager.setStreamingPreviewCallback(this);
         // update the StreamingProfile
 //        mProfile.setStream(new Stream(mJSONObject1));
 //        mMediaStreamingManager.setStreamingProfile(mProfile);
         setFocusAreaIndicator();
-    }
-
-    @Override
-    public boolean onRecordAudioFailedHandled(int err) {
-        mMediaStreamingManager.updateEncodingType(AVCodecType.HW_VIDEO_CODEC);
-        mMediaStreamingManager.startStreaming();
-        return true;
     }
 }

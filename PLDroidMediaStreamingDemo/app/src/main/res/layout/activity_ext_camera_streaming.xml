@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/content"
@@ -24,6 +23,7 @@
         android:contentDescription="@string/cd_btn_camera_switcher"
         android:layout_marginTop="@dimen/pldroid_streaming_item_padding"
         android:layout_centerHorizontal="true"
+        android:text="switch"
         android:textColor="@color/pldroid_streaming_white"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
@@ -39,6 +39,17 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
+    <Button
+        android:id="@+id/encoding_mirror_btn"
+        android:contentDescription="@string/cd_encoding_mirror"
+        android:text="Mirror\n(Encode)"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:textColor="@color/pldroid_streaming_white"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
     <include layout="@layout/status" />
     <include layout="@layout/camera_button_holder" />
+
 </RelativeLayout>
