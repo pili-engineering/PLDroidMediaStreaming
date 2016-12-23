@@ -40,4 +40,6 @@
     <string name="cd_shutter_button">cd_shutter_button</string>
     <string name="cd_btn_screen_recorder">cd_btn_screen_recorder</string>
     <string name="cd_btn_ext_cap">cd_btn_ext_cap</string>
+    <string name="cd_preview_mirror">cd_preview_mirror</string>
+    <string name="cd_encoding_mirror">cd_encoding_mirror</string>
 </resources>

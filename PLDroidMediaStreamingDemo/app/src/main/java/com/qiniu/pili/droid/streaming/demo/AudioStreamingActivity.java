@@ -18,7 +18,7 @@ public class AudioStreamingActivity extends StreamingBaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_audio_streaming);
 
-        mSatusTextView = (TextView) findViewById(R.id.streamingStatus);
+        mStatusTextView = (TextView) findViewById(R.id.streamingStatus);
         mShutterButton = (Button) findViewById(R.id.toggleRecording_button);
 
         mProfile.setAudioQuality(StreamingProfile.AUDIO_QUALITY_LOW1);

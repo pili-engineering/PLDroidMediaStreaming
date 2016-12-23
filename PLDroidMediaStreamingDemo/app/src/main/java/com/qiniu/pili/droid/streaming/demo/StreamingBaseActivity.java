@@ -56,9 +56,6 @@ import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.util.List;
 
-/**
- * Created by jerikc on 15/7/6.
- */
 public class StreamingBaseActivity extends Activity implements
         View.OnLayoutChangeListener,
         StreamStatusCallback,
@@ -73,6 +70,14 @@ public class StreamingBaseActivity extends Activity implements
 
     private static final int ZOOM_MINIMUM_WAIT_MILLIS = 33; //ms
 
+    private static final int MSG_START_STREAMING    = 0;
+    private static final int MSG_STOP_STREAMING     = 1;
+    private static final int MSG_SET_ZOOM           = 2;
+    private static final int MSG_MUTE               = 3;
+    private static final int MSG_FB                 = 4;
+    private static final int MSG_PREVIEW_MIRROR     = 5;
+    private static final int MSG_ENCODING_MIRROR    = 6;
+
     private Context mContext;
 
     protected Button mShutterButton;
@@ -84,27 +89,20 @@ public class StreamingBaseActivity extends Activity implements
     private Button mFaceBeautyBtn;
     private RotateLayout mRotateLayout;
 
-    protected TextView mSatusTextView;
-    private TextView mLogTextView;
-    private TextView mStreamStatus;
+    protected TextView mLogTextView;
+    protected TextView mStatusTextView;
+    protected TextView mStatView;
 
     protected boolean mShutterButtonPressed = false;
     private boolean mIsTorchOn = false;
     private boolean mIsNeedMute = false;
     private boolean mIsNeedFB = false;
-    private boolean isEncOrientationPort = true;
+    private boolean mIsEncOrientationPort = true;
+    private boolean mIsPreviewMirror = false;
+    private boolean mIsEncodingMirror = false;
 
-    protected static final int MSG_START_STREAMING  = 0;
-    protected static final int MSG_STOP_STREAMING   = 1;
-    private static final int MSG_SET_ZOOM           = 2;
-    private static final int MSG_MUTE               = 3;
-    private static final int MSG_FB                 = 4;
-
-    protected String mStatusMsgContent;
-
-    protected String mLogContent = "\n";
-
-    private View mRootView;
+    private String mStatusMsgContent;
+    private String mLogContent = "\n";
 
     protected MediaStreamingManager mMediaStreamingManager;
     protected CameraStreamingSetting mCameraStreamingSetting;
@@ -120,7 +118,7 @@ public class StreamingBaseActivity extends Activity implements
 
     private FBO mFBO = new FBO();
 
-    private Screenshooter mScreenshooter = new Screenshooter();
+    private ScreenShooter mScreenShooter = new ScreenShooter();
     private Switcher mSwitcher = new Switcher();
     private EncodingOrientationSwitcher mEncodingOrientationSwitcher = new EncodingOrientationSwitcher();
 
@@ -174,6 +172,16 @@ public class StreamingBaseActivity extends Activity implements
                             : CameraStreamingSetting.VIDEO_FILTER_TYPE.VIDEO_FILTER_NONE);
                     updateFBButtonText();
                     break;
+                case MSG_PREVIEW_MIRROR:
+                    mIsPreviewMirror = !mIsPreviewMirror;
+                    mMediaStreamingManager.setPreviewMirror(mIsPreviewMirror);
+                    Toast.makeText(mContext, "镜像成功", Toast.LENGTH_SHORT).show();
+                    break;
+                case MSG_ENCODING_MIRROR:
+                    mIsEncodingMirror = !mIsEncodingMirror;
+                    mMediaStreamingManager.setEncodingMirror(mIsEncodingMirror);
+                    Toast.makeText(mContext, "镜像成功", Toast.LENGTH_SHORT).show();
+                    break;
                 default:
                     Log.e(TAG, "Invalid message");
                     break;
@@ -194,9 +202,9 @@ public class StreamingBaseActivity extends Activity implements
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         if (Config.SCREEN_ORIENTATION == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
-            isEncOrientationPort = true;
+            mIsEncOrientationPort = true;
         } else if (Config.SCREEN_ORIENTATION == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
-            isEncOrientationPort = false;
+            mIsEncOrientationPort = false;
         }
         setRequestedOrientation(Config.SCREEN_ORIENTATION);
 
@@ -216,10 +224,6 @@ public class StreamingBaseActivity extends Activity implements
         Log.i(TAG, "publishUrlFromServer:" + publishUrlFromServer);
 
         mContext = this;
-
-        StreamingProfile.AudioProfile aProfile = new StreamingProfile.AudioProfile(44100, 96 * 1024);
-        StreamingProfile.VideoProfile vProfile = new StreamingProfile.VideoProfile(30, 1000 * 1024, 48);
-        StreamingProfile.AVProfile avProfile = new StreamingProfile.AVProfile(vProfile, aProfile);
 
         mProfile = new StreamingProfile();
 
@@ -242,12 +246,16 @@ public class StreamingBaseActivity extends Activity implements
             Toast.makeText(this, "Invalid Publish Url", Toast.LENGTH_LONG).show();
         }
 
+        StreamingProfile.AudioProfile aProfile = new StreamingProfile.AudioProfile(44100, 96 * 1024);
+        StreamingProfile.VideoProfile vProfile = new StreamingProfile.VideoProfile(30, 1000 * 1024, 48);
+        StreamingProfile.AVProfile avProfile = new StreamingProfile.AVProfile(vProfile, aProfile);
+
         mProfile.setVideoQuality(StreamingProfile.VIDEO_QUALITY_MEDIUM2)
                 .setAudioQuality(StreamingProfile.AUDIO_QUALITY_MEDIUM2)
+//                .setAVProfile(avProfile)
 //                .setPreferredVideoEncodingSize(960, 544)
                 .setEncodingSizeLevel(Config.ENCODING_LEVEL)
                 .setEncoderRCMode(StreamingProfile.EncoderRCModes.BITRATE_PRIORITY)
-//                .setAVProfile(avProfile)
                 .setDnsManager(getMyDnsManager())
                 .setAdaptiveBitrateEnable(true)
                 .setFpsControllerEnable(true)
@@ -262,15 +270,15 @@ public class StreamingBaseActivity extends Activity implements
                 .setContinuousFocusModeEnabled(true)
                 .setRecordingHint(false)
                 .setCameraFacingId(cameraFacingId)
-                .setBuiltInFaceBeautyEnabled(true)
 //                .setCameraSourceImproved(true)
-//                .setCaptureCameraFrameOnly(true)
                 .setResetTouchFocusDelayInMs(3000)
 //                .setFocusMode(CameraStreamingSetting.FOCUS_MODE_CONTINUOUS_PICTURE)
-                .setCameraPrvSizeLevel(CameraStreamingSetting.PREVIEW_SIZE_LEVEL.SMALL)
+                .setCameraPrvSizeLevel(CameraStreamingSetting.PREVIEW_SIZE_LEVEL.MEDIUM)
                 .setCameraPrvSizeRatio(CameraStreamingSetting.PREVIEW_SIZE_RATIO.RATIO_16_9)
+                .setBuiltInFaceBeautyEnabled(true)
                 .setFaceBeautySetting(new CameraStreamingSetting.FaceBeautySetting(1.0f, 1.0f, 0.8f))
                 .setVideoFilter(CameraStreamingSetting.VIDEO_FILTER_TYPE.VIDEO_FILTER_BEAUTY);
+
         mIsNeedFB = true;
         mMicrophoneStreamingSetting = new MicrophoneStreamingSetting();
         mMicrophoneStreamingSetting.setBluetoothSCOEnabled(false);
@@ -333,7 +341,9 @@ public class StreamingBaseActivity extends Activity implements
 
     @Override
     public boolean onRecordAudioFailedHandled(int err) {
-        return false;
+        mMediaStreamingManager.updateEncodingType(AVCodecType.SW_VIDEO_CODEC);
+        mMediaStreamingManager.startStreaming();
+        return true;
     }
 
     @Override
@@ -441,7 +451,7 @@ public class StreamingBaseActivity extends Activity implements
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mStreamStatus.setText("bitrate:" + streamStatus.totalAVBitrate / 1024 + " kbps"
+                mStatView.setText("bitrate:" + streamStatus.totalAVBitrate / 1024 + " kbps"
                         + "\naudio:" + streamStatus.audioFps + " fps"
                         + "\nvideo:" + streamStatus.videoFps + " fps");
             }
@@ -523,7 +533,7 @@ public class StreamingBaseActivity extends Activity implements
                     Log.i(TAG, "current camera id:" + (Integer) extra);
                 }
                 Log.i(TAG, "camera switched");
-                final int currentCamId = (Integer)extra;
+                final int currentCamId = (Integer) extra;
                 this.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -554,14 +564,14 @@ public class StreamingBaseActivity extends Activity implements
                 if (mLogTextView != null) {
                     mLogTextView.setText(mLogContent);
                 }
-                mSatusTextView.setText(mStatusMsgContent);
+                mStatusTextView.setText(mStatusMsgContent);
             }
         });
     }
 
     private void initUIs() {
-        mRootView = findViewById(R.id.content);
-        mRootView.addOnLayoutChangeListener(this);
+        View rootView = findViewById(R.id.content);
+        rootView.addOnLayoutChangeListener(this);
 
         mMuteButton = (Button) findViewById(R.id.mute_btn);
         mShutterButton = (Button) findViewById(R.id.toggleRecording_button);
@@ -569,10 +579,12 @@ public class StreamingBaseActivity extends Activity implements
         mCameraSwitchBtn = (Button) findViewById(R.id.camera_switch_btn);
         mCaptureFrameBtn = (Button) findViewById(R.id.capture_btn);
         mFaceBeautyBtn = (Button) findViewById(R.id.fb_btn);
-        mSatusTextView = (TextView) findViewById(R.id.streamingStatus);
+        mStatusTextView = (TextView) findViewById(R.id.streamingStatus);
+        Button previewMirrorBtn = (Button) findViewById(R.id.preview_mirror_btn);
+        Button encodingMirrorBtn = (Button) findViewById(R.id.encoding_mirror_btn);
 
         mLogTextView = (TextView) findViewById(R.id.log_info);
-        mStreamStatus = (TextView) findViewById(R.id.stream_status);
+        mStatView = (TextView) findViewById(R.id.stream_status);
 
         mFaceBeautyBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -588,6 +600,24 @@ public class StreamingBaseActivity extends Activity implements
             public void onClick(View v) {
                 if (!mHandler.hasMessages(MSG_MUTE)) {
                     mHandler.sendEmptyMessage(MSG_MUTE);
+                }
+            }
+        });
+
+        previewMirrorBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!mHandler.hasMessages(MSG_PREVIEW_MIRROR)) {
+                    mHandler.sendEmptyMessage(MSG_PREVIEW_MIRROR);
+                }
+            }
+        });
+
+        encodingMirrorBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!mHandler.hasMessages(MSG_ENCODING_MIRROR)) {
+                    mHandler.sendEmptyMessage(MSG_ENCODING_MIRROR);
                 }
             }
         });
@@ -633,8 +663,8 @@ public class StreamingBaseActivity extends Activity implements
         mCaptureFrameBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mHandler.removeCallbacks(mScreenshooter);
-                mHandler.postDelayed(mScreenshooter, 100);
+                mHandler.removeCallbacks(mScreenShooter);
+                mHandler.postDelayed(mScreenShooter, 100);
             }
         });
 
@@ -682,7 +712,7 @@ public class StreamingBaseActivity extends Activity implements
     }
 
     private void updateOrientationBtnText() {
-        if (isEncOrientationPort) {
+        if (mIsEncOrientationPort) {
             mEncodingOrientationSwitcherBtn.setText("Land");
         } else {
             mEncodingOrientationSwitcherBtn.setText("Port");
@@ -691,7 +721,7 @@ public class StreamingBaseActivity extends Activity implements
 
     protected void setFocusAreaIndicator() {
         if (mRotateLayout == null) {
-            mRotateLayout = (RotateLayout)findViewById(R.id.focus_indicator_rotate_layout);
+            mRotateLayout = (RotateLayout) findViewById(R.id.focus_indicator_rotate_layout);
             mMediaStreamingManager.setFocusAreaIndicator(mRotateLayout,
                     mRotateLayout.findViewById(R.id.focus_indicator));
         }
@@ -721,7 +751,7 @@ public class StreamingBaseActivity extends Activity implements
     }
 
     private void saveToSDCard(String filename, Bitmap bmp) throws IOException {
-        if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             File file = new File(Environment.getExternalStorageDirectory(), filename);
             BufferedOutputStream bos = null;
             try {
@@ -787,13 +817,13 @@ public class StreamingBaseActivity extends Activity implements
 
         @Override
         public void run() {
-            Log.i(TAG, "isEncOrientationPort:" + isEncOrientationPort);
+            Log.i(TAG, "mIsEncOrientationPort:" + mIsEncOrientationPort);
             stopStreaming();
             mOrientationChanged = !mOrientationChanged;
-            isEncOrientationPort = !isEncOrientationPort;
-            mProfile.setEncodingOrientation(isEncOrientationPort ? StreamingProfile.ENCODING_ORIENTATION.PORT : StreamingProfile.ENCODING_ORIENTATION.LAND);
+            mIsEncOrientationPort = !mIsEncOrientationPort;
+            mProfile.setEncodingOrientation(mIsEncOrientationPort ? StreamingProfile.ENCODING_ORIENTATION.PORT : StreamingProfile.ENCODING_ORIENTATION.LAND);
             mMediaStreamingManager.setStreamingProfile(mProfile);
-            setRequestedOrientation(isEncOrientationPort ? ActivityInfo.SCREEN_ORIENTATION_PORTRAIT : ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            setRequestedOrientation(mIsEncOrientationPort ? ActivityInfo.SCREEN_ORIENTATION_PORTRAIT : ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
             mMediaStreamingManager.notifyActivityOrientationChanged();
             updateOrientationBtnText();
             Toast.makeText(StreamingBaseActivity.this, Config.HINT_ENCODING_ORIENTATION_CHANGED,
@@ -802,7 +832,7 @@ public class StreamingBaseActivity extends Activity implements
         }
     }
 
-    private class Screenshooter implements Runnable {
+    private class ScreenShooter implements Runnable {
         @Override
         public void run() {
             final String fileName = "PLStreaming_" + System.currentTimeMillis() + ".jpg";

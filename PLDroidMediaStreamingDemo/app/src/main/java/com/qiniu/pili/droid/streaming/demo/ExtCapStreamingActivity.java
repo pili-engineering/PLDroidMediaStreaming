@@ -46,35 +46,38 @@ public class ExtCapStreamingActivity extends Activity implements
 
     private static final String TAG = "ExtCapStreamingActivity";
 
-    protected Button mShutterButton;
+    private static final int MSG_START_STREAMING  = 0;
+    private static final int MSG_STOP_STREAMING   = 1;
+
+    private Button mShutterButton;
     private Button mCameraSwitchBtn;
 
-    protected TextView mSatusTextView;
+    private TextView mStatusTextView;
     private TextView mLogTextView;
     private TextView mStreamStatus;
     private SurfaceView mSurfaceView;
 
-    protected boolean mShutterButtonPressed = false;
-    protected static final int MSG_START_STREAMING  = 0;
-    protected static final int MSG_STOP_STREAMING   = 1;
+    private boolean mIsEncodingMirror = false;
 
-    protected String mStatusMsgContent;
+    private boolean mShutterButtonPressed = false;
 
-    protected String mLogContent = "\n";
+    private String mStatusMsgContent;
+
+    private String mLogContent = "\n";
 
     private ExtAudioCapture mExtAudioCapture;
     private ExtVideoCapture mExtVideoCapture;
 
-    protected StreamingManager mStreamingManager;
-    protected StreamingProfile mProfile;
-    protected JSONObject mJSONObject;
+    private StreamingManager mStreamingManager;
+    private StreamingProfile mProfile;
+    private JSONObject mJSONObject;
     private boolean mOrientationChanged = false;
 
     private Switcher mSwitcher = new Switcher();
 
-    protected boolean mIsReady = false;
+    private boolean mIsReady = false;
 
-    protected Handler mHandler = new Handler(Looper.getMainLooper()) {
+    private Handler mHandler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
@@ -333,14 +336,15 @@ public class ExtCapStreamingActivity extends Activity implements
                 if (mLogTextView != null) {
                     mLogTextView.setText(mLogContent);
                 }
-                mSatusTextView.setText(mStatusMsgContent);
+                mStatusTextView.setText(mStatusMsgContent);
             }
         });
     }
 
     private void initUIs() {
         mShutterButton = (Button) findViewById(R.id.toggleRecording_button);
-        mSatusTextView = (TextView) findViewById(R.id.streamingStatus);
+        mStatusTextView = (TextView) findViewById(R.id.streamingStatus);
+        Button encodingMirrorBtn = (Button) findViewById(R.id.encoding_mirror_btn);
 
         mLogTextView = (TextView) findViewById(R.id.log_info);
         mStreamStatus = (TextView) findViewById(R.id.stream_status);
@@ -353,6 +357,14 @@ public class ExtCapStreamingActivity extends Activity implements
                 } else {
                     startStreaming();
                 }
+            }
+        });
+
+        encodingMirrorBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mIsEncodingMirror = !mIsEncodingMirror;
+                Toast.makeText(ExtCapStreamingActivity.this, "镜像成功", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -391,7 +403,7 @@ public class ExtCapStreamingActivity extends Activity implements
     private ExtVideoCapture.OnPreviewFrameCallback mOnPreviewFrameCallback = new ExtVideoCapture.OnPreviewFrameCallback() {
         @Override
         public void onPreviewFrameCaptured(byte[] data, int width, int height, int orientation, boolean mirror, int fmt, long tsInNanoTime) {
-            mStreamingManager.inputVideoFrame(data, width, height, orientation, mirror, fmt, tsInNanoTime);
+            mStreamingManager.inputVideoFrame(data, width, height, orientation, mIsEncodingMirror, fmt, tsInNanoTime);
         }
     };
 
