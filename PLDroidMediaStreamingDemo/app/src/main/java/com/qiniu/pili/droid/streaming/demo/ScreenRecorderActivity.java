@@ -7,6 +7,7 @@ package com.qiniu.pili.droid.streaming.demo;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
+import android.hardware.Camera;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -21,19 +22,22 @@ import android.widget.Toast;
 import com.qiniu.pili.droid.streaming.ScreenSetting;
 import com.qiniu.pili.droid.streaming.ScreenStreamingManager;
 import com.qiniu.pili.droid.streaming.StreamingProfile;
+import com.qiniu.pili.droid.streaming.StreamingSessionListener;
 import com.qiniu.pili.droid.streaming.StreamingState;
 import com.qiniu.pili.droid.streaming.StreamingStateChangedListener;
 
 import org.json.JSONObject;
 
 import java.net.URISyntaxException;
+import java.util.List;
 
 /**
  * Created by jerikc on 16/6/21.
  */
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
 public class ScreenRecorderActivity extends Activity implements
-        StreamingStateChangedListener {
+        StreamingStateChangedListener,
+        StreamingSessionListener {
 
     private static final String TAG = "ScreenRecorderActivity";
 
@@ -121,8 +125,9 @@ public class ScreenRecorderActivity extends Activity implements
                 .setPreferredVideoEncodingSize(width, height)
                 .setVideoQuality(StreamingProfile.VIDEO_QUALITY_HIGH2);
 
-        screenStreamingManager = new ScreenStreamingManager(this);
+        screenStreamingManager = new ScreenStreamingManager();
         screenStreamingManager.setStreamingStateListener(this);
+        screenStreamingManager.setStreamingSessionListener(this);
 
         mStreamingBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -135,7 +140,7 @@ public class ScreenRecorderActivity extends Activity implements
             }
         });
 
-        screenStreamingManager.prepare(screenSetting, null, streamingProfile);
+        screenStreamingManager.prepare(this, screenSetting, null, streamingProfile);
     }
 
     @Override
@@ -183,5 +188,22 @@ public class ScreenRecorderActivity extends Activity implements
                 }
             }
         });
+    }
+
+    @Override
+    public boolean onRecordAudioFailedHandled(int err) {
+        Log.i(TAG, "onRecordAudioFailedHandled");
+        return false;
+    }
+
+    @Override
+    public boolean onRestartStreamingHandled(int err) {
+        Log.i(TAG, "onRestartStreamingHandled");
+        return screenStreamingManager.startStreaming();
+    }
+
+    @Override
+    public Camera.Size onPreviewSizeSelected(List<Camera.Size> list) {
+        return null;
     }
 }
