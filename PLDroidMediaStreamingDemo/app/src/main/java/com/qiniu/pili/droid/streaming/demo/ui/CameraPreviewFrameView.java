@@ -1,4 +1,4 @@
-package com.qiniu.pili.droid.streaming.demo;
+package com.qiniu.pili.droid.streaming.demo.ui;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
@@ -8,9 +8,6 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 
-/**
- * Created by jerikc on 16/2/5.
- */
 public class CameraPreviewFrameView extends GLSurfaceView {
     private static final String TAG = "CameraPreviewFrameView";
 

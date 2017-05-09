@@ -1,269 +1,144 @@
 package com.qiniu.pili.droid.streaming.demo;
 
-import android.Manifest;
-import android.annotation.TargetApi;
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
+import android.widget.CheckBox;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import java.io.InputStream;
-import java.net.HttpURLConnection;
+import com.qiniu.pili.droid.streaming.StreamingEnv;
+import com.qiniu.pili.droid.streaming.demo.activity.AVStreamingActivity;
+import com.qiniu.pili.droid.streaming.demo.activity.AudioStreamingActivity;
+import com.qiniu.pili.droid.streaming.demo.activity.ImportStreamingActivity;
+import com.qiniu.pili.droid.streaming.demo.activity.ScreenStreamingActivity;
+import com.qiniu.pili.droid.streaming.demo.activity.StreamingBaseActivity;
+import com.qiniu.pili.droid.streaming.demo.fragment.CameraConfigFragment;
+import com.qiniu.pili.droid.streaming.demo.fragment.EncodingConfigFragment;
+import com.qiniu.pili.droid.streaming.demo.utils.Cache;
+import com.qiniu.pili.droid.streaming.demo.utils.PermissionChecker;
+import com.qiniu.pili.droid.streaming.demo.utils.Util;
+
 import java.net.URI;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 
-public class MainActivity extends Activity {
+public class MainActivity extends FragmentActivity {
     private static final String TAG = "MainActivity";
+
     private static final String url = "Your app server url which get StreamJson";
     private static final String url2 = "Your app server url which get PublishUrl";
 
-    private static final String INPUT_TYPE_STREAM_JSON      = "StreamJson";
-    private static final String INPUT_TYPE_AUTHORIZED_URL   = "AuthorizedUrl";
-    private static final String INPUT_TYPE_UNAUTHORIZED_URL = "UnauthorizedUrl";
-
-    private static final String[] mInputTypeList = {
-            "Please select input type of publish url:",
-            INPUT_TYPE_STREAM_JSON,
-            INPUT_TYPE_AUTHORIZED_URL,
-            INPUT_TYPE_UNAUTHORIZED_URL
+    private static final String[] INPUT_TYPES = { "Authorized", "Unauthorized", "JSON" };
+    private static final String[] STREAM_TYPES = { "Video-Audio", "Audio", "Import", "Screen" };
+    private static final Class[] ACTIVITY_CLASSES = {
+            AVStreamingActivity.class,
+            AudioStreamingActivity.class,
+            ImportStreamingActivity.class,
+            ScreenStreamingActivity.class
     };
 
-    private Button mHwCodecCameraStreamingBtn;
-    private Button mSwCodecCameraStreamingBtn;
-    private Button mAudioStreamingBtn;
-    private Button mScreenRecorderStreamingBtn;
-    private Button mExtCapStreamingBtn;
+    private TextView mInputTextTV;
+    private Spinner mInputTypeSpinner;
+    private Spinner mStreamTypeSpinner;
+    private CheckBox mDebugModeCheckBox;
 
-    private EditText mInputUrlEditText;
+    private EncodingConfigFragment mEncodingConfigFragment;
+    private CameraConfigFragment mCameraConfigFragment;
 
-    private String mSelectedInputType = null;
-
-    private boolean mPermissionEnabled = false;
-
-    private static boolean isSupportHWEncode() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2;
-    }
-
-    private static boolean isSupportScreenCapture() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
-    }
-
-    private boolean isPermissionOK() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            mPermissionEnabled = true;
-            return true;
-        }
-        else {
-            return checkPermission();
-        }
-    }
-
-    /**
-     * Check that all given permissions have been granted by verifying that each entry in the
-     * given array is of the value {@link PackageManager#PERMISSION_GRANTED}.
-     *
-     * @see Activity#onRequestPermissionsResult(int, String[], int[])
-     */
-    public static boolean verifyPermissions(int[] grantResults) {
-        // At least one result must be checked.
-        if(grantResults.length < 1){
-            return false;
-        }
-
-        // Verify that each required permission has been granted, otherwise return false.
-        for (int result : grantResults) {
-            if (result != PackageManager.PERMISSION_GRANTED) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    final private int REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS = 124;
-
-    @TargetApi(Build.VERSION_CODES.M)
-    private boolean checkPermission() {
-        boolean ret = true;
-
-        List<String> permissionsNeeded = new ArrayList<String>();
-        final List<String> permissionsList = new ArrayList<String>();
-        if (!addPermission(permissionsList, Manifest.permission.CAMERA)) {
-            permissionsNeeded.add("CAMERA");
-        }
-        if (!addPermission(permissionsList, Manifest.permission.RECORD_AUDIO)) {
-            permissionsNeeded.add("MICROPHONE");
-        }
-        if (!addPermission(permissionsList, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            permissionsNeeded.add("Write external storage");
-        }
-
-        if (permissionsNeeded.size() > 0) {
-            // Need Rationale
-            String message = "You need to grant access to " + permissionsNeeded.get(0);
-            for (int i = 1; i < permissionsNeeded.size(); i++) {
-                message = message + ", " + permissionsNeeded.get(i);
-            }
-            // Check for Rationale Option
-            if (!shouldShowRequestPermissionRationale(permissionsList.get(0))) {
-                showMessageOKCancel(message,
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                requestPermissions(permissionsList.toArray(new String[permissionsList.size()]),
-                                        REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS);
-                            }
-                        });
-            }
-            else {
-                requestPermissions(permissionsList.toArray(new String[permissionsList.size()]),
-                        REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS);
-            }
-            ret = false;
-        }
-
-        return ret;
-    }
-
-    @TargetApi(Build.VERSION_CODES.M)
-    private boolean addPermission(List<String> permissionsList, String permission) {
-        boolean ret = true;
-        if (checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
-            permissionsList.add(permission);
-            ret = false;
-        }
-        return ret;
-    }
-
-    private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
-        new AlertDialog.Builder(MainActivity.this)
-                .setMessage(message)
-                .setPositiveButton("OK", okListener)
-                .setNegativeButton("Cancel", null)
-                .create()
-                .show();
-    }
+    private PermissionChecker mPermissionChecker = new PermissionChecker(this);
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        switch (requestCode) {
-            case REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS: {
-                if (verifyPermissions(grantResults)) {
-                    // All Permissions Granted
-                    mPermissionEnabled = true;
-                } else {
-                    // Permission Denied
-                    mPermissionEnabled = false;
-                    showToast("Some Permission is Denied");
-                }
-            }
-            break;
-            default:
-                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
+        mPermissionChecker.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-    private String requestStream(String appServerUrl) {
-        try {
-            HttpURLConnection httpConn = (HttpURLConnection) new URL(appServerUrl).openConnection();
-            httpConn.setRequestMethod("POST");
-            httpConn.setConnectTimeout(5000);
-            httpConn.setReadTimeout(10000);
-            int responseCode = httpConn.getResponseCode();
-            if (responseCode != HttpURLConnection.HTTP_OK) {
-                return null;
-            }
-
-            int length = httpConn.getContentLength();
-            if (length <= 0) {
-                length = 16*1024;
-            }
-            InputStream is = httpConn.getInputStream();
-            byte[] data = new byte[length];
-            int read = is.read(data);
-            is.close();
-            if (read <= 0) {
-                return null;
-            }
-            return new String(data, 0, read);
-        } catch (Exception e) {
-            showToast("Network error!");
-        }
-        return null;
+    private boolean isInputTypeJSON() {
+        return mInputTypeSpinner.getSelectedItemPosition() == 2;
     }
 
-    void showToast(final String msg) {
-        this.runOnUiThread(new Runnable() {
+    private boolean isInputTypeUnauthorized() {
+        return mInputTypeSpinner.getSelectedItemPosition() == 1;
+    }
+
+    private void updateInputTextView(final String url) {
+        runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(MainActivity.this, msg, Toast.LENGTH_LONG).show();
+                mInputTextTV.setText(url);
+                Cache.saveURL(MainActivity.this, url);
             }
         });
     }
 
-    private void startStreamingActivity(final Intent intent) {
-        if (!isPermissionOK()) {
+    public void launchStreaming(View v) {
+        // API < M, no need to request permissions, so always true.
+        boolean isPermissionOK = Build.VERSION.SDK_INT < Build.VERSION_CODES.M || mPermissionChecker.checkPermission();
+        if (!isPermissionOK) {
+            Util.showToast(this, "Some permissions is not approved !!!");
             return;
         }
 
-        final String inputUrl = mInputUrlEditText.getText().toString().trim();
+        if (mDebugModeCheckBox.isChecked()) {
+            StreamingEnv.setLogLevel(Log.VERBOSE);
+        }
 
-        new Thread(new Runnable() {
+        String streamText = mInputTextTV.getText().toString().trim();
+        int streamType = isInputTypeJSON()
+                ? StreamingBaseActivity.INPUT_TYPE_JSON
+                : StreamingBaseActivity.INPUT_TYPE_URL;
+
+        int pos = mStreamTypeSpinner.getSelectedItemPosition();
+        Intent intent = new Intent(this, ACTIVITY_CLASSES[pos]);
+        intent.putExtra(StreamingBaseActivity.INPUT_TYPE, streamType);
+        intent.putExtra(StreamingBaseActivity.INPUT_TEXT, streamText);
+        intent.putExtras(mEncodingConfigFragment.getIntent());
+        boolean bAudioStereo = ((CheckBox) findViewById(R.id.audio_channel_stereo)).isChecked();
+        if (bAudioStereo) {
+            intent.putExtra(StreamingBaseActivity.AUDIO_CHANNEL_STEREO, bAudioStereo);
+        }
+        if (pos == 0) {
+            intent.putExtras(mCameraConfigFragment.getIntent());
+        }
+        startActivity(intent);
+    }
+
+    private void initInputTypeSpinner() {
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, INPUT_TYPES);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mInputTypeSpinner.setAdapter(adapter);
+    }
+
+    private void initStreamTypeSpinner() {
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_item,
+                Util.isSupportScreenCapture() ? STREAM_TYPES: Arrays.copyOf(STREAM_TYPES, 3));
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mStreamTypeSpinner.setAdapter(adapter);
+        mStreamTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void run() {
-                String publishUrl = null;
-                Log.i(TAG, "mSelectedInputType:" + mSelectedInputType + ",inputUrl:" + inputUrl);
-                if (!"".equalsIgnoreCase(inputUrl)) {
-                    publishUrl = Config.EXTRA_PUBLISH_URL_PREFIX + inputUrl;
-                } else {
-                    if (mSelectedInputType != null) {
-                        if (INPUT_TYPE_STREAM_JSON.equalsIgnoreCase(mSelectedInputType)) {
-                            publishUrl = requestStream(url);
-                            if (publishUrl != null) {
-                                publishUrl = Config.EXTRA_PUBLISH_JSON_PREFIX + publishUrl;
-                            }
-                        } else if (INPUT_TYPE_AUTHORIZED_URL.equalsIgnoreCase(mSelectedInputType)) {
-                            publishUrl = requestStream(url2);
-                            if (publishUrl != null) {
-                                publishUrl = Config.EXTRA_PUBLISH_URL_PREFIX + publishUrl;
-                            }
-                        } else if (INPUT_TYPE_UNAUTHORIZED_URL.equalsIgnoreCase(mSelectedInputType)) {
-                            // just for test
-                            publishUrl = requestStream(url2);
-                            try {
-                                URI u = new URI(publishUrl);
-                                publishUrl = Config.EXTRA_PUBLISH_URL_PREFIX + String.format("rtmp://401.qbox.net%s?%s", u.getPath(), u.getRawQuery());
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                publishUrl = null;
-                            }
-                        } else {
-                            throw new IllegalArgumentException("Illegal input type");
-                        }
-                    }
-                }
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                mEncodingConfigFragment.enableAudioOnly(position == 1);
+                mEncodingConfigFragment.enableWatermark(position == 0);
+                mEncodingConfigFragment.enablePictureStreaming(position == 0);
+                // Import & Screen streaming must specify custom video encoding size
+                mEncodingConfigFragment.forceCustomVideoEncodingSize(position == 2 || position == 3);
 
-                if (publishUrl == null) {
-                    showToast("Publish Url Got Fail!");
-                    return;
-                }
-                intent.putExtra(Config.EXTRA_KEY_PUB_URL, publishUrl);
-                startActivity(intent);
+                View cameraConfigPanel = findViewById(R.id.camera_config_panel);
+                cameraConfigPanel.setVisibility(position == 0 ? View.VISIBLE : View.GONE);
             }
-        }).start();
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
     }
 
     @Override
@@ -271,113 +146,70 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        TextView mVersionInfoTextView = (TextView) findViewById(R.id.version_info);
-        mVersionInfoTextView.setText(Config.VERSION_HINT);
+        TextView versionInfo = (TextView) findViewById(R.id.version_info);
+        mInputTextTV = (TextView) findViewById(R.id.input_url);
+        mInputTypeSpinner = (Spinner) findViewById(R.id.stream_input_types);
+        mStreamTypeSpinner = (Spinner) findViewById(R.id.stream_types);
+        mDebugModeCheckBox = (CheckBox) findViewById(R.id.debug_mode);
 
-        Spinner inputTypeSpinner = (Spinner) findViewById(R.id.spinner_input_type);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, mInputTypeList);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        inputTypeSpinner.setAdapter(adapter);
-        inputTypeSpinner.setOnItemSelectedListener(new SpinnerSelectedListener());
-        inputTypeSpinner.setVisibility(View.VISIBLE);
+        mInputTextTV.setText(Cache.retrieveURL(this));
 
-        mInputUrlEditText = (EditText) findViewById(R.id.input_url);
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        mEncodingConfigFragment = (EncodingConfigFragment) fragmentManager.findFragmentById(R.id.encoding_config_fragment);
+        mCameraConfigFragment = (CameraConfigFragment) fragmentManager.findFragmentById(R.id.camera_config_fragment);
 
-        mHwCodecCameraStreamingBtn = (Button) findViewById(R.id.hw_codec_camera_streaming_btn);
-        mHwCodecCameraStreamingBtn.setVisibility(View.GONE);
-        mHwCodecCameraStreamingBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mHwCodecCameraStreamingBtn.setClickable(false);
-                Intent intent = new Intent(MainActivity.this, HWCodecCameraStreamingActivity.class);
-                startStreamingActivity(intent);
-            }
-        });
-
-        mSwCodecCameraStreamingBtn = (Button) findViewById(R.id.sw_codec_camera_streaming_btn);
-        mSwCodecCameraStreamingBtn.setVisibility(View.GONE);
-        mSwCodecCameraStreamingBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mSwCodecCameraStreamingBtn.setClickable(false);
-                Intent intent = new Intent(MainActivity.this, SWCodecCameraStreamingActivity.class);
-                startStreamingActivity(intent);
-            }
-        });
-
-        mAudioStreamingBtn = (Button) findViewById(R.id.start_pure_audio_streaming_btn);
-        mAudioStreamingBtn.setVisibility(View.GONE);
-        mAudioStreamingBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mAudioStreamingBtn.setClickable(false);
-                Intent intent = new Intent(MainActivity.this, AudioStreamingActivity.class);
-                startStreamingActivity(intent);
-            }
-        });
-
-        mScreenRecorderStreamingBtn = (Button) findViewById(R.id.start_screen_recorder_streaming_btn);
-        mScreenRecorderStreamingBtn.setVisibility(View.GONE);
-        mScreenRecorderStreamingBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mScreenRecorderStreamingBtn.setClickable(false);
-                Intent intent = new Intent(MainActivity.this, ScreenRecorderActivity.class);
-                startStreamingActivity(intent);
-            }
-        });
-
-        mExtCapStreamingBtn = (Button) findViewById(R.id.start_ext_cap_streaming_btn);
-        mExtCapStreamingBtn.setVisibility(View.GONE);
-        mExtCapStreamingBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mExtCapStreamingBtn.setClickable(false);
-                Intent intent = new Intent(MainActivity.this, ExtCapStreamingActivity.class);
-                startStreamingActivity(intent);
-            }
-        });
+        versionInfo.setText("versionName: " + BuildConfig.VERSION_NAME + " versionCode: " + BuildConfig.VERSION_CODE);
+        initInputTypeSpinner();
+        initStreamTypeSpinner();
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (mHwCodecCameraStreamingBtn != null) {
-            mHwCodecCameraStreamingBtn.setClickable(true);
-        }
-        if (mSwCodecCameraStreamingBtn != null) {
-            mSwCodecCameraStreamingBtn.setClickable(true);
-        }
-        if (mAudioStreamingBtn != null) {
-            mAudioStreamingBtn.setClickable(true);
-        }
-        if (mScreenRecorderStreamingBtn != null) {
-            mScreenRecorderStreamingBtn.setClickable(true);
-        }
-        if (mExtCapStreamingBtn != null) {
-            mExtCapStreamingBtn.setClickable(true);
-        }
-    }
-
-    private class SpinnerSelectedListener implements AdapterView.OnItemSelectedListener {
-
-        public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-            if (arg2 != 0) {
-                mSelectedInputType = mInputTypeList[arg2];
-                if (isSupportHWEncode()) {
-                    mHwCodecCameraStreamingBtn.setVisibility(View.VISIBLE);
+    public void onClickGenPublishURL(View v) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String publishUrl = genPublishURL();
+                if (publishUrl != null) {
+                    Cache.saveURL(MainActivity.this, publishUrl);
+                    updateInputTextView(publishUrl);
                 }
-                mSwCodecCameraStreamingBtn.setVisibility(View.VISIBLE);
-                mAudioStreamingBtn.setVisibility(View.VISIBLE);
-                if (isSupportScreenCapture()) {
-                    mScreenRecorderStreamingBtn.setVisibility(View.VISIBLE);
-                }
-                mExtCapStreamingBtn.setVisibility(View.VISIBLE);
             }
-        }
+        }).start();
+    }
 
-        public void onNothingSelected(AdapterView<?> arg0) {
+    public void toggleEncodingConfigFragment(View v) {
+        toggleFragment(mEncodingConfigFragment);
+    }
+
+    public void toggleCameraConfigFragment(View v) {
+        toggleFragment(mCameraConfigFragment);
+    }
+
+    private void toggleFragment(Fragment fragment) {
+        View v = fragment.getView();
+        if (v != null) {
+            v.setVisibility(v.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE);
         }
     }
 
+    /**
+     * Generate the publish URL, You can request the URL from your app server
+     * @return the publish URL
+     */
+    private String genPublishURL() {
+        String publishUrl = Util.syncRequest(isInputTypeJSON() ? GENERATE_STREAM_TEXT_V1 : GENERATE_STREAM_TEXT_V2);
+        if (publishUrl == null) {
+            Util.showToast(MainActivity.this, "Get publish GENERATE_STREAM_TEXT_V1 failed !!!");
+            return null;
+        }
+        if (isInputTypeUnauthorized()) {
+            // make an unauthorized GENERATE_STREAM_TEXT_V1 for effect
+            try {
+                URI u = new URI(publishUrl);
+                publishUrl = String.format("rtmp://401.qbox.net%s?%s", u.getPath(), u.getRawQuery());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return publishUrl;
+    }
 }

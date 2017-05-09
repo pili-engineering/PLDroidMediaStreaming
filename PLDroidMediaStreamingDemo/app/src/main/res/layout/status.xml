@@ -1,18 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <TextView
         android:id="@+id/streamingStatus"
-        android:contentDescription="@string/cd_tv_streaming_state_hint"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/pldroid_streaming_item_padding"
         android:layout_marginTop="@dimen/pldroid_streaming_item_padding"
+        android:contentDescription="@string/cd_tv_streaming_state_hint"
         android:text="@string/string_state_ready"
-        android:textColor="@color/pldroid_streaming_yellow"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@color/pldroid_streaming_yellow" />
+
+    <TextView
+        android:id="@+id/stream_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:background="@android:color/transparent"
+        android:contentDescription="@string/cd_tv_stream_status"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@color/pldroid_streaming_white" />
 
 </LinearLayout>

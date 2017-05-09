@@ -4,13 +4,10 @@ import android.content.Context;
 import android.opengl.GLES20;
 import android.util.Log;
 
-import com.qiniu.pili.droid.streaming.demo.Config;
+import com.qiniu.pili.droid.streaming.demo.utils.Config;
 import com.qiniu.pili.droid.streaming.demo.R;
 import com.qiniu.pili.droid.streaming.demo.filter.CameraFilterBeauty;
 
-/**
- * Created by jerikc on 16/2/23.
- */
 public class FBO {
     private static final String TAG = "FBO";
     private boolean mEnable = Config.FILTER_ENABLED;

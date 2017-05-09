@@ -16,9 +16,6 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 
-/**
- * Created by jerikc on 16/2/23.
- */
 public class GlUtil {
     private static final String TAG = "GlDemoUtil";
     /** Identity matrix for general use.  Don't modify or life will get weird. */

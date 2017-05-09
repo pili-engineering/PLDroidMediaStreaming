@@ -1,8 +1,5 @@
 package com.qiniu.pili.droid.streaming.demo.gles;
 
-/**
- * Created by jerikc on 16/2/23.
- */
 import android.opengl.Matrix;
 
 import com.qiniu.pili.droid.streaming.demo.filter.IFilter;
