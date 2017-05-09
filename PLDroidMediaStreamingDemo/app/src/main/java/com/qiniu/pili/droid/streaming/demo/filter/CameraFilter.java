@@ -9,9 +9,6 @@ import com.qiniu.pili.droid.streaming.demo.gles.GlUtil;
 
 import java.nio.FloatBuffer;
 
-/**
- * Created by jerikc on 16/2/23.
- */
 public class CameraFilter extends AbstractFilter implements IFilter {
     protected int mProgramHandle;
     private int maPositionLoc;

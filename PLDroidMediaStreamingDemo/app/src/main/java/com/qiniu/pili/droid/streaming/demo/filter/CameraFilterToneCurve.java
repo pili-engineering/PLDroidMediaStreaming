@@ -16,9 +16,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 
-/**
- * Created by jerikc on 16/2/23.
- */
 public class CameraFilterToneCurve extends CameraFilter {
 
     private final int mToneCurveTextureId;

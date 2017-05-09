@@ -8,9 +8,6 @@ import com.qiniu.pili.droid.streaming.demo.gles.GlUtil;
 
 import java.nio.FloatBuffer;
 
-/**
- * Created by shengwenhui on 16/3/3.
- */
 public class CameraFilterBeauty extends CameraFilter {
     private int singleStepOffset;
 

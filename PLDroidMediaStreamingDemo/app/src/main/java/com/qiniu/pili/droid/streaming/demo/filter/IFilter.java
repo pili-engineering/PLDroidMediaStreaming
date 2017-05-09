@@ -2,9 +2,6 @@ package com.qiniu.pili.droid.streaming.demo.filter;
 
 import java.nio.FloatBuffer;
 
-/**
- * Created by jerikc on 16/2/23.
- */
 public interface IFilter {
     int getTextureTarget();
 

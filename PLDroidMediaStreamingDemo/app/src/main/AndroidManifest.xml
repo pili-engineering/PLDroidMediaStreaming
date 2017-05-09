@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.qiniu.pili.droid.streaming.demo" >
+    package="com.qiniu.pili.droid.streaming.demo">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.CAMERA" />
@@ -15,17 +16,20 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <uses-feature android:name="android.hardware.camera.autofocus" />
-    <uses-feature android:glEsVersion="0x00020000" android:required="true" />
+    <uses-feature
+        android:glEsVersion="0x00020000"
+        android:required="true" />
 
     <application
-        android:allowBackup="true"
         android:name=".StreamingApplication"
+        android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme">
         <activity
             android:name=".MainActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name"
+            android:windowSoftInputMode="adjustResize|stateHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -34,43 +38,32 @@
         </activity>
 
         <activity
-            android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
+            android:name=".activity.AVStreamingActivity"
             android:configChanges="orientation|screenSize"
-            android:name=".HWCodecCameraStreamingActivity"
-            android:theme="@android:style/Theme.Holo.Light.NoActionBar" >
-        </activity>
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize"></activity>
 
-        <activity
-            android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
-            android:configChanges="orientation|screenSize"
-            android:name=".SWCodecCameraStreamingActivity"
-            android:theme="@android:style/Theme.Holo.Light.NoActionBar" >
-        </activity>
         <!--android:theme="@android:style/Theme.Holo.Light.NoActionBar.Fullscreen" >-->
         <activity
-            android:name=".AudioStreamingActivity"
+            android:name=".activity.AudioStreamingActivity"
+            android:label="@string/title_activity_audio_streaming"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar"></activity>
+
+        <activity
+            android:name=".activity.ScreenStreamingActivity"
+            android:configChanges="orientation|screenSize"
             android:theme="@android:style/Theme.Holo.Light.NoActionBar"
-            android:label="@string/title_activity_audio_streaming" >
-        </activity>
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize"></activity>
 
         <activity
-            android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
+            android:name=".activity.ImportStreamingActivity"
             android:configChanges="orientation|screenSize"
-            android:name=".ScreenRecorderActivity"
-            android:theme="@android:style/Theme.Holo.Light.NoActionBar" >
-        </activity>
-
-        <activity
-            android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
-            android:configChanges="orientation|screenSize"
-            android:name=".ExtCapStreamingActivity"
-            android:theme="@android:style/Theme.Holo.Light.NoActionBar" >
-        </activity>
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize"></activity>
 
         <activity
             android:name="com.qiniu.pili.droid.streaming.screen.ScreenCaptureRequestActivity"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar" >
-        </activity>
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"></activity>
     </application>
 
 </manifest>

@@ -2,9 +2,6 @@ package com.qiniu.pili.droid.streaming.demo.gles;
 
 import java.nio.FloatBuffer;
 
-/**
- * Created by jerikc on 16/2/23.
- */
 public class Drawable2d {
     private static final int SIZEOF_FLOAT = 4;
 
