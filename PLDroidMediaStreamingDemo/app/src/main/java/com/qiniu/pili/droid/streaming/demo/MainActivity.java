@@ -32,8 +32,8 @@ import java.util.Arrays;
 public class MainActivity extends FragmentActivity {
     private static final String TAG = "MainActivity";
 
-    private static final String url = "Your app server url which get StreamJson";
-    private static final String url2 = "Your app server url which get PublishUrl";
+    private static final String GENERATE_STREAM_TEXT_V1 = "Your app server url which get StreamJson";
+    private static final String GENERATE_STREAM_TEXT_V2 = "Your app server url which get PublishUrl";
 
     private static final String[] INPUT_TYPES = { "Authorized", "Unauthorized", "JSON" };
     private static final String[] STREAM_TYPES = { "Video-Audio", "Audio", "Import", "Screen" };

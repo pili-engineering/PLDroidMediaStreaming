@@ -69,6 +69,14 @@
             android:text="Mirror\n(Encode)"
             android:textColor="@color/pldroid_streaming_white" />
 
+        <Button
+            android:id="@+id/pic_streaming_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/cd_encoding_mirror"
+            android:text="Picture\nStreaming"
+            android:textColor="@color/pldroid_streaming_white" />
+
     </LinearLayout>
 
     <LinearLayout
@@ -77,6 +85,13 @@
         android:layout_gravity="right|center"
         android:gravity="center_vertical"
         android:orientation="vertical">
+
+        <Button
+            android:id="@+id/mix_panel_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Audio mix panel"
+            android:textColor="@color/pldroid_streaming_white" />
 
         <Button
             android:id="@+id/orientation_btn"
@@ -127,5 +142,11 @@
         android:progress="100" />
 
     <include layout="@layout/camera_button_holder" />
+
+    <include
+        layout="@layout/audio_mixer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom" />
 
 </FrameLayout>

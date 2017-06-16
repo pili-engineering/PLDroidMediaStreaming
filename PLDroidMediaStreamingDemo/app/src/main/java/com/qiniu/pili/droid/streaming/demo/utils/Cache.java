@@ -14,4 +14,14 @@ public class Cache {
     public static String retrieveURL(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context).getString("URL", "");
     }
+
+    public static void setAudioFile(Context context, String audioFile) {
+        SharedPreferences.Editor e = PreferenceManager.getDefaultSharedPreferences(context).edit();
+        e.putString("audioFile", audioFile);
+        e.commit();
+    }
+
+    public static String getAudioFile(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context).getString("audioFile", null);
+    }
 }
