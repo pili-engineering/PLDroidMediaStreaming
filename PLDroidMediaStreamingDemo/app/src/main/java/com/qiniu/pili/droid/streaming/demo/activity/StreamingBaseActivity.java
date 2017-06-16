@@ -319,7 +319,7 @@ public abstract class StreamingBaseActivity extends Activity implements
             if (mEncodingConfig.mIsVideoSizePreset) {
                 mProfile.setEncodingSizeLevel(mEncodingConfig.mVideoSizePreset);
             } else {
-                mProfile.setPreferredVideoEncodingSize(mEncodingConfig.mVideoSizeCustomWidth, mEncodingConfig.mVideoSizeCustomHeight);
+                mProfile.setPreferredVideoEncodingSize(mEncodingConfig.mVideoCustomX, mEncodingConfig.mVideoCustomY, mEncodingConfig.mVideoSizeCustomWidth, mEncodingConfig.mVideoSizeCustomHeight);
             }
 
             // video misc

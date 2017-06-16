@@ -178,6 +178,8 @@ public class EncodingConfigFragment extends ConfigFragment {
                 Spinner presetSpinner = (Spinner) root.findViewById(R.id.video_size_presets);
                 encodingConfig.mVideoSizePreset = presetSpinner.getSelectedItemPosition();
             } else {
+                encodingConfig.mVideoCustomX = Integer.parseInt(((EditText) root.findViewById(R.id.video_custom_x)).getText().toString());
+                encodingConfig.mVideoCustomY = Integer.parseInt(((EditText) root.findViewById(R.id.video_custom_y)).getText().toString());
                 encodingConfig.mVideoSizeCustomWidth = Integer.parseInt(((EditText) root.findViewById(R.id.video_size_custom_width)).getText().toString());
                 encodingConfig.mVideoSizeCustomHeight = Integer.parseInt(((EditText) root.findViewById(R.id.video_size_custom_height)).getText().toString());
             }
@@ -213,7 +215,8 @@ public class EncodingConfigFragment extends ConfigFragment {
             }
 
             // picture streaming
-            if (getView().findViewById(R.id.picture_panel).getVisibility() == View.VISIBLE) {
+            encodingConfig.mIsPictureStreamingEnabled = ((CheckBox) getView().findViewById(R.id.pic_streaming_control)).isChecked();
+            if (mPictureFilePath != null) {
                 encodingConfig.mPictureStreamingFilePath = mPictureFilePath;
             }
         }
@@ -311,7 +314,8 @@ public class EncodingConfigFragment extends ConfigFragment {
     }
 
     private void initPicturePanel(final View root) {
-        root.findViewById(R.id.picture_choose).setOnClickListener(new View.OnClickListener() {
+        ((ImageView) root.findViewById(R.id.picture_preview)).setImageResource(R.drawable.pause_publish);
+        root.findViewById(R.id.picture_preview).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 DialogProperties properties = new DialogProperties();
@@ -326,8 +330,14 @@ public class EncodingConfigFragment extends ConfigFragment {
                 dialog.setDialogSelectionListener(new DialogSelectionListener() {
                     @Override
                     public void onSelectedFilePaths(String[] files) {
-                        mPictureFilePath = files[0];
-                        ((ImageView) getView().findViewById(R.id.picture_preview)).setImageBitmap(BitmapFactory.decodeFile(mPictureFilePath));
+                        ImageView imageView = ((ImageView) getView().findViewById(R.id.picture_preview));
+                        if (files != null && files.length > 0){
+                            mPictureFilePath = files[0];
+                            imageView.setImageBitmap(BitmapFactory.decodeFile(mPictureFilePath));
+                        } else {
+                            mPictureFilePath = null;
+                            imageView.setImageResource(R.drawable.pause_publish);
+                        }
                     }
                 });
                 dialog.show();

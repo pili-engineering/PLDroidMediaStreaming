@@ -157,6 +157,30 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:text="X:" />
+
+                <EditText
+                    android:id="@+id/video_custom_x"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal"
+                    android:text="0" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Y:" />
+
+                <EditText
+                    android:id="@+id/video_custom_y"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal"
+                    android:text="0" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:text="Width:" />
 
                 <EditText
@@ -379,17 +403,18 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <Button
-                android:id="@+id/picture_choose"
+            <CheckBox
+                android:id="@+id/pic_streaming_control"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:text="Choose picture streaming file" />
+                android:checked="true"
+                android:text="picture streaming" />
 
             <ImageView
                 android:id="@+id/picture_preview"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
+                android:layout_margin="5dp"
                 android:layout_gravity="center_vertical"
                 android:background="@android:color/darker_gray" />
         </LinearLayout>

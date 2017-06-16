@@ -18,6 +18,9 @@ public class EncodingConfig implements Serializable {
 
     public boolean mIsVideoSizePreset;
     public int mVideoSizePreset;
+
+    public int mVideoCustomX;
+    public int mVideoCustomY;
     public int mVideoSizeCustomWidth;
     public int mVideoSizeCustomHeight;
 
@@ -37,6 +40,7 @@ public class EncodingConfig implements Serializable {
     public float mWatermarkLocationCustomX;
     public float mWatermarkLocationCustomY;
 
+    public boolean mIsPictureStreamingEnabled;
     public String mPictureStreamingFilePath;
 
     public boolean mIsAudioQualityPreset;
