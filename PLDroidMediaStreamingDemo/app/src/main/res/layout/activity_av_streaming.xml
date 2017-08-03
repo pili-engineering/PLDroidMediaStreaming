@@ -73,7 +73,6 @@
             android:id="@+id/pic_streaming_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:contentDescription="@string/cd_encoding_mirror"
             android:text="Picture\nStreaming"
             android:textColor="@color/pldroid_streaming_white" />
 

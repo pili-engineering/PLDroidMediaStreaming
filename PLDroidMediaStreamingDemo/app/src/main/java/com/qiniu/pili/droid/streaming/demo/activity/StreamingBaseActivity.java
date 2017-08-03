@@ -2,6 +2,7 @@ package com.qiniu.pili.droid.streaming.demo.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Point;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.util.Log;
@@ -49,6 +50,7 @@ public abstract class StreamingBaseActivity extends Activity implements
 
     protected boolean mShutterButtonPressed = false;
     protected EncodingConfig mEncodingConfig;
+    protected boolean mIsEncOrientationPort = true;
     protected boolean mIsReady;
     private String mStatusMsgContent;
     private String mLogContent = "\n";
@@ -319,7 +321,7 @@ public abstract class StreamingBaseActivity extends Activity implements
             if (mEncodingConfig.mIsVideoSizePreset) {
                 mProfile.setEncodingSizeLevel(mEncodingConfig.mVideoSizePreset);
             } else {
-                mProfile.setPreferredVideoEncodingSize(mEncodingConfig.mVideoCustomX, mEncodingConfig.mVideoCustomY, mEncodingConfig.mVideoSizeCustomWidth, mEncodingConfig.mVideoSizeCustomHeight);
+                mProfile.setPreferredVideoEncodingSize(mEncodingConfig.mVideoSizeCustomWidth, mEncodingConfig.mVideoSizeCustomHeight);
             }
 
             // video misc
