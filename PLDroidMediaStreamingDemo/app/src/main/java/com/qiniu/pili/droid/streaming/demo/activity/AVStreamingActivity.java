@@ -2,6 +2,7 @@ package com.qiniu.pili.droid.streaming.demo.activity;
 
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
+import android.graphics.Point;
 import android.hardware.Camera;
 import android.media.AudioFormat;
 import android.os.Build;
@@ -71,7 +72,6 @@ public class AVStreamingActivity extends StreamingBaseActivity implements
     private boolean mIsTorchOn = false;
     private boolean mIsNeedMute = false;
     private boolean mIsNeedFB = false;
-    private boolean mIsEncOrientationPort = true;
     private boolean mIsPreviewMirror = false;
     private boolean mIsEncodingMirror = false;
     private boolean mIsPlayingback = false;
@@ -209,14 +209,6 @@ public class AVStreamingActivity extends StreamingBaseActivity implements
             mOrientationChanged = true;
             mIsEncOrientationPort = !mIsEncOrientationPort;
             mProfile.setEncodingOrientation(mIsEncOrientationPort ? StreamingProfile.ENCODING_ORIENTATION.PORT : StreamingProfile.ENCODING_ORIENTATION.LAND);
-            if (!mEncodingConfig.mIsVideoSizePreset) {
-                if (mIsEncOrientationPort) { // port crop
-                    mProfile.setPreferredVideoEncodingSize(mEncodingConfig.mVideoCustomX, mEncodingConfig.mVideoCustomY,
-                            mEncodingConfig.mVideoSizeCustomWidth, mEncodingConfig.mVideoSizeCustomHeight);
-                } else { // land full video
-                    mProfile.setPreferredVideoEncodingSize(0, 0, 848, 480);
-                }
-            }
             mMediaStreamingManager.setStreamingProfile(mProfile);
             stopStreamingInternal();
             setRequestedOrientation(mIsEncOrientationPort ? ActivityInfo.SCREEN_ORIENTATION_PORTRAIT : ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
@@ -277,6 +269,9 @@ public class AVStreamingActivity extends StreamingBaseActivity implements
         }
     }
 
+    /**
+     * switch picture during streaming
+     */
     private class ImageSwitcher implements Runnable {
         @Override
         public void run() {
@@ -285,7 +280,15 @@ public class AVStreamingActivity extends StreamingBaseActivity implements
                 return;
             }
 
-            mMediaStreamingManager.setPictureStreamingResourceId(mTimes % 2 == 0 ? R.drawable.pause_publish : R.drawable.qiniu_logo);
+            if (mTimes % 2 == 0) {
+                if (mEncodingConfig.mPictureStreamingFilePath != null) {
+                    mMediaStreamingManager.setPictureStreamingFilePath(mEncodingConfig.mPictureStreamingFilePath);
+                } else {
+                    mMediaStreamingManager.setPictureStreamingResourceId(R.drawable.qiniu_logo);
+                }
+            } else {
+                mMediaStreamingManager.setPictureStreamingResourceId(R.drawable.pause_publish);
+            }
             mTimes++;
             if (mHandler != null && mIsPictureStreaming) {
                 mHandler.postDelayed(this, 1000);
@@ -308,8 +311,8 @@ public class AVStreamingActivity extends StreamingBaseActivity implements
         }
 
         mIsPictureStreaming = !mIsPictureStreaming;
-        mTimes = 0;
 
+        mTimes = 0;
         if (mIsPictureStreaming) {
             if (mImageSwitcher == null) {
                 mImageSwitcher = new ImageSwitcher();
@@ -385,9 +388,6 @@ public class AVStreamingActivity extends StreamingBaseActivity implements
                 .setBuiltInFaceBeautyEnabled(!mCameraConfig.mIsCustomFaceBeauty)
                 .setFaceBeautySetting(new CameraStreamingSetting.FaceBeautySetting(1.0f, 1.0f, 0.8f));
 
-        if (!mEncodingConfig.mIsVideoSizePreset){
-            cameraStreamingSetting.setPreviewAdaptToEncodingSize(false);
-        }
         if (mCameraConfig.mIsFaceBeautyEnabled) {
             cameraStreamingSetting.setVideoFilter(CameraStreamingSetting.VIDEO_FILTER_TYPE.VIDEO_FILTER_BEAUTY);
         } else {

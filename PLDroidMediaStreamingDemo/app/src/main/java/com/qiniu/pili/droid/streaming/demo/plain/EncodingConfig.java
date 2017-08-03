@@ -19,8 +19,6 @@ public class EncodingConfig implements Serializable {
     public boolean mIsVideoSizePreset;
     public int mVideoSizePreset;
 
-    public int mVideoCustomX;
-    public int mVideoCustomY;
     public int mVideoSizeCustomWidth;
     public int mVideoSizeCustomHeight;
 
