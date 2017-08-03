@@ -154,10 +154,13 @@ public class EncodingConfigFragment extends ConfigFragment {
         encodingConfig.mIsAudioOnly = root.findViewById(R.id.video_config_panel).getVisibility() == View.GONE;
         // set codec type
         boolean codecSW = ((RadioButton) root.findViewById(R.id.encoding_sw)).isChecked();
+        boolean codecHW = ((RadioButton) root.findViewById(R.id.encoding_hw)).isChecked();
         if (encodingConfig.mIsAudioOnly) {
             encodingConfig.mCodecType = codecSW ? AVCodecType.SW_AUDIO_CODEC : AVCodecType.HW_AUDIO_CODEC;
         } else {
-            encodingConfig.mCodecType = codecSW ? AVCodecType.SW_VIDEO_WITH_SW_AUDIO_CODEC : AVCodecType.HW_VIDEO_SURFACE_AS_INPUT_WITH_HW_AUDIO_CODEC;
+            encodingConfig.mCodecType = codecSW ? AVCodecType.SW_VIDEO_WITH_SW_AUDIO_CODEC :
+                    codecHW? AVCodecType.HW_VIDEO_SURFACE_AS_INPUT_WITH_HW_AUDIO_CODEC :
+                            AVCodecType.HW_VIDEO_YUV_AS_INPUT_WITH_HW_AUDIO_CODEC;
         }
         // set video if not audio only
         if (!encodingConfig.mIsAudioOnly) {
@@ -178,8 +181,6 @@ public class EncodingConfigFragment extends ConfigFragment {
                 Spinner presetSpinner = (Spinner) root.findViewById(R.id.video_size_presets);
                 encodingConfig.mVideoSizePreset = presetSpinner.getSelectedItemPosition();
             } else {
-                encodingConfig.mVideoCustomX = Integer.parseInt(((EditText) root.findViewById(R.id.video_custom_x)).getText().toString());
-                encodingConfig.mVideoCustomY = Integer.parseInt(((EditText) root.findViewById(R.id.video_custom_y)).getText().toString());
                 encodingConfig.mVideoSizeCustomWidth = Integer.parseInt(((EditText) root.findViewById(R.id.video_size_custom_width)).getText().toString());
                 encodingConfig.mVideoSizeCustomHeight = Integer.parseInt(((EditText) root.findViewById(R.id.video_size_custom_height)).getText().toString());
             }
