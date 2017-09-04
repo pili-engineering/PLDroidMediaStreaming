@@ -1,5 +1,6 @@
 package com.qiniu.pili.droid.streaming.demo;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -13,7 +14,10 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 import com.qiniu.pili.droid.streaming.StreamingEnv;
 import com.qiniu.pili.droid.streaming.demo.activity.AVStreamingActivity;
 import com.qiniu.pili.droid.streaming.demo.activity.AudioStreamingActivity;
@@ -176,6 +180,15 @@ public class MainActivity extends FragmentActivity {
         }).start();
     }
 
+    public void scanQRCode(View v) {
+        IntentIntegrator integrator = new IntentIntegrator(this);
+        integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE_TYPES);
+        integrator.setOrientationLocked(true);
+        integrator.setCameraId(0);
+        integrator.setBeepEnabled(true);
+        integrator.initiateScan();
+    }
+
     public void toggleEncodingConfigFragment(View v) {
         toggleFragment(mEncodingConfigFragment);
     }
@@ -188,6 +201,23 @@ public class MainActivity extends FragmentActivity {
         View v = fragment.getView();
         if (v != null) {
             v.setVisibility(v.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode != Activity.RESULT_OK) {
+            return;
+        }
+        if (requestCode ==  IntentIntegrator.REQUEST_CODE) {
+            IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+            if(result != null) {
+                if(result.getContents() == null) {
+                    Toast.makeText(this, "扫码取消！", Toast.LENGTH_SHORT).show();
+                } else {
+                    mInputTextTV.setText(result.getContents());
+                }
+            }
         }
     }
 

@@ -329,6 +329,9 @@ public abstract class StreamingBaseActivity extends Activity implements
             mProfile.setEncoderRCMode(mEncodingConfig.mVideoRateControlQuality ? StreamingProfile.EncoderRCModes.QUALITY_PRIORITY : StreamingProfile.EncoderRCModes.BITRATE_PRIORITY);
             mProfile.setBitrateAdjustMode(mEncodingConfig.mBitrateAdjustMode);
             mProfile.setFpsControllerEnable(mEncodingConfig.mVideoFPSControl);
+            if (mEncodingConfig.mBitrateAdjustMode == StreamingProfile.BitrateAdjustMode.Auto) {
+                mProfile.setVideoAdaptiveBitrateRange(mEncodingConfig.mAdaptiveBitrateMin * 1024, mEncodingConfig.mAdaptiveBitrateMax * 1024);
+            }
         }
 
         // audio quality

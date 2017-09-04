@@ -27,6 +27,8 @@ public class EncodingConfig implements Serializable {
     public boolean mVideoRateControlQuality;
 
     public StreamingProfile.BitrateAdjustMode mBitrateAdjustMode;
+    public int mAdaptiveBitrateMin = -1;
+    public int mAdaptiveBitrateMax = -1;
 
     public boolean mVideoFPSControl;
 

@@ -188,12 +188,15 @@ public class EncodingConfigFragment extends ConfigFragment {
             // misc
             encodingConfig.mVideoOrientationPortrait = ((RadioButton) root.findViewById(R.id.orientation_portrait)).isChecked();
             encodingConfig.mVideoRateControlQuality = ((RadioButton) root.findViewById(R.id.rate_control_quality)).isChecked();
-            encodingConfig.mBitrateAdjustMode =
-                    ((RadioButton) root.findViewById(R.id.bitrate_auto)).isChecked() ?
-                            StreamingProfile.BitrateAdjustMode.Auto :
-                            (((RadioButton) root.findViewById(R.id.bitrate_manual)).isChecked() ?
-                                    StreamingProfile.BitrateAdjustMode.Manual :
-                                    StreamingProfile.BitrateAdjustMode.Disable);
+            boolean isAdaptiveBitrate = ((RadioButton) root.findViewById(R.id.bitrate_auto)).isChecked();
+            boolean isManualBitrate = ((RadioButton) root.findViewById(R.id.bitrate_manual)).isChecked();
+            encodingConfig.mBitrateAdjustMode = isAdaptiveBitrate ? StreamingProfile.BitrateAdjustMode.Auto :
+                            (isManualBitrate ? StreamingProfile.BitrateAdjustMode.Manual : StreamingProfile.BitrateAdjustMode.Disable);
+            if (isAdaptiveBitrate) {
+                encodingConfig.mAdaptiveBitrateMin = Integer.parseInt(((EditText) root.findViewById(R.id.auto_bitrate_min)).getText().toString());
+                encodingConfig.mAdaptiveBitrateMax = Integer.parseInt(((EditText) root.findViewById(R.id.auto_bitrate_max)).getText().toString());
+            }
+
             encodingConfig.mVideoFPSControl = ((CheckBox) root.findViewById(R.id.fps_control)).isChecked();
 
             // watermark
@@ -346,6 +349,17 @@ public class EncodingConfigFragment extends ConfigFragment {
         });
     }
 
+    private void initBitrateCtrlPanel(final View root) {
+        RadioGroup bitrateRadioGroup = (RadioGroup) root.findViewById(R.id.bitrate_control_group);
+        bitrateRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, @IdRes int checkedId) {
+                LinearLayout bitrateLayout = (LinearLayout) root.findViewById(R.id.auto_bitrate_range);
+                bitrateLayout.setVisibility(checkedId == R.id.bitrate_auto ? View.VISIBLE : View.GONE);
+            }
+        });
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -355,6 +369,7 @@ public class EncodingConfigFragment extends ConfigFragment {
         initAudioQualityPanel(root);
         initWatermarkPanel(root);
         initPicturePanel(root);
+        initBitrateCtrlPanel(root);
         return root;
     }
 
