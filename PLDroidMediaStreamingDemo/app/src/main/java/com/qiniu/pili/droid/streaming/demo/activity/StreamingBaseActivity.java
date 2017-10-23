@@ -2,9 +2,10 @@ package com.qiniu.pili.droid.streaming.demo.activity;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Point;
 import android.hardware.Camera;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -172,6 +173,12 @@ public abstract class StreamingBaseActivity extends Activity implements
                 mLogContent += "IOERROR\n";
                 mStatusMsgContent = getString(R.string.string_state_ready);
                 setShutterButtonEnabled(true);
+                new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        startStreamingInternal();
+                    }
+                }, 2000);
                 break;
             case DISCONNECTED:
                 /**
