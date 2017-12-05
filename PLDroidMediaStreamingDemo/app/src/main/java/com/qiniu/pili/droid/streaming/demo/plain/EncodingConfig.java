@@ -47,4 +47,6 @@ public class EncodingConfig implements Serializable {
     public int mAudioQualityPreset;
     public int mAudioQualityCustomSampleRate;
     public int mAudioQualityCustomBitrate;
+
+    public StreamingProfile.YuvFilterMode mYuvFilterMode;
 }

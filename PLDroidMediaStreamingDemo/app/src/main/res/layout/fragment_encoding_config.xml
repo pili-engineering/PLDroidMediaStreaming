@@ -37,6 +37,24 @@
     </RadioGroup>
 
     <LinearLayout
+        android:id="@+id/yuv_filter_mode_panel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="YUV filter mode:" />
+
+        <Spinner
+            android:id="@+id/yuv_filter_mode_set"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/video_config_panel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

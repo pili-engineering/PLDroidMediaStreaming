@@ -244,6 +244,11 @@ public abstract class StreamingBaseActivity extends Activity implements
         return null;
     }
 
+    @Override
+    public int onPreviewFpsSelected(List<int[]> list) {
+        return -1;
+    }
+
     protected void setShutterButtonEnabled(final boolean enable) {
         runOnUiThread(new Runnable() {
             @Override
@@ -336,6 +341,7 @@ public abstract class StreamingBaseActivity extends Activity implements
             mProfile.setEncoderRCMode(mEncodingConfig.mVideoRateControlQuality ? StreamingProfile.EncoderRCModes.QUALITY_PRIORITY : StreamingProfile.EncoderRCModes.BITRATE_PRIORITY);
             mProfile.setBitrateAdjustMode(mEncodingConfig.mBitrateAdjustMode);
             mProfile.setFpsControllerEnable(mEncodingConfig.mVideoFPSControl);
+            mProfile.setYuvFilterMode(mEncodingConfig.mYuvFilterMode);
             if (mEncodingConfig.mBitrateAdjustMode == StreamingProfile.BitrateAdjustMode.Auto) {
                 mProfile.setVideoAdaptiveBitrateRange(mEncodingConfig.mAdaptiveBitrateMin * 1024, mEncodingConfig.mAdaptiveBitrateMax * 1024);
             }

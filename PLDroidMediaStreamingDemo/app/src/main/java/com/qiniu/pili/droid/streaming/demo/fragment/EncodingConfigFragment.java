@@ -122,6 +122,13 @@ public class EncodingConfigFragment extends ConfigFragment {
             WatermarkSetting.WATERMARK_LOCATION.SOUTH_WEST
     };
 
+    private static final String[] YUV_FILTER_MODE = {
+            "NONE",
+            "Linear",
+            "Bilinear",
+            "Box",
+    };
+
     private String mWatermarkFilePath;
     private String mPictureFilePath;
 
@@ -198,6 +205,10 @@ public class EncodingConfigFragment extends ConfigFragment {
             }
 
             encodingConfig.mVideoFPSControl = ((CheckBox) root.findViewById(R.id.fps_control)).isChecked();
+
+            // YUV filter mode
+            Spinner yuvFilterModeSpinner = (Spinner) root.findViewById(R.id.yuv_filter_mode_set);
+            encodingConfig.mYuvFilterMode  = StreamingProfile.YuvFilterMode.values()[yuvFilterModeSpinner.getSelectedItemPosition()];
 
             // watermark
             CheckBox cbWatermarkControl = (CheckBox) getView().findViewById(R.id.watermark_control);
@@ -360,6 +371,13 @@ public class EncodingConfigFragment extends ConfigFragment {
         });
     }
 
+    private void initYuvFilterModePanel(final View root) {
+        final Spinner yuvFilterModeSpinner = (Spinner) root.findViewById(R.id.yuv_filter_mode_set);
+        ArrayAdapter<String> data = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, YUV_FILTER_MODE);
+        yuvFilterModeSpinner.setAdapter(data);
+        yuvFilterModeSpinner.setSelection(1);
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -370,6 +388,7 @@ public class EncodingConfigFragment extends ConfigFragment {
         initWatermarkPanel(root);
         initPicturePanel(root);
         initBitrateCtrlPanel(root);
+        initYuvFilterModePanel(root);
         return root;
     }
 
