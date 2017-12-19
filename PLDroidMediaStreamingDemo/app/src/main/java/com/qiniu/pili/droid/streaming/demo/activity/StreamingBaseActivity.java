@@ -325,7 +325,8 @@ public abstract class StreamingBaseActivity extends Activity implements
                 vProfile = new StreamingProfile.VideoProfile(
                         mEncodingConfig.mVideoQualityCustomFPS,
                         mEncodingConfig.mVideoQualityCustomBitrate * 1024,
-                        mEncodingConfig.mVideoQualityCustomMaxKeyFrameInterval
+                        mEncodingConfig.mVideoQualityCustomMaxKeyFrameInterval,
+                        StreamingProfile.H264Profile.HIGH
                 );
             }
 
