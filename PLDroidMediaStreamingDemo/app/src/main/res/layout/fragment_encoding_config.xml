@@ -98,43 +98,65 @@
                 android:id="@+id/video_quality_custom_panel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:orientation="vertical"
                 android:visibility="gone">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="FPS:" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
 
-                <EditText
-                    android:id="@+id/video_quality_custom_fps"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:inputType="numberDecimal"
-                    android:text="30" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="FPS:" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Bitrate:" />
+                    <EditText
+                        android:id="@+id/video_quality_custom_fps"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:inputType="numberDecimal"
+                        android:text="20" />
 
-                <EditText
-                    android:id="@+id/video_quality_custom_bitrate"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:inputType="numberDecimal"
-                    android:text="1000" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Bitrate:" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Max key frame interval:" />
+                    <EditText
+                        android:id="@+id/video_quality_custom_bitrate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:inputType="numberDecimal"
+                        android:text="1000" />
 
-                <EditText
-                    android:id="@+id/video_quality_custom_max_key_frame_interval"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:inputType="numberDecimal"
-                    android:text="48" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Profile:" />
+
+                    <Spinner
+                        android:id="@+id/video_quality_custom_profile"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Max key frame interval:" />
+
+                    <EditText
+                        android:id="@+id/video_quality_custom_max_key_frame_interval"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:inputType="numberDecimal"
+                        android:text="60" />
+                </LinearLayout>
             </LinearLayout>
         </RelativeLayout>
 
@@ -434,6 +456,7 @@
                     android:text="0.5" />
             </LinearLayout>
         </LinearLayout>
+
         <LinearLayout
             android:id="@+id/picture_panel"
             android:layout_width="match_parent"
@@ -450,8 +473,8 @@
                 android:id="@+id/picture_preview"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:layout_margin="5dp"
                 android:layout_gravity="center_vertical"
+                android:layout_margin="5dp"
                 android:background="@android:color/darker_gray" />
         </LinearLayout>
     </LinearLayout>
