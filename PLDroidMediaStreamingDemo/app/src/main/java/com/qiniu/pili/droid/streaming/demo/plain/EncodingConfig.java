@@ -15,6 +15,7 @@ public class EncodingConfig implements Serializable {
     public int mVideoQualityCustomFPS;
     public int mVideoQualityCustomBitrate;
     public int mVideoQualityCustomMaxKeyFrameInterval;
+    public StreamingProfile.H264Profile mVideoQualityCustomProfile;
 
     public boolean mIsVideoSizePreset;
     public int mVideoSizePreset;

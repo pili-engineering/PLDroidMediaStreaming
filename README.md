@@ -23,10 +23,12 @@ PLDroidCameraStreaming 是一个适用于 Android 的 RTMP 直播推流 SDK，�
   - [x] 支持截帧功能
   - [x] 支持动态更改 Encoding Orientation
   - [x] 支持动态切换横竖屏
+  - [x] 支持动态水印
   - [x] 支持蓝牙麦克风
   - [x] 支持后台推流
   - [x] 支持双声道立体声
   - [x] 支持混音和返听
+  - [x] 支持 QUIC 推流
   - [x] 支持 ARM, ARMv7a, ARM64v8a, X86 主流芯片体系架构
   
 ## PLDroidCameraStreaming Wiki

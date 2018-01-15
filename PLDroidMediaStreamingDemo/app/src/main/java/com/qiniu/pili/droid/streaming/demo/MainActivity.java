@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
+import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -52,6 +53,7 @@ public class MainActivity extends FragmentActivity {
     private Spinner mInputTypeSpinner;
     private Spinner mStreamTypeSpinner;
     private CheckBox mDebugModeCheckBox;
+    private RadioButton mQuicPushButton;
 
     private EncodingConfigFragment mEncodingConfigFragment;
     private CameraConfigFragment mCameraConfigFragment;
@@ -93,6 +95,7 @@ public class MainActivity extends FragmentActivity {
             StreamingEnv.setLogLevel(Log.VERBOSE);
         }
 
+        boolean quicEnable = mQuicPushButton.isChecked();
         String streamText = mInputTextTV.getText().toString().trim();
         int streamType = isInputTypeJSON()
                 ? StreamingBaseActivity.INPUT_TYPE_JSON
@@ -102,6 +105,7 @@ public class MainActivity extends FragmentActivity {
         Intent intent = new Intent(this, ACTIVITY_CLASSES[pos]);
         intent.putExtra(StreamingBaseActivity.INPUT_TYPE, streamType);
         intent.putExtra(StreamingBaseActivity.INPUT_TEXT, streamText);
+        intent.putExtra(StreamingBaseActivity.TRANSFER_MODE_QUIC, quicEnable);
         intent.putExtras(mEncodingConfigFragment.getIntent());
         boolean bAudioStereo = ((CheckBox) findViewById(R.id.audio_channel_stereo)).isChecked();
         if (bAudioStereo) {
@@ -155,6 +159,7 @@ public class MainActivity extends FragmentActivity {
         mInputTypeSpinner = (Spinner) findViewById(R.id.stream_input_types);
         mStreamTypeSpinner = (Spinner) findViewById(R.id.stream_types);
         mDebugModeCheckBox = (CheckBox) findViewById(R.id.debug_mode);
+        mQuicPushButton = (RadioButton) findViewById(R.id.transfer_quic);
 
         mInputTextTV.setText(Cache.retrieveURL(this));
 

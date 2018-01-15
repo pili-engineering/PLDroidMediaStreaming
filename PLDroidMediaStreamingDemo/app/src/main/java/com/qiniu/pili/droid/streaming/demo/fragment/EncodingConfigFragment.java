@@ -78,6 +78,18 @@ public class EncodingConfigFragment extends ConfigFragment {
             VIDEO_QUALITY_HIGH3
     };
 
+    private static final String[] VIDEO_QUALITY_PROFILES = {
+            "HIGH",
+            "MAIN",
+            "BASELINE"
+    };
+
+    private static final StreamingProfile.H264Profile[] VIDEO_QUALITY_PROFILES_MAPPING = {
+            StreamingProfile.H264Profile.HIGH,
+            StreamingProfile.H264Profile.MAIN,
+            StreamingProfile.H264Profile.BASELINE
+    };
+
     private static final String[] AUDIO_QUALITY_PRESETS = {
             "LOW1(SampleRate:44.1kHZ, Bitrate:18kbps)",
             "LOW2(SampleRate:44.1kHZ, Bitrate:24kbps)",
@@ -180,6 +192,8 @@ public class EncodingConfigFragment extends ConfigFragment {
                 encodingConfig.mVideoQualityCustomFPS = Integer.parseInt(((EditText) root.findViewById(R.id.video_quality_custom_fps)).getText().toString());
                 encodingConfig.mVideoQualityCustomBitrate = Integer.parseInt(((EditText) root.findViewById(R.id.video_quality_custom_bitrate)).getText().toString());
                 encodingConfig.mVideoQualityCustomMaxKeyFrameInterval = Integer.parseInt(((EditText) root.findViewById(R.id.video_quality_custom_max_key_frame_interval)).getText().toString());
+                Spinner profileSpinner = (Spinner) root.findViewById(R.id.video_quality_custom_profile);
+                encodingConfig.mVideoQualityCustomProfile = VIDEO_QUALITY_PROFILES_MAPPING[profileSpinner.getSelectedItemPosition()];
             }
 
             // size
@@ -260,6 +274,11 @@ public class EncodingConfigFragment extends ConfigFragment {
         ArrayAdapter<String> data = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, VIDEO_QUALITY_PRESETS);
         presetSpinner.setAdapter(data);
         presetSpinner.setSelection(4);
+
+        Spinner profileSpinner = (Spinner) root.findViewById(R.id.video_quality_custom_profile);
+        data = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, VIDEO_QUALITY_PROFILES);
+        profileSpinner.setAdapter(data);
+        profileSpinner.setSelection(0);
 
         RadioGroup videoRadioGroup = (RadioGroup) root.findViewById(R.id.video_quality_radio_group);
         videoRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
