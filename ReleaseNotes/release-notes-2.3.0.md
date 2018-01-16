@@ -5,7 +5,7 @@
 ## 版本
 
 - 发布 pldroid-media-streaming-2.3.0.jar
-- 新增 libpuicclient.so
+- 新增 libpldroid_streaming_puic.so
 - 更新 libpldroid_mmprocessing.so
 - 更新 libpldroid_streaming_core.so
 
@@ -22,5 +22,5 @@
 
 ## 注意事项
 
-- 从 v2.3.0 版本开始，增加 libpuicclient.so 库
-- libpldroid_streaming_core.so 依赖于 libpuicclient.so，无论是否启用 QUIC 推流，都需要包含 libpuicclient.so 库
+- 从 v2.3.0 版本开始，增加 libpldroid_streaming_puic.so 库
+- libpldroid_streaming_core.so 依赖于 libpldroid_streaming_puic.so，无论是否启用 QUIC 推流，都需要包含 libpldroid_streaming_puic.so 库
