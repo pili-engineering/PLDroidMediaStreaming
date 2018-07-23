@@ -33,14 +33,14 @@ import com.qiniu.pili.droid.streaming.demo.utils.Util;
 
 import java.net.URI;
 import java.util.Arrays;
+import java.util.UUID;
 
 public class MainActivity extends FragmentActivity {
     private static final String TAG = "MainActivity";
 
-    private static final String GENERATE_STREAM_TEXT_V1 = "Your app server url which get StreamJson";
-    private static final String GENERATE_STREAM_TEXT_V2 = "Your app server url which get PublishUrl";
+    private static final String GENERATE_STREAM_TEXT = "http://api-demo.qnsdk.com/v1/live/stream/";
 
-    private static final String[] INPUT_TYPES = { "Authorized", "Unauthorized", "JSON" };
+    private static final String[] INPUT_TYPES = { "Authorized", "Unauthorized" };
     private static final String[] STREAM_TYPES = { "Video-Audio", "Audio", "Import", "Screen" };
     private static final Class[] ACTIVITY_CLASSES = {
             AVStreamingActivity.class,
@@ -63,10 +63,6 @@ public class MainActivity extends FragmentActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         mPermissionChecker.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    }
-
-    private boolean isInputTypeJSON() {
-        return mInputTypeSpinner.getSelectedItemPosition() == 2;
     }
 
     private boolean isInputTypeUnauthorized() {
@@ -97,13 +93,9 @@ public class MainActivity extends FragmentActivity {
 
         boolean quicEnable = mQuicPushButton.isChecked();
         String streamText = mInputTextTV.getText().toString().trim();
-        int streamType = isInputTypeJSON()
-                ? StreamingBaseActivity.INPUT_TYPE_JSON
-                : StreamingBaseActivity.INPUT_TYPE_URL;
 
         int pos = mStreamTypeSpinner.getSelectedItemPosition();
         Intent intent = new Intent(this, ACTIVITY_CLASSES[pos]);
-        intent.putExtra(StreamingBaseActivity.INPUT_TYPE, streamType);
         intent.putExtra(StreamingBaseActivity.INPUT_TEXT, streamText);
         intent.putExtra(StreamingBaseActivity.TRANSFER_MODE_QUIC, quicEnable);
         intent.putExtras(mEncodingConfigFragment.getIntent());
@@ -231,13 +223,13 @@ public class MainActivity extends FragmentActivity {
      * @return the publish URL
      */
     private String genPublishURL() {
-        String publishUrl = Util.syncRequest(isInputTypeJSON() ? GENERATE_STREAM_TEXT_V1 : GENERATE_STREAM_TEXT_V2);
+        String publishUrl = Util.syncRequest(GENERATE_STREAM_TEXT + UUID.randomUUID());
         if (publishUrl == null) {
-            Util.showToast(MainActivity.this, "Get publish GENERATE_STREAM_TEXT_V1 failed !!!");
+            Util.showToast(MainActivity.this, "Get publish GENERATE_STREAM_TEXT failed !!!");
             return null;
         }
         if (isInputTypeUnauthorized()) {
-            // make an unauthorized GENERATE_STREAM_TEXT_V1 for effect
+            // make an unauthorized GENERATE_STREAM_TEXT for effect
             try {
                 URI u = new URI(publishUrl);
                 publishUrl = String.format("rtmp://401.qbox.net%s?%s", u.getPath(), u.getRawQuery());

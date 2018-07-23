@@ -30,7 +30,7 @@ public class Util {
     public static String syncRequest(String appServerUrl) {
         try {
             HttpURLConnection httpConn = (HttpURLConnection) new URL(appServerUrl).openConnection();
-            httpConn.setRequestMethod("POST");
+            httpConn.setRequestMethod("GET");
             httpConn.setConnectTimeout(5000);
             httpConn.setReadTimeout(10000);
             int responseCode = httpConn.getResponseCode();
