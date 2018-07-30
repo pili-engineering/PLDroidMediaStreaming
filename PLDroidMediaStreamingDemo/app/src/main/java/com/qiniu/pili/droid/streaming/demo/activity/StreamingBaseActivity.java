@@ -25,9 +25,6 @@ import com.qiniu.pili.droid.streaming.StreamingState;
 import com.qiniu.pili.droid.streaming.StreamingStateChangedListener;
 import com.qiniu.pili.droid.streaming.demo.R;
 import com.qiniu.pili.droid.streaming.demo.plain.EncodingConfig;
-import com.qiniu.pili.droid.streaming.demo.utils.Util;
-
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -41,10 +38,6 @@ public abstract class StreamingBaseActivity extends Activity implements
         StreamingStateChangedListener,
         AudioSourceCallback {
     private static final String TAG = "StreamingBaseActivity";
-
-    public static final String INPUT_TYPE = "INPUT_TYPE";
-    public static final int INPUT_TYPE_URL = 0;
-    public static final int INPUT_TYPE_JSON = 1;
 
     public static final String INPUT_TEXT = "INPUT_TEXT";
     public static final String AUDIO_CHANNEL_STEREO = "AUDIO_CHANNEL_STEREO";
@@ -97,27 +90,14 @@ public abstract class StreamingBaseActivity extends Activity implements
 
         Intent intent = getIntent();
         String inputText = intent.getStringExtra(INPUT_TEXT);
-        int inputType = intent.getIntExtra(INPUT_TYPE, -1);
         boolean quicEnable = intent.getBooleanExtra(TRANSFER_MODE_QUIC, false);
         mProfile.setQuicEnable(quicEnable);
 
-        if (inputType == INPUT_TYPE_URL) {
-            // publish url
-            try {
-                mProfile.setPublishUrl(inputText);
-            } catch (URISyntaxException e) {
-                e.printStackTrace();
-            }
-        } else if (inputType == INPUT_TYPE_JSON) {
-            try {
-                JSONObject jsonObject = new JSONObject(inputText);
-                StreamingProfile.Stream stream = new StreamingProfile.Stream(jsonObject);
-                mProfile.setStream(stream);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } else {
-            Util.showToast(this, "Invalid Publish Url");
+        // publish url
+        try {
+            mProfile.setPublishUrl(inputText);
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
         }
         mAudioStereoEnable = intent.getBooleanExtra(AUDIO_CHANNEL_STEREO, false);
 
