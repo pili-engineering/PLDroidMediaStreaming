@@ -36,6 +36,8 @@ public class EncodingConfig implements Serializable {
     public boolean mIsWatermarkEnabled;
     public int mWatermarkAlpha;
     public WatermarkSetting.WATERMARK_SIZE mWatermarkSize;
+    public int mWatermarkCustomWidth;
+    public int mWatermarkCustomHeight;
     public boolean mIsWatermarkLocationPreset;
     public WatermarkSetting.WATERMARK_LOCATION mWatermarkLocationPreset;
     public float mWatermarkLocationCustomX;

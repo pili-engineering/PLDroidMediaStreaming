@@ -2,7 +2,6 @@ package com.qiniu.pili.droid.streaming.demo.activity;
 
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
-import android.graphics.Point;
 import android.hardware.Camera;
 import android.media.AudioFormat;
 import android.os.Build;
@@ -11,11 +10,14 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
@@ -23,6 +25,7 @@ import com.github.angads25.filepicker.controller.DialogSelectionListener;
 import com.github.angads25.filepicker.model.DialogConfigs;
 import com.github.angads25.filepicker.model.DialogProperties;
 import com.github.angads25.filepicker.view.FilePickerDialog;
+import com.qiniu.pili.droid.streaming.AVCodecType;
 import com.qiniu.pili.droid.streaming.CameraStreamingSetting;
 import com.qiniu.pili.droid.streaming.FrameCapturedCallback;
 import com.qiniu.pili.droid.streaming.MediaStreamingManager;
@@ -154,6 +157,7 @@ public class AVStreamingActivity extends StreamingBaseActivity implements
             microphoneStreamingSetting.setChannelConfig(AudioFormat.CHANNEL_IN_STEREO);
         }
         mMediaStreamingManager.prepare(mCameraStreamingSetting, microphoneStreamingSetting, buildWatermarkSetting(), mProfile);
+        mMediaStreamingManager.setAutoRefreshOverlay(true);
         if (mCameraConfig.mIsCustomFaceBeauty) {
             mMediaStreamingManager.setSurfaceTextureCallback(this);
         }
@@ -234,6 +238,9 @@ public class AVStreamingActivity extends StreamingBaseActivity implements
             }
             Log.i(TAG, "switchCamera:" + facingId);
             mMediaStreamingManager.switchCamera(facingId);
+
+            mIsEncodingMirror = mCameraConfig.mEncodingMirror;
+            mIsPreviewMirror = facingId == CameraStreamingSetting.CAMERA_FACING_ID.CAMERA_FACING_FRONT ? mCameraConfig.mPreviewMirror : false;
         }
     }
 
@@ -364,6 +371,9 @@ public class AVStreamingActivity extends StreamingBaseActivity implements
         watermarkSetting.setResourceId(R.drawable.qiniu_logo);
         watermarkSetting.setAlpha(mEncodingConfig.mWatermarkAlpha);
         watermarkSetting.setSize(mEncodingConfig.mWatermarkSize);
+        if (mEncodingConfig.mWatermarkCustomWidth != 0 || mEncodingConfig.mWatermarkCustomHeight != 0) {
+            watermarkSetting.setCustomSize(mEncodingConfig.mWatermarkCustomWidth, mEncodingConfig.mWatermarkCustomHeight);
+        }
         if (mEncodingConfig.mIsWatermarkLocationPreset) {
             watermarkSetting.setLocation(mEncodingConfig.mWatermarkLocationPreset);
         } else {
@@ -448,6 +458,7 @@ public class AVStreamingActivity extends StreamingBaseActivity implements
         Button previewMirrorBtn = (Button) findViewById(R.id.preview_mirror_btn);
         Button encodingMirrorBtn = (Button) findViewById(R.id.encoding_mirror_btn);
         Button picStreamingBtn = (Button) findViewById(R.id.pic_streaming_btn);
+        Button addOverlayBtn = (Button) findViewById(R.id.add_overlay_btn);
 
         mFaceBeautyBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -502,6 +513,25 @@ public class AVStreamingActivity extends StreamingBaseActivity implements
                 togglePictureStreaming();
             }
         });
+
+        if (mEncodingConfig.mCodecType == AVCodecType.HW_VIDEO_SURFACE_AS_INPUT_WITH_HW_AUDIO_CODEC ||
+                mEncodingConfig.mCodecType == AVCodecType.HW_VIDEO_SURFACE_AS_INPUT_WITH_SW_AUDIO_CODEC ||
+                mEncodingConfig.mCodecType == AVCodecType.HW_VIDEO_WITH_HW_AUDIO_CODEC ||
+                mEncodingConfig.mCodecType == AVCodecType.HW_VIDEO_CODEC) {
+            addOverlayBtn.setVisibility(View.VISIBLE);
+            addOverlayBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ImageView imageOverlay = new ImageView(AVStreamingActivity.this);
+                    imageOverlay.setImageResource(R.drawable.qiniu_logo);
+                    imageOverlay.setOnTouchListener(new ViewTouchListener(imageOverlay));
+                    ((FrameLayout) findViewById(R.id.content)).addView(imageOverlay, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT));
+
+                    mMediaStreamingManager.addOverlay(imageOverlay);
+                    Toast.makeText(AVStreamingActivity.this, "双击删除贴图!", Toast.LENGTH_LONG).show();
+                }
+            });
+        }
 
         mTorchBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -585,6 +615,85 @@ public class AVStreamingActivity extends StreamingBaseActivity implements
 
         initButtonText();
         initAudioMixerPanel();
+    }
+
+    private class ViewTouchListener implements View.OnTouchListener {
+        private float lastTouchRawX;
+        private float lastTouchRawY;
+        private boolean scale;
+        private View mView;
+
+        public ViewTouchListener(View view) {
+            mView = view;
+        }
+
+        GestureDetector.SimpleOnGestureListener simpleOnGestureListener = new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onDoubleTap(MotionEvent e) {
+                ((FrameLayout) findViewById(R.id.content)).removeView(mView);
+                mMediaStreamingManager.removeOverlay(mView);
+                return true;
+            }
+
+            @Override
+            public boolean onSingleTapConfirmed(MotionEvent e) {
+                return true;
+            }
+        };
+
+        final GestureDetector gestureDetector = new GestureDetector(AVStreamingActivity.this, simpleOnGestureListener);
+
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            if (gestureDetector.onTouchEvent(event)) {
+                return true;
+            }
+
+            int action = event.getAction();
+            float touchRawX = event.getRawX();
+            float touchRawY = event.getRawY();
+            float touchX = event.getX();
+            float touchY = event.getY();
+
+            if (action == MotionEvent.ACTION_DOWN) {
+                boolean xOK = touchX >= v.getWidth() * 3 / 4 && touchX <= v.getWidth();
+                boolean yOK = touchY >= v.getHeight() * 2 / 4 && touchY <= v.getHeight();
+                scale = xOK && yOK;
+            }
+
+            if (action == MotionEvent.ACTION_MOVE) {
+                float deltaRawX = touchRawX - lastTouchRawX;
+                float deltaRawY = touchRawY - lastTouchRawY;
+
+                if (scale) {
+                    // rotate
+                    float centerX = v.getX() + (float) v.getWidth() / 2;
+                    float centerY = v.getY() + (float) v.getHeight() / 2;
+                    double angle = Math.atan2(touchRawY - centerY, touchRawX - centerX) * 180 / Math.PI;
+                    v.setRotation((float) angle - 45);
+
+                    // scale
+                    float xx = (touchRawX >= centerX ? deltaRawX : -deltaRawX);
+                    float yy = (touchRawY >= centerY ? deltaRawY : -deltaRawY);
+                    float sf = (v.getScaleX() + xx / v.getWidth() + v.getScaleY() + yy / v.getHeight()) / 2;
+                    v.setScaleX(sf);
+                    v.setScaleY(sf);
+                } else {
+                    // translate
+                    v.setTranslationX(v.getTranslationX() + deltaRawX);
+                    v.setTranslationY(v.getTranslationY() + deltaRawY);
+                }
+            }
+
+            if (action == MotionEvent.ACTION_UP) {
+//                当 mMediaStreamingManager.setAutoRefreshOverlay(false) 时自动刷新关闭，建议在 UP 事件里进行手动刷新。
+//                mMediaStreamingManager.refreshOverlay(v, false);
+            }
+
+            lastTouchRawX = touchRawX;
+            lastTouchRawY = touchRawY;
+            return true;
+        }
     }
 
     private void initButtonText() {

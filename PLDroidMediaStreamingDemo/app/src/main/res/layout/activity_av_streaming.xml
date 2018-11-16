@@ -76,6 +76,14 @@
             android:text="Picture\nStreaming"
             android:textColor="@color/pldroid_streaming_white" />
 
+        <Button
+            android:id="@+id/add_overlay_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add\nOverlay"
+            android:textColor="@color/pldroid_streaming_white"
+            android:visibility="gone" />
+
     </LinearLayout>
 
     <LinearLayout

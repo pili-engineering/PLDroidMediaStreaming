@@ -233,6 +233,8 @@ public class EncodingConfigFragment extends ConfigFragment {
                 encodingConfig.mWatermarkAlpha = Integer.parseInt(((EditText) root.findViewById(R.id.watermark_alpha)).getText().toString());
                 Spinner sizeSpinner = (Spinner) root.findViewById(R.id.watermark_size_presets);
                 encodingConfig.mWatermarkSize = WATERMARK_SIZE_PRESETS_MAPPING[sizeSpinner.getSelectedItemPosition()];
+                encodingConfig.mWatermarkCustomWidth = Integer.parseInt(((EditText)root.findViewById(R.id.watermark_custom_width)).getText().toString().trim());
+                encodingConfig.mWatermarkCustomHeight = Integer.parseInt(((EditText)root.findViewById(R.id.watermark_custom_height)).getText().toString().trim());
                 encodingConfig.mIsWatermarkLocationPreset = ((RadioButton) root.findViewById(R.id.watermark_location_preset)).isChecked();
                 if (encodingConfig.mIsWatermarkLocationPreset) {
                     Spinner presetSpinner = (Spinner) root.findViewById(R.id.watermark_location_presets);
