@@ -38,7 +38,7 @@ import java.util.UUID;
 public class MainActivity extends FragmentActivity {
     private static final String TAG = "MainActivity";
 
-    private static final String GENERATE_STREAM_TEXT = "http://api-demo.qnsdk.com/v1/live/stream/";
+    private static final String GENERATE_STREAM_TEXT = "https://api-demo.qnsdk.com/v1/live/stream/";
 
     private static final String[] INPUT_TYPES = { "Authorized", "Unauthorized" };
     private static final String[] STREAM_TYPES = { "Video-Audio", "Audio", "Import", "Screen" };
