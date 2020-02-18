@@ -5,9 +5,9 @@
 ## 版本
 
 - 发布 pldroid-media-streaming-2.2.2.jar
-- 更新 libpldroid\_streaming\_amix.so
-- 更新 libpldroid\_streaming\_core.so
-- 更新 libpldroid\_mmprocessing.so
+- 更新 libpldroid_streaming_amix.so
+- 更新 libpldroid_streaming_core.so
+- 更新 libpldroid_mmprocessing.so
 
 ## 功能
 

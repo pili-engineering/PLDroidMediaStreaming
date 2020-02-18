@@ -14,6 +14,7 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
 
     <uses-feature android:name="android.hardware.camera.autofocus" />
     <uses-feature
@@ -64,6 +65,7 @@
         <activity
             android:name="com.qiniu.pili.droid.streaming.screen.ScreenCaptureRequestActivity"
             android:theme="@android:style/Theme.Translucent.NoTitleBar"></activity>
+        <service android:name=".service.KeepAppAliveService" />
     </application>
 
 </manifest>
