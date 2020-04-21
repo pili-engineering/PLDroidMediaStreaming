@@ -186,6 +186,9 @@ public abstract class StreamingBaseActivity extends Activity implements
                 Log.e(TAG, "Unauthorized streaming url:" + extra);
                 mLogContent += "Unauthorized Url\n";
                 break;
+            case UNAUTHORIZED_PACKAGE:
+                mLogContent += "Unauthorized package\n";
+                break;
         }
         runOnUiThread(new Runnable() {
             @Override

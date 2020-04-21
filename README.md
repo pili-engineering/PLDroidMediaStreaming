@@ -42,6 +42,12 @@ PLDroidCameraStreaming 是一个适用于 Android 的 RTMP 直播推流 SDK，�
 - 系统要求：Android 4.0.3(API 15) 及其以上
 
 ## 版本升级须知
+
+### v3.0.0
+- **从 v3.0.0 版本开始，七牛直播推流 SDK 需要先获取授权才能使用。授权分为试用版和正式版，可通过 400-808-9176 转 2 号线联系七牛商务咨询，或者 [通过工单](https://support.qiniu.com/?ref=developer.qiniu.com) 联系七牛的技术支持。**
+- **v3.0.0 之前的版本不受影响，请继续放心使用。**
+- **老客户升级 v3.0.0 版本之前，请先联系七牛获取相应授权，以免发生鉴权不通过的现象。**
+
 ### v2.3.0
 - 从 v2.3.0 版本开始，增加 libpldroid_streaming_puic.so 库
 - libpldroid_streaming_core.so 依赖于 libpldroid_streaming_puic.so，无论是否启用 QUIC 推流，都需要包含 libpldroid_streaming_puic.so 库
