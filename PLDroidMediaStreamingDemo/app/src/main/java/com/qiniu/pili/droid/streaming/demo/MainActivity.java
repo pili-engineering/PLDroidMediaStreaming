@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
+import com.qiniu.pili.droid.streaming.PLAuthenticationResultCallback;
 import com.qiniu.pili.droid.streaming.StreamingEnv;
 import com.qiniu.pili.droid.streaming.demo.activity.AVStreamingActivity;
 import com.qiniu.pili.droid.streaming.demo.activity.AudioStreamingActivity;
@@ -107,6 +108,23 @@ public class MainActivity extends FragmentActivity {
             intent.putExtras(mCameraConfigFragment.getIntent());
         }
         startActivity(intent);
+    }
+
+    public void onClickCheckAuth(View v) {
+        StreamingEnv.checkAuthentication(new PLAuthenticationResultCallback() {
+            @Override
+            public void onAuthorizationResult(int result) {
+                String authState;
+                if (result == PLAuthenticationResultCallback.UnCheck) {
+                    authState = "UnCheck";
+                } else if (result == PLAuthenticationResultCallback.UnAuthorized) {
+                    authState = "UnAuthorized";
+                } else {
+                    authState = "Authorized";
+                }
+                Toast.makeText(MainActivity.this, "auth : " + authState, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void initInputTypeSpinner() {
