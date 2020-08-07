@@ -15,7 +15,12 @@ import android.widget.Spinner;
 import com.qiniu.pili.droid.streaming.CameraStreamingSetting;
 import com.qiniu.pili.droid.streaming.demo.R;
 import com.qiniu.pili.droid.streaming.demo.plain.CameraConfig;
+import com.qiniu.pili.droid.streaming.demo.utils.Config;
 
+/**
+ * 相机采集配置项 Fragment，仅用作 demo 中获取配置信息，后续在推流初始化时传递给 SDK 内部使用
+ * 此 Fragment 为非必须的，您可以根据您的产品定义自行决定配置信息的配置方式
+ */
 public class CameraConfigFragment extends ConfigFragment {
     private static final String[] PREVIEW_SIZE_LEVEL_PRESETS = {
             "SMALL",
@@ -54,7 +59,7 @@ public class CameraConfigFragment extends ConfigFragment {
     @Override
     public Intent getIntent() {
         Intent data = new Intent();
-        data.putExtra("CameraConfig", buildCameraConfig());
+        data.putExtra(Config.NAME_CAMERA_CONFIG, buildCameraConfig());
         return data;
     }
 

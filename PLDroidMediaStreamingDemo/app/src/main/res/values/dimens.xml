@@ -5,7 +5,7 @@
 
     <dimen name="pldroid_streaming_activity_horizontal_margin">0dp</dimen>
     <dimen name="pldroid_streaming_activity_vertical_margin">0dp</dimen>
-    <dimen name="pldroid_streaming_item_padding">12dp</dimen>
+    <dimen name="pldroid_streaming_item_padding">24dp</dimen>
     <dimen name="pldroid_streaming_ring_size">72dp</dimen>
     <dimen name="pldroid_streaming_ring_width">6dip</dimen>
     <dimen name="pldroid_streaming_square_corner_radius">8dip</dimen>

@@ -31,46 +31,34 @@
                 android:layout_marginBottom="2dp"
                 android:background="#000" />
 
-            <EditText
-                android:id="@+id/input_url"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="You could paste publish URL here :)"
-                android:singleLine="true" />
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Stream input type:" />
-
-                <Spinner
-                    android:id="@+id/stream_input_types"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"></Spinner>
-
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:onClick="onClickGenPublishURL"
-                    android:text="GEN" />
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
                 android:layout_marginTop="2dp"
                 android:layout_marginBottom="2dp"
-                android:background="#000" />
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/input_url"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="8"
+                    android:hint="You could paste publish URL here :)"
+                    android:singleLine="true" />
+
+                <Button
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:onClick="onClickGenPublishURL"
+                    android:text="New" />
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="2dp"
                 android:orientation="horizontal">
 
                 <TextView
@@ -206,10 +194,20 @@
         android:orientation="horizontal">
 
         <Button
+            android:id="@+id/copy_play_url"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="12sp"
+            android:onClick="onClickCopyPlayUrl"
+            android:text="PLAY URL" />
+
+        <Button
             android:id="@+id/reauth_btn"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:textSize="12sp"
             android:onClick="onClickCheckAuth"
             android:text="Auth" />
 
@@ -218,6 +216,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="1"
+            android:textSize="12sp"
             android:onClick="scanQRCode"
             android:text="QR Code" />
 
@@ -226,6 +225,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="1"
+            android:textSize="12sp"
             android:onClick="launchStreaming"
             android:text="LAUNCH" />
     </LinearLayout>

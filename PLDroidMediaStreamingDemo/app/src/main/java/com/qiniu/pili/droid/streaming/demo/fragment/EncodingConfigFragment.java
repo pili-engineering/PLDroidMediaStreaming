@@ -26,6 +26,7 @@ import com.qiniu.pili.droid.streaming.StreamingProfile;
 import com.qiniu.pili.droid.streaming.WatermarkSetting;
 import com.qiniu.pili.droid.streaming.demo.R;
 import com.qiniu.pili.droid.streaming.demo.plain.EncodingConfig;
+import com.qiniu.pili.droid.streaming.demo.utils.Config;
 
 import java.io.File;
 
@@ -45,7 +46,19 @@ import static com.qiniu.pili.droid.streaming.StreamingProfile.VIDEO_QUALITY_MEDI
 import static com.qiniu.pili.droid.streaming.StreamingProfile.VIDEO_QUALITY_MEDIUM2;
 import static com.qiniu.pili.droid.streaming.StreamingProfile.VIDEO_QUALITY_MEDIUM3;
 
+/**
+ * 推流编码配置项 Fragment，仅用作 demo 中获取配置信息，后续在推流初始化时配置 StreamingProfile
+ * 此 Fragment 为非必须的，您可以根据您的产品定义自行决定配置信息的配置方式
+ */
 public class EncodingConfigFragment extends ConfigFragment {
+    private static final int DEFAULT_VIDEO_QUALITY_POS = 6;
+    private static final int DEFAULT_AUDIO_QUALITY_POS = 3;
+    private static final int DEFAULT_H264_PROFILE_POS = 2;
+    private static final int DEFAULT_VIDEO_ENCODE_SIZE_POS = 1;
+    private static final int DEFAULT_WATERMARK_SIZE_POS = 1;
+    private static final int DEFAULT_WATERMARK_LOCATION_POS = 2;
+    private static final int DEFAULT_YUV_FILTER_MODE_POS = 1;
+
     private static final String[] VIDEO_SIZE_PRESETS = {
             "240p(320x240 (4:3), 424x240 (16:9))",
             "480p(640x480 (4:3), 848x480 (16:9))",
@@ -144,6 +157,27 @@ public class EncodingConfigFragment extends ConfigFragment {
     private String mWatermarkFilePath;
     private String mPictureFilePath;
 
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View root = inflater.inflate(R.layout.fragment_encoding_config, null);
+        initVideoQualityPanel(root);
+        initVideoSizePanel(root);
+        initAudioQualityPanel(root);
+        initWatermarkPanel(root);
+        initPicturePanel(root);
+        initBitrateCtrlPanel(root);
+        initYuvFilterModePanel(root);
+        return root;
+    }
+
+    @Override
+    public Intent getIntent() {
+        Intent data = new Intent();
+        data.putExtra(Config.NAME_ENCODING_CONFIG, buildEncodingConfig());
+        return data;
+    }
+
     public void forceCustomVideoEncodingSize(boolean enable) {
         getView().findViewById(R.id.video_size_preset).setEnabled(!enable);
         if (enable) {
@@ -165,6 +199,11 @@ public class EncodingConfigFragment extends ConfigFragment {
         pictureConfigPanel.setVisibility(enable ? View.VISIBLE : View.GONE);
     }
 
+    /**
+     * 根据所选配置生成 EncodingConfig，用来保存配置信息
+     *
+     * @return 配置信息实体类实例
+     */
     private EncodingConfig buildEncodingConfig() {
         EncodingConfig encodingConfig = new EncodingConfig();
 
@@ -264,23 +303,16 @@ public class EncodingConfigFragment extends ConfigFragment {
         return encodingConfig;
     }
 
-    @Override
-    public Intent getIntent() {
-        Intent data = new Intent();
-        data.putExtra("EncodingConfig", buildEncodingConfig());
-        return data;
-    }
-
     private void initVideoQualityPanel(final View root) {
         final Spinner presetSpinner = (Spinner) root.findViewById(R.id.video_quality_presets);
         ArrayAdapter<String> data = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, VIDEO_QUALITY_PRESETS);
         presetSpinner.setAdapter(data);
-        presetSpinner.setSelection(4);
+        presetSpinner.setSelection(DEFAULT_VIDEO_QUALITY_POS);
 
         Spinner profileSpinner = (Spinner) root.findViewById(R.id.video_quality_custom_profile);
         data = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, VIDEO_QUALITY_PROFILES);
         profileSpinner.setAdapter(data);
-        profileSpinner.setSelection(0);
+        profileSpinner.setSelection(DEFAULT_H264_PROFILE_POS);
 
         RadioGroup videoRadioGroup = (RadioGroup) root.findViewById(R.id.video_quality_radio_group);
         videoRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
@@ -297,7 +329,7 @@ public class EncodingConfigFragment extends ConfigFragment {
         final Spinner presetSpinner = (Spinner) root.findViewById(R.id.video_size_presets);
         ArrayAdapter<String> data = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, VIDEO_SIZE_PRESETS);
         presetSpinner.setAdapter(data);
-        presetSpinner.setSelection(1);
+        presetSpinner.setSelection(DEFAULT_VIDEO_ENCODE_SIZE_POS);
 
         RadioGroup videoRadioGroup = (RadioGroup) root.findViewById(R.id.video_size_radio_group);
         videoRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
@@ -314,7 +346,7 @@ public class EncodingConfigFragment extends ConfigFragment {
         final Spinner presetSpinner = (Spinner) root.findViewById(R.id.audio_quality_presets);
         ArrayAdapter<String> data = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, AUDIO_QUALITY_PRESETS);
         presetSpinner.setAdapter(data);
-        presetSpinner.setSelection(3);
+        presetSpinner.setSelection(DEFAULT_AUDIO_QUALITY_POS);
 
         RadioGroup audioGroup = (RadioGroup) root.findViewById(R.id.audio_quality_radio_group);
         audioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
@@ -331,12 +363,12 @@ public class EncodingConfigFragment extends ConfigFragment {
         Spinner presetSpinner = (Spinner) root.findViewById(R.id.watermark_size_presets);
         ArrayAdapter<String> data = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, WATERMARK_SIZE_PRESETS);
         presetSpinner.setAdapter(data);
-        presetSpinner.setSelection(1);
+        presetSpinner.setSelection(DEFAULT_WATERMARK_SIZE_POS);
 
         final Spinner locationSpinner = (Spinner) root.findViewById(R.id.watermark_location_presets);
         data = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, WATERMARK_LOCATION_PRESETS);
         locationSpinner.setAdapter(data);
-        locationSpinner.setSelection(2);
+        locationSpinner.setSelection(DEFAULT_WATERMARK_LOCATION_POS);
 
         RadioGroup watermarkGroup = (RadioGroup) root.findViewById(R.id.watermark_location_radio_group);
         watermarkGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
@@ -396,21 +428,6 @@ public class EncodingConfigFragment extends ConfigFragment {
         final Spinner yuvFilterModeSpinner = (Spinner) root.findViewById(R.id.yuv_filter_mode_set);
         ArrayAdapter<String> data = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, YUV_FILTER_MODE);
         yuvFilterModeSpinner.setAdapter(data);
-        yuvFilterModeSpinner.setSelection(1);
+        yuvFilterModeSpinner.setSelection(DEFAULT_YUV_FILTER_MODE_POS);
     }
-
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.fragment_encoding_config, null);
-        initVideoQualityPanel(root);
-        initVideoSizePanel(root);
-        initAudioQualityPanel(root);
-        initWatermarkPanel(root);
-        initPicturePanel(root);
-        initBitrateCtrlPanel(root);
-        initYuvFilterModePanel(root);
-        return root;
-    }
-
 }

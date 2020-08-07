@@ -6,6 +6,10 @@ import com.qiniu.pili.droid.streaming.WatermarkSetting;
 
 import java.io.Serializable;
 
+/**
+ * 保存所选择的推流配置信息，仅在 demo 上用来保存配置信息
+ * 此类为非必须的，您可以根据您的产品定义自行决定配置信息的保存方式
+ */
 public class EncodingConfig implements Serializable {
     public AVCodecType mCodecType;
     public boolean mIsAudioOnly;

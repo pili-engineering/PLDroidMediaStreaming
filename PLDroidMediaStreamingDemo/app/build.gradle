@@ -1,15 +1,15 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
     buildToolsVersion '28.0.3'
 
     defaultConfig {
         applicationId "com.qiniu.pili.droid.streaming.demo"
         minSdkVersion 16
-        targetSdkVersion 28
-        versionCode 70
-        versionName "3.0.0"
+        targetSdkVersion 29
+        versionCode 71
+        versionName "3.0.1"
     }
     buildTypes {
         release {
@@ -20,10 +20,19 @@ android {
 }
 
 dependencies {
+    // 文件选择 jar 包，非必须
     implementation 'com.github.angads25:filepicker:1.0.6'
-    implementation 'com.qiniu:happy-dns:0.2.8'
+    // dns 相关 jar 包，若无需自定义 DNS 配置，则无需依赖
+    implementation 'com.qiniu:happy-dns:0.2.16'
+    // 扫码相关 jar 包，非必须
     implementation 'com.journeyapps:zxing-android-embedded:3.0.2@aar'
     implementation 'com.google.zxing:core:3.2.0'
     implementation 'com.android.support:appcompat-v7:28.0.0'
-    implementation files('libs/pldroid-media-streaming-3.0.0.jar')
+
+    if (buildWithCameraStreamingLibrary) {
+        implementation project(':library')
+    } else {
+        // 推流 SDK jar 包，为推流 SDK 必须依赖的库
+        implementation files('libs/pldroid-media-streaming-3.0.1.jar')
+    }
 }
