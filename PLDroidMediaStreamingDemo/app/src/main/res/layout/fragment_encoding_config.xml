@@ -20,13 +20,13 @@
             android:id="@+id/encoding_sw"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:checked="true"
             android:text="SW" />
 
         <RadioButton
             android:id="@+id/encoding_hw"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:checked="true"
             android:text="HW" />
 
         <RadioButton
@@ -323,7 +323,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:inputType="numberDecimal"
-                android:text="150" />
+                android:text="800" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -335,7 +335,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:inputType="numberDecimal"
-                android:text="800" />
+                android:text="1500" />
 
             <TextView
                 android:layout_width="wrap_content"

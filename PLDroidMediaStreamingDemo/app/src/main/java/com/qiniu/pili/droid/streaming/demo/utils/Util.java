@@ -1,11 +1,21 @@
 package com.qiniu.pili.droid.streaming.demo.utils;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Build;
 import android.widget.Toast;
 
+import com.qiniu.android.dns.DnsManager;
+import com.qiniu.android.dns.IResolver;
+import com.qiniu.android.dns.NetworkInfo;
+import com.qiniu.android.dns.http.DnspodFree;
+import com.qiniu.android.dns.local.AndroidDnsServer;
+import com.qiniu.android.dns.local.Resolver;
+
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.InetAddress;
 import java.net.URL;
 
 public class Util {
@@ -18,11 +28,15 @@ public class Util {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2;
     }
 
-    public static void showToast(final Activity activity, final String msg) {
+    public static void showToast(Activity activity, String msg) {
+        showToast(activity, msg, Toast.LENGTH_SHORT);
+    }
+
+    public static void showToast(final Activity activity, final String msg, final int duration) {
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(activity, msg, Toast.LENGTH_LONG).show();
+                Toast.makeText(activity, msg, duration).show();
             }
         });
     }
@@ -54,5 +68,23 @@ public class Util {
             e.printStackTrace();
         }
         return null;
+    }
+
+    /**
+     * 配置自定义 DNS 服务器，非必须
+     *
+     * 注意：基于 114 dns 解析的不确定性，使用该解析可能会导致解析的网络 ip 无法做到最大的优化策略，进而出现推流质量不佳的现象。
+     * 因此如果您希望配置 DNS 服务器的话，建议使用非 114 dns 解析
+     */
+    public static DnsManager getMyDnsManager(Context context) {
+        IResolver r0 = null;
+        IResolver r1 = new DnspodFree();
+        IResolver r2 = AndroidDnsServer.defaultResolver(context);
+        try {
+            r0 = new Resolver(InetAddress.getByName("119.29.29.29"));
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        return new DnsManager(NetworkInfo.normal, new IResolver[]{r0, r1, r2});
     }
 }

@@ -4,7 +4,9 @@
     android:layout_height="wrap_content"
     android:layout_width="wrap_content"
     android:layout_centerInParent="true">
-    <View android:id="@+id/focus_indicator"
-        android:layout_height="120dp"
-        android:layout_width="120dp"/>
+
+    <View
+        android:id="@+id/focus_indicator"
+        android:layout_width="80dp"
+        android:layout_height="80dp" />
 </com.qiniu.pili.droid.streaming.demo.ui.FocusIndicatorRotateLayout>

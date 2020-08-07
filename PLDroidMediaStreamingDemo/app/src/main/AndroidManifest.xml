@@ -14,7 +14,7 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <uses-feature android:name="android.hardware.camera.autofocus" />
     <uses-feature
@@ -25,6 +25,7 @@
         android:name=".StreamingApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
+        android:requestLegacyExternalStorage="true"
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
         <activity
@@ -42,30 +43,37 @@
             android:name=".activity.AVStreamingActivity"
             android:configChanges="orientation|screenSize"
             android:theme="@android:style/Theme.Holo.Light.NoActionBar"
-            android:windowSoftInputMode="stateAlwaysHidden|adjustResize"></activity>
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize" />
 
         <!--android:theme="@android:style/Theme.Holo.Light.NoActionBar.Fullscreen" >-->
         <activity
             android:name=".activity.AudioStreamingActivity"
             android:label="@string/title_activity_audio_streaming"
-            android:theme="@android:style/Theme.Holo.Light.NoActionBar"></activity>
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar" />
 
         <activity
             android:name=".activity.ScreenStreamingActivity"
             android:configChanges="orientation|screenSize"
+            android:launchMode="singleTop"
             android:theme="@android:style/Theme.Holo.Light.NoActionBar"
-            android:windowSoftInputMode="stateAlwaysHidden|adjustResize"></activity>
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize" />
 
         <activity
             android:name=".activity.ImportStreamingActivity"
             android:configChanges="orientation|screenSize"
             android:theme="@android:style/Theme.Holo.Light.NoActionBar"
-            android:windowSoftInputMode="stateAlwaysHidden|adjustResize"></activity>
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize" />
 
         <activity
             android:name="com.qiniu.pili.droid.streaming.screen.ScreenCaptureRequestActivity"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar"></activity>
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+
         <service android:name=".service.KeepAppAliveService" />
+
+        <service
+            android:name="com.qiniu.pili.droid.streaming.screen.ScreenRecordService"
+            android:enabled="true"
+            android:foregroundServiceType="mediaProjection" />
     </application>
 
 </manifest>

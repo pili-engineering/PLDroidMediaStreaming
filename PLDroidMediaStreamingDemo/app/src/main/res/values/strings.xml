@@ -19,27 +19,21 @@
     <string name="string_state_con_timeout">CONNECTION TIMEOUT</string>
     <string name="title_activity_audio_streaming">AudioStreamingActivity</string>
 
-    <string name="flash_light_on">ON</string>
-    <string name="flash_light_off">OFF</string>
-
-    <string name="cd_et_input_url">cd_et_input_url</string>
-    <string name="cd_btn_hw_codec">cd_btn_hw_codec</string>
-    <string name="cd_btn_sw_codec">cd_btn_sw_codec</string>
-    <string name="cd_btn_pure_audio">cd_btn_pure_audio</string>
-    <string name="cd_tv_version_info">cd_tv_version_info</string>
-    <string name="cd_tv_log_info">cd_tv_log_info</string>
-    <string name="cd_et_input_method">cd_et_input_method</string>
-    <string name="cd_btn_camera_switcher">cd_btn_camera_switcher</string>
-    <string name="cd_tv_stream_status">cd_tv_stream_status</string>
-    <string name="cd_btn_torch">cd_btn_torch</string>
-    <string name="cd_btn_capture">cd_btn_capture</string>
-    <string name="cd_btn_orientation">cd_btn_orientation</string>
-    <string name="cd_btn_mute">cd_btn_mute</string>
-    <string name="cd_btn_fb">cd_btn_fb</string>
-    <string name="cd_tv_streaming_state_hint">cd_tv_streaming_state_hint</string>
-    <string name="cd_shutter_button">cd_shutter_button</string>
-    <string name="cd_btn_screen_recorder">cd_btn_screen_recorder</string>
-    <string name="cd_btn_ext_cap">cd_btn_ext_cap</string>
-    <string name="cd_preview_mirror">cd_preview_mirror</string>
-    <string name="cd_encoding_mirror">cd_encoding_mirror</string>
+    <string name="invisible_control_view">隐藏控件</string>
+    <string name="visible_control_view">显示控件</string>
+    <string name="preview_mirror">预览镜像</string>
+    <string name="encoding_mirror">编码镜像</string>
+    <string name="mute_audio">静音</string>
+    <string name="unmute_audio">取消静音</string>
+    <string name="face_beauty_on">打开美颜</string>
+    <string name="face_beauty_off">关闭美颜</string>
+    <string name="audio_mix_panel">混音面板</string>
+    <string name="picture_streaming">图片推流</string>
+    <string name="port_orientation_streaming">竖屏推流</string>
+    <string name="land_orientation_streaming">横屏推流</string>
+    <string name="capture_frame">截帧</string>
+    <string name="add_overlay">添加贴纸</string>
+    <string name="send_sei">发送 SEI</string>
+    <string name="flash_light_on">打开闪光灯</string>
+    <string name="flash_light_off">关闭闪光灯</string>
 </resources>

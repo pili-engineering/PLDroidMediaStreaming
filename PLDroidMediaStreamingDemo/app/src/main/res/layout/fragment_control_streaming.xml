@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/picture_streaming_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitXY"
+        android:visibility="gone" />
+
+    <ImageButton
+        android:id="@+id/camera_switch_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|top"
+        android:layout_marginTop="24dp"
+        android:background="@color/pldroid_streaming_transparent"
+        android:src="@drawable/ic_switch_camera" />
+
+    <include
+        layout="@layout/status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left|top" />
+
+    <Button
+        android:id="@+id/control_view_btn"
+        style="@style/actionButton"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_marginTop="18dp"
+        android:layout_marginRight="12dp"
+        android:text="@string/visible_control_view" />
+
+    <ScrollView
+        android:id="@+id/control_view"
+        android:layout_width="100dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="end"
+        android:layout_marginTop="72dp"
+        android:layout_marginRight="12dp"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/preview_mirror_btn"
+                style="@style/actionButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/preview_mirror" />
+
+            <Button
+                android:id="@+id/encoding_mirror_btn"
+                style="@style/actionButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/encoding_mirror" />
+
+            <Button
+                android:id="@+id/mix_panel_btn"
+                style="@style/actionButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/audio_mix_panel" />
+
+            <Button
+                android:id="@+id/pic_streaming_btn"
+                style="@style/actionButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/picture_streaming" />
+
+            <Button
+                android:id="@+id/capture_btn"
+                style="@style/actionButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/capture_frame" />
+
+            <Button
+                android:id="@+id/orientation_btn"
+                style="@style/actionButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/land_orientation_streaming" />
+
+            <Button
+                android:id="@+id/torch_btn"
+                style="@style/actionButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/flash_light_on" />
+
+            <Button
+                android:id="@+id/mute_btn"
+                style="@style/actionButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/mute_audio" />
+
+            <Button
+                android:id="@+id/fb_btn"
+                style="@style/actionButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/face_beauty_off" />
+
+            <Button
+                android:id="@+id/send_sei_btn"
+                style="@style/actionButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/send_sei" />
+
+            <Button
+                android:id="@+id/add_overlay_btn"
+                style="@style/actionButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/add_overlay"
+                android:visibility="gone" />
+        </LinearLayout>
+    </ScrollView>
+
+    <SeekBar
+        android:id="@+id/beauty_level_seekBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="100dp"
+        android:max="100"
+        android:progress="60" />
+
+    <include layout="@layout/camera_button_holder" />
+
+    <include
+        layout="@layout/audio_mixer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom" />
+</FrameLayout>
