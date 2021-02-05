@@ -2,6 +2,7 @@ package com.qiniu.pili.droid.streaming.demo.utils;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.widget.Toast;
 
@@ -17,6 +18,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.URL;
+import java.util.Random;
 
 public class Util {
 
@@ -86,5 +88,22 @@ public class Util {
             ex.printStackTrace();
         }
         return new DnsManager(NetworkInfo.normal, new IResolver[]{r0, r1, r2});
+    }
+
+    public static String getUserId(Context context) {
+        SharedPreferences preferences = context.getSharedPreferences(Config.SP_NAME, Context.MODE_PRIVATE);
+        String userId = preferences.getString(Config.KEY_USER_ID, "");
+        if ("".equals(userId)) {
+            userId = userId();
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putString(Config.KEY_USER_ID, userId);
+            editor.apply();
+        }
+        return userId;
+    }
+
+    private static String userId() {
+        Random r = new Random();
+        return System.currentTimeMillis() + "" + r.nextInt(999);
     }
 }

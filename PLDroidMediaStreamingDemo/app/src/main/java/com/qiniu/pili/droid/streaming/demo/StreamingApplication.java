@@ -6,6 +6,7 @@ import android.content.Intent;
 import com.qiniu.pili.droid.streaming.StreamingEnv;
 import com.qiniu.pili.droid.streaming.demo.service.KeepAppAliveService;
 import com.qiniu.pili.droid.streaming.demo.utils.AppStateTracker;
+import com.qiniu.pili.droid.streaming.demo.utils.Util;
 
 public class StreamingApplication extends Application {
 
@@ -17,8 +18,10 @@ public class StreamingApplication extends Application {
         super.onCreate();
         /**
          * init must be called before any other func
+         *
+         * 注意：参数 userId 代表用户的唯一标识符，用于区分不同的用户
          */
-        StreamingEnv.init(getApplicationContext());
+        StreamingEnv.init(getApplicationContext(), Util.getUserId(getApplicationContext()));
 
         /**
          * track app background state to avoid possibly stopping microphone recording

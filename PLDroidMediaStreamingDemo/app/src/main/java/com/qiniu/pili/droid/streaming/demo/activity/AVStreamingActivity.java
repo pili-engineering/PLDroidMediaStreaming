@@ -396,6 +396,15 @@ public class AVStreamingActivity extends Activity implements
         if (mCameraConfig.mIsCustomFaceBeauty) {
             mMediaStreamingManager.setSurfaceTextureCallback(mSurfaceTextureCallback);
         }
+        mMediaStreamingManager.setCameraErrorCallback(new Camera.ErrorCallback() {
+            @Override
+            public void onError(int errorCode, Camera camera) {
+                // 摄像头被其他应用抢占时触发
+                if (errorCode == Camera.CAMERA_ERROR_EVICTED) {
+                    Log.e(TAG, "camera was evicted by the other app!");
+                }
+            }
+        });
 
         mAudioMixer = mMediaStreamingManager.getAudioMixer();
         mAudioMixer.setOnAudioMixListener(new OnAudioMixListener() {
@@ -885,6 +894,25 @@ public class AVStreamingActivity extends Activity implements
                         }
                     });
                     break;
+                case START_VIDEO_ENCODER_FAIL:
+                case VIDEO_ENCODER_ERROR:
+                case START_AUDIO_ENCODER_FAIL:
+                case AUDIO_ENCODER_ERROR:
+                    /**
+                     * 当回调 START_VIDEO_ENCODER_FAIL、VIDEO_ENCODER_ERROR、START_AUDIO_ENCODER_FAIL、
+                     * AUDIO_ENCODER_ERROR 等状态时，代表编码器出现异常，推流已停止，相应资源也已释放，
+                     * 如果需要，可以基于报错的编码器进行重新配置，更新 {@link AVCodecType} 之后，重新开启推流
+                     */
+                    mIsStreaming = false;
+                    mStatusMsgContent = getString(R.string.string_state_ready);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mControlFragment.setShutterButtonPressed(false);
+                            Toast.makeText(AVStreamingActivity.this, "编码器错误！！！", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    break;
                 case IOERROR:
                     /**
                      * 在 `startStreaming` 时，如果网络不可用，则会回调此状态
@@ -972,7 +1000,7 @@ public class AVStreamingActivity extends Activity implements
         public boolean onRestartStreamingHandled(int code) {
             Log.i(TAG, "onRestartStreamingHandled");
             startStreamingInternal(2000);
-            return false;
+            return true;
         }
 
         /**

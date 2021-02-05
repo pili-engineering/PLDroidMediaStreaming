@@ -16,4 +16,7 @@ public class Config {
     public static final String PUBLISH_URL = "PUBLISH_URL";
     public static final String TRANSFER_MODE_QUIC = "TRANSFER_MODE_QUIC";
     public static final String AUDIO_CHANNEL_STEREO = "AUDIO_CHANNEL_STEREO";
+
+    public static final String SP_NAME = "PLDroidMediaStreamingDemo";
+    public static final String KEY_USER_ID = "userId";
 }

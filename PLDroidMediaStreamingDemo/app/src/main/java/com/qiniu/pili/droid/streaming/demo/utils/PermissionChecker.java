@@ -56,8 +56,14 @@ public class PermissionChecker {
         if (!addPermission(permissionsList, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
             permissionsNeeded.add("Write external storage");
         }
+        if (!addPermission(permissionsList, Manifest.permission.READ_PHONE_STATE)) {
+            permissionsNeeded.add("Read phone state");
+        }
+        if (!addPermission(permissionsList, Manifest.permission.ACCESS_FINE_LOCATION)) {
+            permissionsNeeded.add("Access fine location");
+        }
 
-        if (permissionsNeeded.size() > 0) {
+        if (!permissionsNeeded.isEmpty()) {
             // Need Rationale
             String message = "You need to grant access to " + permissionsNeeded.get(0);
             for (int i = 1; i < permissionsNeeded.size(); i++) {
