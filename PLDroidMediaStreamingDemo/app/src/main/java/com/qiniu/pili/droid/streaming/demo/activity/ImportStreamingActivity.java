@@ -6,7 +6,6 @@ import android.hardware.Camera;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.os.Looper;
 import android.util.Log;
 import android.view.SurfaceView;
 import android.view.View;
@@ -391,6 +390,24 @@ public class ImportStreamingActivity extends Activity {
                     break;
                 case UNAUTHORIZED_PACKAGE:
                     mLogContent += "Unauthorized package\n";
+                    break;
+                case START_VIDEO_ENCODER_FAIL:
+                case VIDEO_ENCODER_ERROR:
+                case START_AUDIO_ENCODER_FAIL:
+                case AUDIO_ENCODER_ERROR:
+                    /**
+                     * 当回调 START_VIDEO_ENCODER_FAIL、VIDEO_ENCODER_ERROR、START_AUDIO_ENCODER_FAIL、
+                     * AUDIO_ENCODER_ERROR 等状态时，代表编码器出现异常，推流已停止，相应资源也已释放，
+                     * 如果需要，可以基于报错的编码器进行重新配置，更新 {@link AVCodecType} 之后，重新开启推流
+                     */
+                    mStatusMsgContent = getString(R.string.string_state_ready);
+                    setShutterButtonEnabled(true);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(ImportStreamingActivity.this, "编码器错误！！！", Toast.LENGTH_SHORT).show();
+                        }
+                    });
                     break;
             }
             runOnUiThread(new Runnable() {
