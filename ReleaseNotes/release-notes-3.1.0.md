@@ -9,6 +9,10 @@
 - 发布 libssl.so
 - 发布 libcrypto.so
 - 更新 libpldroid_streaming_core.so
+- 更新 libpldroid_mmprocessing.so
+- 更新 libpldroid_streaming_aac_encoder.so
+- 更新 libpldroid_streaming_amix.so
+- 更新 libpldroid_streaming_h264_encoder.so
 
 ## 功能
 
