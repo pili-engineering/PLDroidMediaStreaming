@@ -24,6 +24,7 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.qiniu.pili.droid.streaming.PLAuthenticationResultCallback;
 import com.qiniu.pili.droid.streaming.StreamingEnv;
+import com.qiniu.pili.droid.streaming.common.FileLogHelper;
 import com.qiniu.pili.droid.streaming.demo.activity.AVStreamingActivity;
 import com.qiniu.pili.droid.streaming.demo.activity.AudioStreamingActivity;
 import com.qiniu.pili.droid.streaming.demo.activity.ImportStreamingActivity;
@@ -35,7 +36,10 @@ import com.qiniu.pili.droid.streaming.demo.utils.Config;
 import com.qiniu.pili.droid.streaming.demo.utils.PermissionChecker;
 import com.qiniu.pili.droid.streaming.demo.utils.Util;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 public class MainActivity extends FragmentActivity {
@@ -56,7 +60,9 @@ public class MainActivity extends FragmentActivity {
     private TextView mInputTextTV;
     private Spinner mStreamTypeSpinner;
     private CheckBox mDebugModeCheckBox;
+    private RadioButton mRtmpPushButton;
     private RadioButton mQuicPushButton;
+    private RadioButton mSrtPushButton;
 
     private EncodingConfigFragment mEncodingConfigFragment;
     private CameraConfigFragment mCameraConfigFragment;
@@ -67,31 +73,58 @@ public class MainActivity extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        // 开启日志的本地保存，保存在应用私有目录(getExternalFilesDir) 或者 getFilesDir 文件目录下的 Pili 文件夹中
-        StreamingEnv.setLogLevel(Log.INFO);
-        StreamingEnv.startLogFile();
 
         TextView versionInfo = (TextView) findViewById(R.id.version_info);
         mInputTextTV = (TextView) findViewById(R.id.input_url);
         mStreamTypeSpinner = (Spinner) findViewById(R.id.stream_types);
         mDebugModeCheckBox = (CheckBox) findViewById(R.id.debug_mode);
+        mRtmpPushButton = (RadioButton) findViewById(R.id.transfer_rtmp);
         mQuicPushButton = (RadioButton) findViewById(R.id.transfer_quic);
+        mSrtPushButton = (RadioButton) findViewById(R.id.transfer_srt);
 
-        mInputTextTV.setText(Cache.retrieveURL(this));
+        String publishUrl = Cache.retrieveURL(this);
+        if (publishUrl.startsWith("srt")) {
+            mSrtPushButton.setChecked(true);
+        } else {
+            mRtmpPushButton.setChecked(true);
+        }
+        mInputTextTV.setText(publishUrl);
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         mEncodingConfigFragment = (EncodingConfigFragment) fragmentManager.findFragmentById(R.id.encoding_config_fragment);
         mCameraConfigFragment = (CameraConfigFragment) fragmentManager.findFragmentById(R.id.camera_config_fragment);
 
         versionInfo.setText("versionName: " + BuildConfig.VERSION_NAME + " versionCode: " + BuildConfig.VERSION_CODE);
+        versionInfo.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                StreamingEnv.reportLogFiles(new FileLogHelper.LogReportCallback() {
+                    @Override
+                    public void onReportSuccess(List<String> logNames) {
+                        if (logNames.size() == 0) {
+                            return;
+                        }
+                        for (String logName : logNames) {
+                            Log.i(TAG, logName);
+                        }
+                        Log.i(TAG, "日志已上传");
+                        Toast.makeText(MainActivity.this, "日志已上传！", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onReportError(String name, String errorMsg) {
+                        Toast.makeText(MainActivity.this, "日志 " + name + " 上传失败: " + errorMsg, Toast.LENGTH_SHORT).show();
+                    }
+                });
+                return true;
+            }
+        });
         initStreamTypeSpinner();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        StreamingEnv.stopLogFile();
-        Log.i(TAG, "Log file path : " + StreamingEnv.getLogFilePath());
     }
 
     @Override
@@ -129,17 +162,24 @@ public class MainActivity extends FragmentActivity {
             Util.showToast(this, "推流地址不能为空!!!");
             return;
         }
+        if ((mSrtPushButton.isChecked() && !streamText.startsWith("srt"))
+                || (!mSrtPushButton.isChecked() && !streamText.startsWith("rtmp"))) {
+            Util.showToast(this, "请检查推流地址和协议是否匹配!!!");
+            return;
+        }
 
         if (mDebugModeCheckBox.isChecked()) {
             StreamingEnv.setLogLevel(Log.VERBOSE);
         }
 
         boolean quicEnable = mQuicPushButton.isChecked();
+        boolean srtEnable = mSrtPushButton.isChecked();
 
         int pos = mStreamTypeSpinner.getSelectedItemPosition();
         Intent intent = new Intent(this, ACTIVITY_CLASSES[pos]);
         intent.putExtra(Config.PUBLISH_URL, streamText);
         intent.putExtra(Config.TRANSFER_MODE_QUIC, quicEnable);
+        intent.putExtra(Config.TRANSFER_MODE_SRT, srtEnable);
         intent.putExtras(mEncodingConfigFragment.getIntent());
         boolean isAudioStereo = ((CheckBox) findViewById(R.id.audio_channel_stereo)).isChecked();
         intent.putExtra(Config.AUDIO_CHANNEL_STEREO, isAudioStereo);
@@ -182,6 +222,9 @@ public class MainActivity extends FragmentActivity {
             @Override
             public void run() {
                 String publishUrl = genPublishURL();
+                if (mSrtPushButton.isChecked() && publishUrl.startsWith("rtmp://")) {
+                    publishUrl = getSrtPublishUrl(publishUrl);
+                }
                 if (publishUrl != null) {
                     Cache.saveURL(MainActivity.this, publishUrl);
                     updateInputTextView(publishUrl);
@@ -253,6 +296,35 @@ public class MainActivity extends FragmentActivity {
             return null;
         }
         return publishUrl;
+    }
+
+    /**
+     * 自定义组装 SRT 推流地址
+     *
+     * 建议由您业务服务端生成符合规范的 SRT 推流地址
+     * 地址规范可参考：https://github.com/Haivision/srt/blob/master/docs/features/access-control.md#general-syntax
+     *
+     * @param rtmpUrl rtmp 地址
+     * @return 组装的 SRT 地址
+     */
+    private String getSrtPublishUrl(String rtmpUrl) {
+        URI u;
+        try {
+            u = new URI(rtmpUrl);
+            String path = u.getPath().substring(1);
+            String query = u.getQuery();
+            StringBuilder publishUrl = new StringBuilder(String.format("srt://%s?streamid=#!::h=%s,m=publish", u.getHost(), path));
+            if (query != null) {
+                String[] queries = query.split("&");
+                for (String q : queries) {
+                    publishUrl.append(",").append(q);
+                }
+            }
+            return publishUrl.toString();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 
     private void updateInputTextView(final String url) {

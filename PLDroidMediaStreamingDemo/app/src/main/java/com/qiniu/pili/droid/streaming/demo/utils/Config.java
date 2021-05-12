@@ -15,6 +15,7 @@ public class Config {
     public static final String NAME_CAMERA_CONFIG = "CameraConfig";
     public static final String PUBLISH_URL = "PUBLISH_URL";
     public static final String TRANSFER_MODE_QUIC = "TRANSFER_MODE_QUIC";
+    public static final String TRANSFER_MODE_SRT = "TRANSFER_MODE_SRT";
     public static final String AUDIO_CHANNEL_STEREO = "AUDIO_CHANNEL_STEREO";
 
     public static final String SP_NAME = "PLDroidMediaStreamingDemo";

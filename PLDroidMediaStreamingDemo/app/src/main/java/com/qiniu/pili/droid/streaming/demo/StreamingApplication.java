@@ -2,6 +2,7 @@ package com.qiniu.pili.droid.streaming.demo;
 
 import android.app.Application;
 import android.content.Intent;
+import android.util.Log;
 
 import com.qiniu.pili.droid.streaming.StreamingEnv;
 import com.qiniu.pili.droid.streaming.demo.service.KeepAppAliveService;
@@ -22,6 +23,11 @@ public class StreamingApplication extends Application {
          * 注意：参数 userId 代表用户的唯一标识符，用于区分不同的用户
          */
         StreamingEnv.init(getApplicationContext(), Util.getUserId(getApplicationContext()));
+        // 设置日志等级
+        StreamingEnv.setLogLevel(Log.INFO);
+        // 开启日志的本地保存，保存在应用私有目录(getExternalFilesDir) 或者 getFilesDir 文件目录下的 Pili 文件夹中
+        // 默认为关闭
+        StreamingEnv.setLogfileEnabled(true);
 
         /**
          * track app background state to avoid possibly stopping microphone recording

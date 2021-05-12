@@ -60,6 +60,7 @@ public class ScreenStreamingActivity extends Activity {
     private boolean mShutterButtonPressed = false;
     private String mPublishUrl;
     private boolean mIsQuicEnabled;
+    private boolean mIsSrtEnabled;
     private boolean mIsReady;
 
     private SimpleDateFormat mDateFormat;
@@ -89,6 +90,7 @@ public class ScreenStreamingActivity extends Activity {
         Intent intent = getIntent();
         mPublishUrl = intent.getStringExtra(Config.PUBLISH_URL);
         mIsQuicEnabled = intent.getBooleanExtra(Config.TRANSFER_MODE_QUIC, false);
+        mIsSrtEnabled = intent.getBooleanExtra(Config.TRANSFER_MODE_SRT, false);
 
         mDateFormat = new SimpleDateFormat(TIME_PATTERN);
 
@@ -168,6 +170,7 @@ public class ScreenStreamingActivity extends Activity {
         // 是否开启 QUIC 推流。
         // QUIC 是基于 UDP 开发的可靠传输协议，在弱网下拥有更好的推流效果，相比于 TCP 拥有更低的延迟，可抵抗更高的丢包率。
         mProfile.setQuicEnable(mIsQuicEnabled);
+        mProfile.setSrtEnabled(mIsSrtEnabled);
 
         // 自定义配置音频的采样率、码率以及声道数的对象，如果使用预设配置，则无需实例化
         StreamingProfile.AudioProfile aProfile = null;
@@ -538,15 +541,25 @@ public class ScreenStreamingActivity extends Activity {
      * 停止推流
      */
     private void stopStreamingInternal() {
-        if (mShutterButtonPressed) {
+        if (mShutterButtonPressed && mSubThreadHandler != null) {
             // disable the shutter button before stopStreaming
             setShutterButtonEnabled(false);
-            boolean res = mScreenStreamingManager.stopStreaming();
-            if (!res) {
-                mShutterButtonPressed = true;
-                setShutterButtonEnabled(true);
-            }
-            setShutterButtonPressed(mShutterButtonPressed);
+            mSubThreadHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    final boolean res = mScreenStreamingManager.stopStreaming();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (!res) {
+                                mShutterButtonPressed = true;
+                                setShutterButtonEnabled(true);
+                            }
+                            setShutterButtonPressed(mShutterButtonPressed);
+                        }
+                    });
+                }
+            });
         }
     }
 

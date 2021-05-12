@@ -31,6 +31,7 @@ PLDroidCameraStreaming 是一个适用于 Android 的 RTMP 直播推流 SDK，�
 - [x] 支持 QUIC 推流
 - [x] 支持 ARM, ARMv7a, ARM64v8a, X86 主流芯片体系架构
 - [x] 支持 SEI 信息发送
+- [x] 支持 SRT 推流
   
 ## PLDroidCameraStreaming 文档
 
