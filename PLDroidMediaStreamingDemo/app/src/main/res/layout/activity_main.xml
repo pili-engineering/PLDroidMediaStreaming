@@ -102,6 +102,12 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="QUIC" />
+
+                <RadioButton
+                    android:id="@+id/transfer_srt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="SRT" />
             </RadioGroup>
 
             <View

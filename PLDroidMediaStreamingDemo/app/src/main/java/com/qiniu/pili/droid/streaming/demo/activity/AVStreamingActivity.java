@@ -100,6 +100,7 @@ public class AVStreamingActivity extends Activity implements
 
     private String mPublishUrl;
     private boolean mIsQuicEnabled;
+    private boolean mIsSrtEnabled;
     private String mPicStreamingFilePath;
 
     // 推流操作管理类实例
@@ -134,6 +135,7 @@ public class AVStreamingActivity extends Activity implements
         Intent intent = getIntent();
         mPublishUrl = intent.getStringExtra(Config.PUBLISH_URL);
         mIsQuicEnabled = intent.getBooleanExtra(Config.TRANSFER_MODE_QUIC, false);
+        mIsSrtEnabled = intent.getBooleanExtra(Config.TRANSFER_MODE_SRT, false);
         mAudioStereoEnable = intent.getBooleanExtra(Config.AUDIO_CHANNEL_STEREO, false);
 
         HandlerThread handlerThread = new HandlerThread(TAG);
@@ -178,10 +180,12 @@ public class AVStreamingActivity extends Activity implements
     protected void onStop() {
         super.onStop();
         // 如果当前正在图片推流，则退后台不会终止推流
-        if (!mIsPictureStreaming) {
+        if (isFinishing() || !mIsPictureStreaming) {
             mIsReady = false;
+            if (mIsStreaming) {
+                Toast.makeText(this, "推流已停止！！！", Toast.LENGTH_SHORT).show();
+            }
             mMediaStreamingManager.pause();
-            Toast.makeText(this, "推流已停止！！！", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(this, "当前正在图片推流！！！", Toast.LENGTH_SHORT).show();
         }
@@ -192,6 +196,7 @@ public class AVStreamingActivity extends Activity implements
         super.onDestroy();
         if (mSubThreadHandler != null) {
             mSubThreadHandler.getLooper().quit();
+            mSubThreadHandler = null;
         }
         // 销毁推流 Manager 的资源
         mMediaStreamingManager.destroy();
@@ -239,6 +244,7 @@ public class AVStreamingActivity extends Activity implements
         // 是否开启 QUIC 推流。
         // QUIC 是基于 UDP 开发的可靠传输协议，在弱网下拥有更好的推流效果，相比于 TCP 拥有更低的延迟，可抵抗更高的丢包率。
         mProfile.setQuicEnable(mIsQuicEnabled);
+        mProfile.setSrtEnabled(mIsSrtEnabled);
 
         // 自定义配置音频的采样率、码率以及声道数的对象，如果使用预设配置，则无需实例化
         StreamingProfile.AudioProfile aProfile = null;
@@ -593,6 +599,10 @@ public class AVStreamingActivity extends Activity implements
         dialog.setDialogSelectionListener(new DialogSelectionListener() {
             @Override
             public void onSelectedFilePaths(String[] files) {
+                if (files == null || files.length == 0) {
+                    Toast.makeText(AVStreamingActivity.this, "Choose an audio please!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 String filePath = files[0];
                 try {
                     mAudioMixer.setFile(filePath, true);
@@ -743,7 +753,9 @@ public class AVStreamingActivity extends Activity implements
             return false;
         }
         Log.i(TAG, "isPortrait : " + isPortrait);
-        mOrientationChanged = true;
+        if (mIsStreaming) {
+            mOrientationChanged = true;
+        }
         mProfile.setEncodingOrientation(isPortrait ? StreamingProfile.ENCODING_ORIENTATION.PORT : StreamingProfile.ENCODING_ORIENTATION.LAND);
 
         // 更新 StreamingProfile 的时候，需要重新推流才可以生效!!!
@@ -1298,16 +1310,23 @@ public class AVStreamingActivity extends Activity implements
     }
 
     private void stopStreamingInternal() {
-        if (mMediaStreamingManager == null) {
+        if (mMediaStreamingManager == null || !mIsStreaming) {
             return;
         }
-        final boolean res = mMediaStreamingManager.stopStreaming();
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mControlFragment.setShutterButtonPressed(!res);
-            }
-        });
+        if (mSubThreadHandler != null) {
+            mSubThreadHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    final boolean res = mMediaStreamingManager.stopStreaming();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mControlFragment.setShutterButtonPressed(!res);
+                        }
+                    });
+                }
+            });
+        }
     }
 
     private boolean isPictureStreaming() {
