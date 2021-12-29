@@ -9,6 +9,7 @@ import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.hardware.Camera;
 import android.media.AudioFormat;
+import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -78,7 +79,6 @@ public class AVStreamingActivity extends Activity implements
     private boolean mIsPreviewMirror = false;
     private boolean mIsEncodingMirror = false;
     private boolean mIsPlayingback = false;
-    private boolean mAudioStereoEnable = false;
     private boolean mIsStreaming = false;
 
     private volatile boolean mIsSupportTorch = false;
@@ -136,7 +136,6 @@ public class AVStreamingActivity extends Activity implements
         mPublishUrl = intent.getStringExtra(Config.PUBLISH_URL);
         mIsQuicEnabled = intent.getBooleanExtra(Config.TRANSFER_MODE_QUIC, false);
         mIsSrtEnabled = intent.getBooleanExtra(Config.TRANSFER_MODE_SRT, false);
-        mAudioStereoEnable = intent.getBooleanExtra(Config.AUDIO_CHANNEL_STEREO, false);
 
         HandlerThread handlerThread = new HandlerThread(TAG);
         handlerThread.start();
@@ -380,15 +379,23 @@ public class AVStreamingActivity extends Activity implements
         CameraPreviewFrameView cameraPreviewFrameView = (CameraPreviewFrameView) findViewById(R.id.cameraPreview_surfaceView);
         mMediaStreamingManager = new MediaStreamingManager(this, cameraPreviewFrameView, mEncodingConfig.mCodecType);
 
+        Intent intent = getIntent();
+        boolean isAudioStereoEnabled = intent.getBooleanExtra(Config.AUDIO_CHANNEL_STEREO, false);
+        boolean isVoIPRecordEnabled = intent.getBooleanExtra(Config.AUDIO_VOIP_RECORD, false);
+        boolean isBluetoothScoEnabled = intent.getBooleanExtra(Config.AUDIO_SCO_ON, false);
+
         // 初始化 MicrophoneStreamingSetting
-        MicrophoneStreamingSetting microphoneStreamingSetting = null;
-        if (mAudioStereoEnable) {
+        MicrophoneStreamingSetting microphoneStreamingSetting = new MicrophoneStreamingSetting();
+        if (isAudioStereoEnabled) {
             /**
              * 注意 !!! {@link AudioFormat#CHANNEL_IN_STEREO} 并不能保证在所有设备上都可以正常运行.
              */
-            microphoneStreamingSetting = new MicrophoneStreamingSetting();
             microphoneStreamingSetting.setChannelConfig(AudioFormat.CHANNEL_IN_STEREO);
         }
+        if (isVoIPRecordEnabled) {
+            microphoneStreamingSetting.setAudioSource(MediaRecorder.AudioSource.VOICE_COMMUNICATION);
+        }
+        microphoneStreamingSetting.setBluetoothSCOEnabled(isBluetoothScoEnabled);
         mMediaStreamingManager.prepare(mCameraStreamingSetting, microphoneStreamingSetting, mWatermarkSetting, mProfile);
         mMediaStreamingManager.setAutoRefreshOverlay(true);
         cameraPreviewFrameView.setListener(this);
@@ -1102,7 +1109,7 @@ public class AVStreamingActivity extends Activity implements
     private StreamingPreviewCallback mStreamingPreviewCallback = new StreamingPreviewCallback() {
         @Override
         public boolean onPreviewFrame(byte[] bytes, int width, int height, int rotation, int fmt, long tsInNanoTime) {
-            Log.i(TAG, "onPreviewFrame " + width + "x" + height + ",fmt:" + (fmt == PLFourCC.FOURCC_I420 ? "I420" : "NV21") + ",ts:" + tsInNanoTime + ",rotation:" + rotation);
+            Log.d(TAG, "onPreviewFrame " + width + "x" + height + ",fmt:" + (fmt == PLFourCC.FOURCC_I420 ? "I420" : "NV21") + ",ts:" + tsInNanoTime + ",rotation:" + rotation);
             // 用于指定截帧的宽高，仅供 demo 演示
             if (rotation == 90 || rotation == 270) {
                 mFrameWidth = height;

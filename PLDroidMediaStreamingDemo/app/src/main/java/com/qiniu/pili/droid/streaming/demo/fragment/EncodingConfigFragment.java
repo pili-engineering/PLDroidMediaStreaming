@@ -5,6 +5,8 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +18,7 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.github.angads25.filepicker.controller.DialogSelectionListener;
 import com.github.angads25.filepicker.model.DialogConfigs;
@@ -27,6 +30,7 @@ import com.qiniu.pili.droid.streaming.WatermarkSetting;
 import com.qiniu.pili.droid.streaming.demo.R;
 import com.qiniu.pili.droid.streaming.demo.plain.EncodingConfig;
 import com.qiniu.pili.droid.streaming.demo.utils.Config;
+import com.qiniu.pili.droid.streaming.demo.utils.ToastUtils;
 
 import java.io.File;
 
@@ -377,6 +381,57 @@ public class EncodingConfigFragment extends ConfigFragment {
                 View customPanel = root.findViewById(R.id.watermark_location_custom_panel);
                 locationSpinner.setVisibility(checkedId == R.id.watermark_location_preset ? View.VISIBLE : View.GONE);
                 customPanel.setVisibility(checkedId == R.id.watermark_location_preset ? View.GONE : View.VISIBLE);
+            }
+        });
+
+        final EditText customX = root.findViewById(R.id.watermark_location_custom_x);
+        customX.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                String text = s.toString();
+                if (text == null || text.isEmpty()) {
+                    return;
+                }
+                float value = Float.parseFloat(text);
+                if (value < 0.0f || value > 1.0f) {
+                    ToastUtils.s(getContext(), "仅支持 [0.0f - 1.0f]");
+                    customX.setText(value < 0.0f ? "0.0" : "1.0");
+                }
+            }
+        });
+        final EditText customY = root.findViewById(R.id.watermark_location_custom_y);
+        customY.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                String text = s.toString();
+                if (text == null || text.isEmpty()) {
+                    return;
+                }
+                float value = Float.parseFloat(text);
+                if (value < 0.0f || value > 1.0f) {
+                    ToastUtils.s(getContext(), "仅支持 [0.0f - 1.0f]");
+                    customY.setText(value < 0.0f ? "0.0" : "1.0");
+                }
             }
         });
     }

@@ -1,13 +1,22 @@
 package com.qiniu.pili.droid.streaming.demo;
 
 import android.app.Application;
+import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
 import com.qiniu.pili.droid.streaming.StreamingEnv;
+import com.qiniu.pili.droid.streaming.common.FileLogHelper;
 import com.qiniu.pili.droid.streaming.demo.service.KeepAppAliveService;
 import com.qiniu.pili.droid.streaming.demo.utils.AppStateTracker;
+import com.qiniu.pili.droid.streaming.demo.utils.ToastUtils;
 import com.qiniu.pili.droid.streaming.demo.utils.Util;
+
+import java.io.File;
+import java.util.List;
+
+import xcrash.TombstoneManager;
+import xcrash.XCrash;
 
 public class StreamingApplication extends Application {
 
@@ -49,6 +58,47 @@ public class StreamingApplication extends Application {
                 stopService();
             }
         });
+    }
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+
+        xcrash.XCrash.init(this, new XCrash.InitParameters()
+                .setLogDir(getExternalFilesDir(null).getAbsolutePath())
+                .setJavaDumpNetworkInfo(false)
+                .setNativeDumpNetwork(false)
+                .setNativeDumpAllThreads(false)
+                .setAppVersion(Util.getVersion(this)));
+        checkToUploadCrashFiles();
+    }
+
+    private void checkToUploadCrashFiles() {
+        File crashFolder = new File(getExternalFilesDir(null).getAbsolutePath());
+        File[] crashFiles = crashFolder.listFiles();
+        if (crashFiles == null) {
+            return;
+        }
+        for (final File crashFile : crashFiles) {
+            if (crashFile.isFile()) {
+                FileLogHelper.getInstance().reportLogFileByPath(crashFile.getPath(), new FileLogHelper.LogReportCallback() {
+                    @Override
+                    public void onReportSuccess(List<String> logNames) {
+                        for (String logName : logNames) {
+                            if (logName.equals(crashFile.getName())) {
+                                TombstoneManager.deleteTombstone(crashFile.getPath());
+                            }
+                        }
+                        ToastUtils.s(StreamingApplication.this, "崩溃日志已上传！");
+                    }
+
+                    @Override
+                    public void onReportError(String name, String errorMsg) {
+                        ToastUtils.s(StreamingApplication.this, "崩溃日志上传失败 : " + errorMsg);
+                    }
+                });
+            }
+        }
     }
 
     /**
