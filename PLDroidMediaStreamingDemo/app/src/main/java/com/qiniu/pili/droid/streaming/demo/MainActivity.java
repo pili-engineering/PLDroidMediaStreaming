@@ -176,13 +176,19 @@ public class MainActivity extends FragmentActivity {
         boolean srtEnable = mSrtPushButton.isChecked();
 
         int pos = mStreamTypeSpinner.getSelectedItemPosition();
+
+        boolean isAudioStereo = ((CheckBox) findViewById(R.id.audio_channel_stereo)).isChecked();
+        boolean isVoIPRecord = ((CheckBox) findViewById(R.id.VoIP_record)).isChecked();
+        boolean isBluetoothScoOn = ((CheckBox) findViewById(R.id.bluetooth_sco_on)).isChecked();
+
         Intent intent = new Intent(this, ACTIVITY_CLASSES[pos]);
         intent.putExtra(Config.PUBLISH_URL, streamText);
         intent.putExtra(Config.TRANSFER_MODE_QUIC, quicEnable);
         intent.putExtra(Config.TRANSFER_MODE_SRT, srtEnable);
         intent.putExtras(mEncodingConfigFragment.getIntent());
-        boolean isAudioStereo = ((CheckBox) findViewById(R.id.audio_channel_stereo)).isChecked();
         intent.putExtra(Config.AUDIO_CHANNEL_STEREO, isAudioStereo);
+        intent.putExtra(Config.AUDIO_VOIP_RECORD, isVoIPRecord);
+        intent.putExtra(Config.AUDIO_SCO_ON, isBluetoothScoOn);
         if (pos == 0) {
             intent.putExtras(mCameraConfigFragment.getIntent());
         }

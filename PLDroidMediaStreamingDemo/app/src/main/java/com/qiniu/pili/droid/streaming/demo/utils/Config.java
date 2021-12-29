@@ -17,6 +17,8 @@ public class Config {
     public static final String TRANSFER_MODE_QUIC = "TRANSFER_MODE_QUIC";
     public static final String TRANSFER_MODE_SRT = "TRANSFER_MODE_SRT";
     public static final String AUDIO_CHANNEL_STEREO = "AUDIO_CHANNEL_STEREO";
+    public static final String AUDIO_VOIP_RECORD = "AUDIO_VOIP_RECORD";
+    public static final String AUDIO_SCO_ON = "AUDIO_SCO_ON";
 
     public static final String SP_NAME = "PLDroidMediaStreamingDemo";
     public static final String KEY_USER_ID = "userId";
