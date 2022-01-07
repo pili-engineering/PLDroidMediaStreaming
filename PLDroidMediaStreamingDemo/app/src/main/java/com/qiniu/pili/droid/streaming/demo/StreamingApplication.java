@@ -81,7 +81,7 @@ public class StreamingApplication extends Application {
         }
         for (final File crashFile : crashFiles) {
             if (crashFile.isFile()) {
-                FileLogHelper.getInstance().reportLogFileByPath(crashFile.getPath(), new FileLogHelper.LogReportCallback() {
+                StreamingEnv.reportLogFileByPath(crashFile.getPath(), new FileLogHelper.LogReportCallback() {
                     @Override
                     public void onReportSuccess(List<String> logNames) {
                         for (String logName : logNames) {
