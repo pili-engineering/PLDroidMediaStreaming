@@ -240,6 +240,12 @@ public class MainActivity extends FragmentActivity {
     }
 
     public void scanQRCode(View v) {
+        // API < M, no need to request permissions, so always true.
+        boolean isPermissionOK = Build.VERSION.SDK_INT < Build.VERSION_CODES.M || mPermissionChecker.checkPermission();
+        if (!isPermissionOK) {
+            Util.showToast(this, "请授予相关权限!!!");
+            return;
+        }
         IntentIntegrator integrator = new IntentIntegrator(this);
         integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE_TYPES);
         integrator.setOrientationLocked(true);
