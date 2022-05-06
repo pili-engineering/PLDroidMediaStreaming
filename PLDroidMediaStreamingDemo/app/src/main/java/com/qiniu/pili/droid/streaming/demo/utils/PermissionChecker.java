@@ -56,12 +56,6 @@ public class PermissionChecker {
         if (!addPermission(permissionsList, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
             permissionsNeeded.add("Write external storage");
         }
-        if (!addPermission(permissionsList, Manifest.permission.READ_PHONE_STATE)) {
-            permissionsNeeded.add("Read phone state");
-        }
-        if (!addPermission(permissionsList, Manifest.permission.ACCESS_FINE_LOCATION)) {
-            permissionsNeeded.add("Access fine location");
-        }
 
         if (!permissionsNeeded.isEmpty()) {
             // Need Rationale
