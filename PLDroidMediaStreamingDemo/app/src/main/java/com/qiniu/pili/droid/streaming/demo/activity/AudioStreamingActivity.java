@@ -172,7 +172,7 @@ public class AudioStreamingActivity extends Activity {
         }
 
         // 其他配置项
-        mProfile.setDnsManager(Util.getMyDnsManager(this))
+        mProfile.setDnsManager(Util.getMyDnsManager())
                 .setStreamStatusConfig(new StreamingProfile.StreamStatusConfig(3))
                 .setSendingBufferProfile(new StreamingProfile.SendingBufferProfile(0.2f, 0.8f, 3.0f, 20 * 1000));
     }
