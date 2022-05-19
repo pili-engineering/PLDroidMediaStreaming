@@ -44,13 +44,17 @@ PLDroidCameraStreaming 是一个适用于 Android 的 RTMP 直播推流 SDK，�
 
 ## 版本升级须知
 
+### v3.1.3
+
+- 从 v3.1.3 版本开始，HappyDNS 库务必升级到 1.0.0 版本
+
 ### v3.1.2
 
 - 从 v3.1.2 版本开始，SDK 将不再强制要求获取 READ_PHONE_STATE 和 ACCESS_FINE_LOCATION 的权限
 
 ### v3.1.1
 
-- 从 v3.1.1 版本开始，Happy DNS 库建议到 0.2.18 版本
+- 从 v3.1.1 版本开始，HappyDNS 库务必升级到 0.2.18 版本
 
 ### v3.0.2
 - 从 v3.0.2 版本开始，请务必添加 `android.arch.lifecycle:extensions:x.y.z` 的依赖

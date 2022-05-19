@@ -8,8 +8,8 @@ android {
         applicationId "com.qiniu.pili.droid.streaming.demo"
         minSdkVersion 18
         targetSdkVersion 29
-        versionCode 75
-        versionName "3.1.2"
+        versionCode 76
+        versionName "3.1.3"
     }
     buildTypes {
         release {
@@ -29,7 +29,7 @@ dependencies {
     // 文件选择 jar 包，非必须
     implementation 'com.github.angads25:filepicker:1.0.6'
     // dns 相关 jar 包，必须依赖
-    implementation 'com.qiniu:happy-dns:0.2.18'
+    implementation 'com.qiniu:happy-dns:1.0.0'
     // 监听应用生命周期，必须依赖
     implementation 'android.arch.lifecycle:extensions:1.1.1'
     // 扫码相关 jar 包，非必须

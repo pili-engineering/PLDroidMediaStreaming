@@ -11,16 +11,16 @@ import android.widget.Toast;
 import com.qiniu.android.dns.DnsManager;
 import com.qiniu.android.dns.IResolver;
 import com.qiniu.android.dns.NetworkInfo;
-import com.qiniu.android.dns.http.DnspodFree;
-import com.qiniu.android.dns.local.AndroidDnsServer;
-import com.qiniu.android.dns.local.Resolver;
-
-import java.io.IOException;
+import com.qiniu.android.dns.Record;
+import com.qiniu.android.dns.dns.DnsUdpResolver;
+import com.qiniu.android.dns.dns.DohResolver;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.InetAddress;
 import java.net.URL;
 import java.util.Random;
+import java.util.concurrent.CountDownLatch;
+
+import static com.qiniu.android.dns.IResolver.DNS_DEFAULT_TIMEOUT;
 
 public class Util {
 
@@ -77,19 +77,20 @@ public class Util {
     /**
      * 配置自定义 DNS 服务器，非必须
      *
-     * 注意：基于 114 dns 解析的不确定性，使用该解析可能会导致解析的网络 ip 无法做到最大的优化策略，进而出现推流质量不佳的现象。
-     * 因此如果您希望配置 DNS 服务器的话，建议使用非 114 dns 解析
+     * - 可通过创建 {@link DnsUdpResolver} 对象配置自定义的 DNS 服务器地址
+     * - 可通过创建 {@link DohResolver} 对象配置支持 Doh(Dns over http) 协议的 url
+     * 其中，UDP 的方式解析速度快，但是安全性无法得到保证，HTTPDNS 的方式解析速度慢，但是安全性有保证，您可根据您的
+     * 使用场景自行选择合适的解析方式
      */
-    public static DnsManager getMyDnsManager(Context context) {
-        IResolver r0 = null;
-        IResolver r1 = new DnspodFree();
-        IResolver r2 = AndroidDnsServer.defaultResolver(context);
-        try {
-            r0 = new Resolver(InetAddress.getByName("119.29.29.29"));
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        return new DnsManager(NetworkInfo.normal, new IResolver[]{r0, r1, r2});
+    public static DnsManager getMyDnsManager() {
+        IResolver[] resolvers = new IResolver[2];
+        // 配置自定义 DNS 服务器地址
+        String[] udpDnsServers = new String[]{"223.5.5.5", "114.114.114.114", "1.1.1.1", "208.67.222.222"};
+        resolvers[0] = new DnsUdpResolver(udpDnsServers, Record.TYPE_A, DNS_DEFAULT_TIMEOUT);
+        // 配置 HTTPDNS 地址
+        String[] httpDnsServers = new String[]{"https://223.6.6.6/dns-query", "https://8.8.8.8/dns-query"};
+        resolvers[1] = new DohResolver(httpDnsServers, Record.TYPE_A, DNS_DEFAULT_TIMEOUT);
+        return new DnsManager(NetworkInfo.normal, resolvers);
     }
 
     public static String getVersion(Context context) {
