@@ -85,10 +85,10 @@ public class Util {
     public static DnsManager getMyDnsManager() {
         IResolver[] resolvers = new IResolver[2];
         // 配置自定义 DNS 服务器地址
-        String[] udpDnsServers = new String[]{"223.5.5.5", "114.114.114.114", "1.1.1.1", "208.67.222.222"};
+        String[] udpDnsServers = new String[]{"223.5.5.5"};
         resolvers[0] = new DnsUdpResolver(udpDnsServers, Record.TYPE_A, DNS_DEFAULT_TIMEOUT);
         // 配置 HTTPDNS 地址
-        String[] httpDnsServers = new String[]{"https://223.6.6.6/dns-query", "https://8.8.8.8/dns-query"};
+        String[] httpDnsServers = new String[]{"https://223.6.6.6/dns-query"};
         resolvers[1] = new DohResolver(httpDnsServers, Record.TYPE_A, DNS_DEFAULT_TIMEOUT);
         return new DnsManager(NetworkInfo.normal, resolvers);
     }
