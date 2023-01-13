@@ -123,6 +123,19 @@ public class MainActivity extends FragmentActivity {
     }
 
     @Override
+    public void onBackPressed() {
+        Fragment primaryNavigationFragment = getSupportFragmentManager().getPrimaryNavigationFragment();
+        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q
+                && isTaskRoot()
+                && (primaryNavigationFragment == null || primaryNavigationFragment.getChildFragmentManager().getBackStackEntryCount() == 0)
+                && getSupportFragmentManager().getBackStackEntryCount() == 0) {
+            finishAfterTransition();
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
     }

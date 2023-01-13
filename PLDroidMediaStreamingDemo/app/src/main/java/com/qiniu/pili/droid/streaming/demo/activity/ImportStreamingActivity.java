@@ -91,6 +91,7 @@ public class ImportStreamingActivity extends Activity {
     protected void onResume() {
         super.onResume();
         mExtAudioCapture.startCapture();
+        mExtAudioCapture.setOnAudioFrameCapturedListener(mOnAudioFrameCapturedListener);
         mStreamingManager.resume();
     }
 
@@ -324,7 +325,8 @@ public class ImportStreamingActivity extends Activity {
                 public void run() {
                     mStatView.setText("bitrate:" + streamStatus.totalAVBitrate / 1024 + " kbps"
                             + "\naudio:" + streamStatus.audioFps + " fps"
-                            + "\nvideo:" + streamStatus.videoFps + " fps");
+                            + "\nvideo:" + streamStatus.videoFps + " fps"
+                            + "\ndropped:" + streamStatus.droppedVideoFrames);
                 }
             });
         }
