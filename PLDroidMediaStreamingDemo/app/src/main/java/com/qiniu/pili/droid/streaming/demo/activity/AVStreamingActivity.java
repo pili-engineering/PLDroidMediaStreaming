@@ -53,6 +53,7 @@ import com.qiniu.pili.droid.streaming.demo.ui.CameraPreviewFrameView;
 import com.qiniu.pili.droid.streaming.demo.ui.RotateLayout;
 import com.qiniu.pili.droid.streaming.demo.utils.Cache;
 import com.qiniu.pili.droid.streaming.demo.utils.Config;
+import com.qiniu.pili.droid.streaming.demo.utils.ToastUtils;
 import com.qiniu.pili.droid.streaming.demo.utils.Util;
 import com.qiniu.pili.droid.streaming.microphone.AudioMixer;
 import com.qiniu.pili.droid.streaming.microphone.OnAudioMixListener;
@@ -64,6 +65,8 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class AVStreamingActivity extends Activity implements
         CameraPreviewFrameView.Listener,
@@ -119,8 +122,7 @@ public class AVStreamingActivity extends Activity implements
     private Handler mSubThreadHandler;
 
     // 用于处理图片推流延时切换图片
-    private Handler mMainThreadHandler;
-    private ImageSwitcher mImageSwitcher;
+    private Timer mImageSwitcherTimer;
     private int mTimes = 0;
     private boolean mIsPictureStreaming = false;
 
@@ -161,7 +163,7 @@ public class AVStreamingActivity extends Activity implements
             // 打开摄像头
             mMediaStreamingManager.resume();
         } else {
-            Toast.makeText(this, "当前正在图片推流！！！", Toast.LENGTH_SHORT).show();
+            ToastUtils.s(this, "当前正在图片推流！！！");
         }
     }
 
@@ -182,17 +184,21 @@ public class AVStreamingActivity extends Activity implements
         if (isFinishing() || !mIsPictureStreaming) {
             mIsReady = false;
             if (mIsStreaming) {
-                Toast.makeText(this, "推流已停止！！！", Toast.LENGTH_SHORT).show();
+                ToastUtils.s(getApplicationContext(), "推流已停止！！！");
             }
             mMediaStreamingManager.pause();
         } else {
-            Toast.makeText(this, "当前正在图片推流！！！", Toast.LENGTH_SHORT).show();
+            ToastUtils.s(getApplicationContext(), "当前正在图片推流！！！");
         }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (mImageSwitcherTimer != null) {
+            mImageSwitcherTimer.cancel();
+            mImageSwitcherTimer = null;
+        }
         if (mSubThreadHandler != null) {
             mSubThreadHandler.getLooper().quit();
             mSubThreadHandler = null;
@@ -426,7 +432,7 @@ public class AVStreamingActivity extends Activity implements
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(AVStreamingActivity.this, "mix finished", Toast.LENGTH_LONG).show();
+                        ToastUtils.s(getApplicationContext(), "mix finished");
                         updateMixBtnText();
                     }
                 });
@@ -493,7 +499,7 @@ public class AVStreamingActivity extends Activity implements
             mIsPreviewMirror = !mIsPreviewMirror;
             boolean res = mMediaStreamingManager.setPreviewMirror(mIsPreviewMirror);
             if (res) {
-                Toast.makeText(AVStreamingActivity.this, "镜像成功", Toast.LENGTH_SHORT).show();
+                ToastUtils.s(AVStreamingActivity.this, "镜像成功");
             } else {
                 mIsPreviewMirror = !mIsPreviewMirror;
             }
@@ -513,7 +519,7 @@ public class AVStreamingActivity extends Activity implements
             mIsEncodingMirror = !mIsEncodingMirror;
             boolean res = mMediaStreamingManager.setEncodingMirror(mIsEncodingMirror);
             if (res) {
-                Toast.makeText(AVStreamingActivity.this, "镜像成功", Toast.LENGTH_SHORT).show();
+                ToastUtils.s(getApplicationContext(), "镜像成功");
             } else {
                 mIsEncodingMirror = !mIsEncodingMirror;
             }
@@ -529,7 +535,7 @@ public class AVStreamingActivity extends Activity implements
     @Override
     public boolean onTorchClicked(boolean isTorchOn) {
         if (!mIsSupportTorch) {
-            Toast.makeText(AVStreamingActivity.this, "当前摄像头不支持闪光灯！", Toast.LENGTH_SHORT).show();
+            ToastUtils.s(getApplicationContext(), "当前摄像头不支持闪光灯！");
             return false;
         }
         if (mMediaStreamingManager != null) {
@@ -607,17 +613,17 @@ public class AVStreamingActivity extends Activity implements
             @Override
             public void onSelectedFilePaths(String[] files) {
                 if (files == null || files.length == 0) {
-                    Toast.makeText(AVStreamingActivity.this, "Choose an audio please!", Toast.LENGTH_SHORT).show();
+                    ToastUtils.s(getApplicationContext(), "Choose an audio please!");
                     return;
                 }
                 String filePath = files[0];
                 try {
                     mAudioMixer.setFile(filePath, true);
                     Cache.setAudioFile(AVStreamingActivity.this, filePath);
-                    Toast.makeText(AVStreamingActivity.this, "setup mix file " + filePath + " success. duration:" + mAudioMixer.getDuration(), Toast.LENGTH_LONG).show();
+                    ToastUtils.s(getApplicationContext(), "setup mix file " + filePath + " success. duration:" + mAudioMixer.getDuration());
                 } catch (IOException e) {
                     e.printStackTrace();
-                    Toast.makeText(AVStreamingActivity.this, "setup mix file " + filePath + " failed !!!", Toast.LENGTH_LONG).show();
+                    ToastUtils.s(getApplicationContext(), "setup mix file " + filePath + " failed !!!");
                 }
             }
         });
@@ -638,7 +644,7 @@ public class AVStreamingActivity extends Activity implements
                 boolean s = mAudioMixer.play();
                 text = s ? "mixing play success" : "mixing play failed !!!";
             }
-            Toast.makeText(AVStreamingActivity.this, text, Toast.LENGTH_LONG).show();
+            ToastUtils.s(getApplicationContext(), text);
 
             updateMixBtnText();
         }
@@ -652,7 +658,7 @@ public class AVStreamingActivity extends Activity implements
         if (mAudioMixer != null) {
             boolean stopSuccess = mAudioMixer.stop();
             String text = stopSuccess ? "mixing stop success" : "mixing stop failed !!!";
-            Toast.makeText(AVStreamingActivity.this, text, Toast.LENGTH_LONG).show();
+            ToastUtils.s(getApplicationContext(), text);
             if (stopSuccess) {
                 updateMixBtnText();
             }
@@ -682,7 +688,7 @@ public class AVStreamingActivity extends Activity implements
         // 切换图片推流模式，如果当前已经是图片推流，则调用该接口会切换回正常音视频推流
         boolean isOK = mMediaStreamingManager.togglePictureStreaming();
         if (!isOK) {
-            Toast.makeText(AVStreamingActivity.this, "toggle picture streaming failed!", Toast.LENGTH_SHORT).show();
+            ToastUtils.s(getApplicationContext(), "toggle picture streaming failed!");
             return;
         }
 
@@ -701,12 +707,15 @@ public class AVStreamingActivity extends Activity implements
         // 模拟推流图片的切换，仅供 demo 演示用
         mTimes = 0;
         if (mIsPictureStreaming) {
-            if (mImageSwitcher == null) {
-                mImageSwitcher = new ImageSwitcher();
+            if (mImageSwitcherTimer == null) {
+                mImageSwitcherTimer = new Timer();
             }
-
-            mMainThreadHandler = new Handler(getMainLooper());
-            mMainThreadHandler.postDelayed(mImageSwitcher, 2000);
+            mImageSwitcherTimer.schedule(new ImageSwitcherTask(), 0, 2000);
+        } else {
+            if (mImageSwitcherTimer != null) {
+                mImageSwitcherTimer.cancel();
+                mImageSwitcherTimer = null;
+            }
         }
     }
 
@@ -771,8 +780,7 @@ public class AVStreamingActivity extends Activity implements
 
         setRequestedOrientation(isPortrait ? ActivityInfo.SCREEN_ORIENTATION_PORTRAIT : ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         mMediaStreamingManager.notifyActivityOrientationChanged();
-        Toast.makeText(AVStreamingActivity.this, Config.HINT_ENCODING_ORIENTATION_CHANGED,
-                Toast.LENGTH_SHORT).show();
+        ToastUtils.s(getApplicationContext(), Config.HINT_ENCODING_ORIENTATION_CHANGED);
         Log.i(TAG, "onOrientationChanged -");
         return true;
     }
@@ -818,7 +826,7 @@ public class AVStreamingActivity extends Activity implements
         ((FrameLayout) findViewById(R.id.content)).addView(imageOverlay, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT));
 
         mMediaStreamingManager.addOverlay(imageOverlay);
-        Toast.makeText(AVStreamingActivity.this, "双击删除贴图!", Toast.LENGTH_LONG).show();
+        ToastUtils.s(getApplicationContext(), "双击删除贴图!");
     }
 
     /**
@@ -928,7 +936,7 @@ public class AVStreamingActivity extends Activity implements
                         @Override
                         public void run() {
                             mControlFragment.setShutterButtonPressed(false);
-                            Toast.makeText(AVStreamingActivity.this, "编码器错误！！！", Toast.LENGTH_SHORT).show();
+                            ToastUtils.s(getApplicationContext(), "编码器错误！！！");
                         }
                     });
                     break;
@@ -1077,7 +1085,8 @@ public class AVStreamingActivity extends Activity implements
                 public void run() {
                     mControlFragment.setStreamStatsText("bitrate:" + streamStatus.totalAVBitrate / 1024 + " kbps"
                             + "\naudio:" + streamStatus.audioFps + " fps"
-                            + "\nvideo:" + streamStatus.videoFps + " fps");
+                            + "\nvideo:" + streamStatus.videoFps + " fps"
+                            + "\ndropped:" + streamStatus.droppedVideoFrames);
                 }
             });
         }
@@ -1184,31 +1193,27 @@ public class AVStreamingActivity extends Activity implements
     /**
      * 在图片推流过程中切换图片，仅供 demo 演示，您可以根据产品定义自行实现
      */
-    private class ImageSwitcher implements Runnable {
+    private class ImageSwitcherTask extends TimerTask {
         @Override
         public void run() {
-            if (!mIsPictureStreaming) {
-                Log.d(TAG, "is not picture streaming!!!");
-                return;
-            }
-
-            if (mTimes % 2 == 0) {
-                if (mPicStreamingFilePath != null) {
-                    mMediaStreamingManager.setPictureStreamingFilePath(mPicStreamingFilePath);
-                    mControlFragment.setPicStreamingImage(mPicStreamingFilePath);
-                } else {
-                    mMediaStreamingManager.setPictureStreamingResourceId(R.drawable.qiniu_logo);
-                    mControlFragment.setPicStreamingImage(R.drawable.qiniu_logo);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (mTimes % 2 == 0) {
+                        if (mPicStreamingFilePath != null) {
+                            mMediaStreamingManager.setPictureStreamingFilePath(mPicStreamingFilePath);
+                            mControlFragment.setPicStreamingImage(mPicStreamingFilePath);
+                        } else {
+                            mMediaStreamingManager.setPictureStreamingResourceId(R.drawable.qiniu_logo);
+                            mControlFragment.setPicStreamingImage(R.drawable.qiniu_logo);
+                        }
+                    } else {
+                        mMediaStreamingManager.setPictureStreamingResourceId(R.drawable.pause_publish);
+                        mControlFragment.setPicStreamingImage(R.drawable.pause_publish);
+                    }
+                    mTimes++;
                 }
-            } else {
-                mMediaStreamingManager.setPictureStreamingResourceId(R.drawable.pause_publish);
-                mControlFragment.setPicStreamingImage(R.drawable.pause_publish);
-            }
-            mTimes++;
-            // 演示周期性切换推流的图片
-            if (mMainThreadHandler != null) {
-                mMainThreadHandler.postDelayed(this, 2000);
-            }
+            });
         }
     }
 
@@ -1338,7 +1343,7 @@ public class AVStreamingActivity extends Activity implements
 
     private boolean isPictureStreaming() {
         if (mIsPictureStreaming) {
-            Toast.makeText(AVStreamingActivity.this, "is picture streaming, operation failed!", Toast.LENGTH_SHORT).show();
+            ToastUtils.s(getApplicationContext(), "is picture streaming, operation failed!");
         }
         return mIsPictureStreaming;
     }
@@ -1366,7 +1371,7 @@ public class AVStreamingActivity extends Activity implements
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(AVStreamingActivity.this, info, Toast.LENGTH_LONG).show();
+                    ToastUtils.s(getApplicationContext(), info);
                 }
             });
         }

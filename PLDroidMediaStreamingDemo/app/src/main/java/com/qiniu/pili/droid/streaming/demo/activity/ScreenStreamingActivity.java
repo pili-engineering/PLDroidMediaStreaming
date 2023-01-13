@@ -328,7 +328,8 @@ public class ScreenStreamingActivity extends Activity {
                 public void run() {
                     mStatView.setText("bitrate:" + streamStatus.totalAVBitrate / 1024 + " kbps"
                             + "\naudio:" + streamStatus.audioFps + " fps"
-                            + "\nvideo:" + streamStatus.videoFps + " fps");
+                            + "\nvideo:" + streamStatus.videoFps + " fps"
+                            + "\ndropped:" + streamStatus.droppedVideoFrames);
                 }
             });
         }
