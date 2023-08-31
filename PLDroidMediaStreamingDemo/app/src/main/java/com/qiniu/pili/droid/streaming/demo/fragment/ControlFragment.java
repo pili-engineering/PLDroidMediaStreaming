@@ -9,6 +9,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ScrollView;
@@ -74,6 +76,7 @@ public class ControlFragment extends Fragment {
         void onAudioMixControllerClicked();
         void onAudioMixStopClicked();
         void onAudioMixPlaybackClicked();
+        void onAudioMixLoopEnabled(boolean enabled);
         void onSendSEIClicked();
     }
 
@@ -409,6 +412,16 @@ public class ControlFragment extends Fragment {
             public void onClick(View v) {
                 if (mOnEventClickedListener != null) {
                     mOnEventClickedListener.onAudioMixPlaybackClicked();
+                }
+            }
+        });
+
+        CheckBox loopCheckBox = mFragmentView.findViewById(R.id.loop_btn);
+        loopCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (mOnEventClickedListener != null) {
+                    mOnEventClickedListener.onAudioMixLoopEnabled(isChecked);
                 }
             }
         });

@@ -36,7 +36,7 @@ public class KeepAppAliveService extends Service {
 
     private Notification getNotification() {
         Notification.Builder builder = new Notification.Builder(this)
-                .setSmallIcon(R.mipmap.ic_launcher)
+                .setSmallIcon(R.drawable.qiniu_logo)
                 .setContentTitle("七牛推流")
                 .setContentText("后台运行中");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

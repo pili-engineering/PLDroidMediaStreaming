@@ -14,31 +14,46 @@
 
         <Button
             android:id="@+id/mix_file_btn"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="File"
             android:textColor="@color/pldroid_streaming_white" />
 
         <Button
             android:id="@+id/mix_btn"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
             android:text="Play"
             android:textColor="@color/pldroid_streaming_white" />
 
         <Button
             android:id="@+id/mix_stop_btn"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="Stop"
             android:textColor="@color/pldroid_streaming_white" />
+    </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
         <Button
             android:id="@+id/playback_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="TogglePlayback"
             android:textColor="@color/pldroid_streaming_white" />
+
+        <CheckBox
+            android:id="@+id/loop_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Loop"
+            android:textColor="@color/pldroid_streaming_white"
+            android:checked="true" />
     </LinearLayout>
 
     <LinearLayout

@@ -25,6 +25,7 @@ import com.github.angads25.filepicker.model.DialogConfigs;
 import com.github.angads25.filepicker.model.DialogProperties;
 import com.github.angads25.filepicker.view.FilePickerDialog;
 import com.qiniu.pili.droid.streaming.AVCodecType;
+import com.qiniu.pili.droid.streaming.PLVideoEncodeType;
 import com.qiniu.pili.droid.streaming.StreamingProfile;
 import com.qiniu.pili.droid.streaming.WatermarkSetting;
 import com.qiniu.pili.droid.streaming.demo.R;
@@ -224,6 +225,8 @@ public class EncodingConfigFragment extends ConfigFragment {
                     codecHW? AVCodecType.HW_VIDEO_SURFACE_AS_INPUT_WITH_HW_AUDIO_CODEC :
                             AVCodecType.HW_VIDEO_YUV_AS_INPUT_WITH_HW_AUDIO_CODEC;
         }
+        boolean encodeH264 = ((RadioButton) root.findViewById(R.id.video_avc)).isChecked();
+        encodingConfig.mVideoEncodeType = encodeH264 ? PLVideoEncodeType.H264 : PLVideoEncodeType.HEVC;
         // set video if not audio only
         if (!encodingConfig.mIsAudioOnly) {
             // quality
