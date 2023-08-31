@@ -36,6 +36,31 @@
             android:text="HW-YUV" />
     </RadioGroup>
 
+    <RadioGroup
+        android:id="@+id/encode_video_type_radio_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Video type:" />
+
+        <RadioButton
+            android:id="@+id/video_avc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="H.264" />
+
+        <RadioButton
+            android:id="@+id/video_hevc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="H.265" />
+    </RadioGroup>
+
     <LinearLayout
         android:id="@+id/yuv_filter_mode_panel"
         android:layout_width="match_parent"

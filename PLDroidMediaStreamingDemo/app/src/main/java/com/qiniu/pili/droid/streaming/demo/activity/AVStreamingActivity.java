@@ -35,6 +35,7 @@ import com.qiniu.pili.droid.streaming.CameraStreamingSetting;
 import com.qiniu.pili.droid.streaming.FrameCapturedCallback;
 import com.qiniu.pili.droid.streaming.MediaStreamingManager;
 import com.qiniu.pili.droid.streaming.MicrophoneStreamingSetting;
+import com.qiniu.pili.droid.streaming.PLVideoEncodeType;
 import com.qiniu.pili.droid.streaming.StreamStatusCallback;
 import com.qiniu.pili.droid.streaming.StreamingPreviewCallback;
 import com.qiniu.pili.droid.streaming.StreamingProfile;
@@ -82,6 +83,7 @@ public class AVStreamingActivity extends Activity implements
     private boolean mIsPreviewMirror = false;
     private boolean mIsEncodingMirror = false;
     private boolean mIsPlayingback = false;
+    private boolean mIsAudioMixLoop = true;
     private boolean mIsStreaming = false;
 
     private volatile boolean mIsSupportTorch = false;
@@ -163,7 +165,7 @@ public class AVStreamingActivity extends Activity implements
             // 打开摄像头
             mMediaStreamingManager.resume();
         } else {
-            ToastUtils.s(this, "当前正在图片推流！！！");
+            ToastUtils.s(getApplicationContext(), "当前正在图片推流！！！");
         }
     }
 
@@ -298,6 +300,8 @@ public class AVStreamingActivity extends Activity implements
                 mProfile.setVideoAdaptiveBitrateRange(mEncodingConfig.mAdaptiveBitrateMin * 1024, mEncodingConfig.mAdaptiveBitrateMax * 1024);
             }
         }
+        // 设置视频编码格式（H.264/H.265）
+        mProfile.setVideoEncodeType(mEncodingConfig.mVideoEncodeType);
 
         // 设置音频质量参数
         if (mEncodingConfig.mIsAudioQualityPreset) {
@@ -404,6 +408,7 @@ public class AVStreamingActivity extends Activity implements
         microphoneStreamingSetting.setBluetoothSCOEnabled(isBluetoothScoEnabled);
         mMediaStreamingManager.prepare(mCameraStreamingSetting, microphoneStreamingSetting, mWatermarkSetting, mProfile);
         mMediaStreamingManager.setAutoRefreshOverlay(true);
+        mMediaStreamingManager.setNativeLoggingEnabled(true);
         cameraPreviewFrameView.setListener(this);
 
         // 设置推流所需监听器
@@ -448,7 +453,7 @@ public class AVStreamingActivity extends Activity implements
         mAudioFile = Cache.getAudioFile(this);
         if (mAudioFile != null) {
             try {
-                mAudioMixer.setFile(mAudioFile, true);
+                mAudioMixer.setFile(mAudioFile, mIsAudioMixLoop);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -499,7 +504,7 @@ public class AVStreamingActivity extends Activity implements
             mIsPreviewMirror = !mIsPreviewMirror;
             boolean res = mMediaStreamingManager.setPreviewMirror(mIsPreviewMirror);
             if (res) {
-                ToastUtils.s(AVStreamingActivity.this, "镜像成功");
+                ToastUtils.s(getApplicationContext(), "镜像成功");
             } else {
                 mIsPreviewMirror = !mIsPreviewMirror;
             }
@@ -618,7 +623,7 @@ public class AVStreamingActivity extends Activity implements
                 }
                 String filePath = files[0];
                 try {
-                    mAudioMixer.setFile(filePath, true);
+                    mAudioMixer.setFile(filePath, mIsAudioMixLoop);
                     Cache.setAudioFile(AVStreamingActivity.this, filePath);
                     ToastUtils.s(getApplicationContext(), "setup mix file " + filePath + " success. duration:" + mAudioMixer.getDuration());
                 } catch (IOException e) {
@@ -660,7 +665,7 @@ public class AVStreamingActivity extends Activity implements
             String text = stopSuccess ? "mixing stop success" : "mixing stop failed !!!";
             ToastUtils.s(getApplicationContext(), text);
             if (stopSuccess) {
-                updateMixBtnText();
+                mControlFragment.setAudioMixControllerText("Play");
             }
         }
     }
@@ -676,6 +681,11 @@ public class AVStreamingActivity extends Activity implements
             mMediaStreamingManager.startPlayback();
         }
         mIsPlayingback = !mIsPlayingback;
+    }
+
+    @Override
+    public void onAudioMixLoopEnabled(boolean enabled) {
+        mIsAudioMixLoop = enabled;
     }
 
     /**
@@ -880,7 +890,7 @@ public class AVStreamingActivity extends Activity implements
      */
     private StreamingStateChangedListener mStreamingStateChangedListener = new StreamingStateChangedListener() {
         @Override
-        public void onStateChanged(StreamingState streamingState, Object extra) {
+        public void onStateChanged(StreamingState streamingState, final Object extra) {
             Log.i(TAG, "onStateChanged : " + streamingState.name());
             switch (streamingState) {
                 case PREPARING:
@@ -918,6 +928,15 @@ public class AVStreamingActivity extends Activity implements
                         @Override
                         public void run() {
                             mControlFragment.setShutterButtonPressed(false);
+                        }
+                    });
+                    break;
+                case VIDEO_ENCODER_READY:
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            ToastUtils.s(getApplicationContext(),
+                                    "编码器初始化完成：" + ((PLVideoEncodeType) extra).name());
                         }
                     });
                     break;

@@ -1,6 +1,7 @@
 package com.qiniu.pili.droid.streaming.demo.plain;
 
 import com.qiniu.pili.droid.streaming.AVCodecType;
+import com.qiniu.pili.droid.streaming.PLVideoEncodeType;
 import com.qiniu.pili.droid.streaming.StreamingProfile;
 import com.qiniu.pili.droid.streaming.WatermarkSetting;
 
@@ -12,6 +13,7 @@ import java.io.Serializable;
  */
 public class EncodingConfig implements Serializable {
     public AVCodecType mCodecType;
+    public PLVideoEncodeType mVideoEncodeType;
     public boolean mIsAudioOnly;
 
     public boolean mIsVideoQualityPreset;

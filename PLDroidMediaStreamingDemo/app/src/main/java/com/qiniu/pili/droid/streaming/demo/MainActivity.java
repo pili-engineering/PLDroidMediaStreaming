@@ -46,7 +46,8 @@ public class MainActivity extends FragmentActivity {
     private static final String TAG = "MainActivity";
 
     private static final String GENERATE_STREAM_TEXT = "https://api-demo.qnsdk.com/v1/live/stream/";
-    private static final String QN_PUBLISH_URL_PREFIX = "rtmp://pili-publish.qnsdk.com/sdk-live/";
+    private static final String QN_RTMP_PUBLISH_URL_PREFIX = "rtmp://pili-publish.qnsdk.com/sdk-live/";
+    private static final String QN_SRT_PUBLISH_URL_PREFIX = "srt://pili-publish.qnsdk.com";
     private static final String QN_PLAY_URL_PREFIX = "rtmp://pili-rtmp.qnsdk.com/sdk-live/";
 
     private static final String[] STREAM_TYPES = { "Video-Audio", "Audio", "Import", "Screen" };
@@ -367,7 +368,8 @@ public class MainActivity extends FragmentActivity {
             Log.i(TAG, "Url can not be null !");
             return false;
         }
-        return url.startsWith(QN_PUBLISH_URL_PREFIX);
+        return url.startsWith(QN_RTMP_PUBLISH_URL_PREFIX)
+                || url.startsWith(QN_SRT_PUBLISH_URL_PREFIX);
     }
 
     private String getStreamName(String publishUrl) {
@@ -376,8 +378,17 @@ public class MainActivity extends FragmentActivity {
             return null;
         }
         int startIndex = publishUrl.lastIndexOf("/");
-        int endIndex = publishUrl.indexOf("?");
-        return publishUrl.substring(startIndex + 1, endIndex);
+        int endIndex = -1;
+        if (publishUrl.startsWith(QN_RTMP_PUBLISH_URL_PREFIX)) {
+            endIndex = publishUrl.indexOf("?");
+        } else if (publishUrl.startsWith(QN_SRT_PUBLISH_URL_PREFIX)) {
+            endIndex = publishUrl.indexOf(',');
+        }
+        if (endIndex == -1) {
+            return publishUrl.substring(startIndex + 1);
+        } else {
+            return publishUrl.substring(startIndex + 1, endIndex);
+        }
     }
 
     private void copyToClipboard(String content) {

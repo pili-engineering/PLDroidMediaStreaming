@@ -4,7 +4,7 @@ PLDroidCameraStreaming 是一个适用于 Android 的 RTMP 直播推流 SDK，�
 
 ## 功能特性
 - [x] 支持 H.264 和 AAC 软编（推荐）
-- [x] 支持 H.264 和 AAC 硬编
+- [x] 支持 H.264、H.265 和 AAC 硬编
 - [x] 软编支持 Android Min API 15（Android 4.0.3）及其以上版本
 - [x] 硬编支持 Android Min API 18（Android 4.3）及其以上版本
 - [x] 支持构造带安全授权凭证的 RTMP 推流地址
@@ -44,6 +44,10 @@ PLDroidCameraStreaming 是一个适用于 Android 的 RTMP 直播推流 SDK，�
 
 ## 版本升级须知
 
+### v3.1.5
+
+- 从 v3.1.5 版本开始，将不再支持 armeabi 架构
+
 ### v3.1.3
 
 - 从 v3.1.3 版本开始，HappyDNS 库务必升级到 1.0.0 版本
@@ -57,6 +61,7 @@ PLDroidCameraStreaming 是一个适用于 Android 的 RTMP 直播推流 SDK，�
 - 从 v3.1.1 版本开始，HappyDNS 库务必升级到 0.2.18 版本
 
 ### v3.0.2
+
 - 从 v3.0.2 版本开始，请务必添加 `android.arch.lifecycle:extensions:x.y.z` 的依赖
 - 从 v3.0.2 版本开始，`StreamingEnv.init(Context context)` 已被弃用，请更新到 `StreamingEnv.init(Context contex, String userId)` 进行环境的初始化，其中，userId 代表用户的唯一标识符，用于区分不同的用户
 

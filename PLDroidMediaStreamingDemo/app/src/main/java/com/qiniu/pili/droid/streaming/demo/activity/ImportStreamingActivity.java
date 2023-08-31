@@ -16,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.qiniu.pili.droid.streaming.AVCodecType;
+import com.qiniu.pili.droid.streaming.PLVideoEncodeType;
 import com.qiniu.pili.droid.streaming.StreamStatusCallback;
 import com.qiniu.pili.droid.streaming.StreamingManager;
 import com.qiniu.pili.droid.streaming.StreamingProfile;
@@ -27,6 +28,7 @@ import com.qiniu.pili.droid.streaming.demo.utils.Config;
 import com.qiniu.pili.droid.streaming.demo.R;
 import com.qiniu.pili.droid.streaming.demo.core.ExtAudioCapture;
 import com.qiniu.pili.droid.streaming.demo.core.ExtVideoCapture;
+import com.qiniu.pili.droid.streaming.demo.utils.ToastUtils;
 import com.qiniu.pili.droid.streaming.demo.utils.Util;
 
 import java.net.URISyntaxException;
@@ -214,6 +216,8 @@ public class ImportStreamingActivity extends Activity {
                 mProfile.setVideoAdaptiveBitrateRange(mEncodingConfig.mAdaptiveBitrateMin * 1024, mEncodingConfig.mAdaptiveBitrateMax * 1024);
             }
         }
+        // 设置视频编码格式（H.264/H.265）
+        mProfile.setVideoEncodeType(mEncodingConfig.mVideoEncodeType);
 
         // 设置音频质量参数
         if (mEncodingConfig.mIsAudioQualityPreset) {
@@ -337,7 +341,7 @@ public class ImportStreamingActivity extends Activity {
      */
     private StreamingStateChangedListener mStreamingStateChangedListener = new StreamingStateChangedListener() {
         @Override
-        public void onStateChanged(StreamingState streamingState, Object extra) {
+        public void onStateChanged(StreamingState streamingState, final Object extra) {
             Log.i(TAG, "StreamingState streamingState:" + streamingState + ",extra:" + extra);
             switch (streamingState) {
                 case PREPARING:
@@ -395,6 +399,15 @@ public class ImportStreamingActivity extends Activity {
                     break;
                 case UNAUTHORIZED_PACKAGE:
                     mLogContent += "Unauthorized package\n";
+                    break;
+                case VIDEO_ENCODER_READY:
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            ToastUtils.s(getApplicationContext(),
+                                    "编码器初始化完成：" + ((PLVideoEncodeType) extra).name());
+                        }
+                    });
                     break;
                 case START_VIDEO_ENCODER_FAIL:
                 case VIDEO_ENCODER_ERROR:
